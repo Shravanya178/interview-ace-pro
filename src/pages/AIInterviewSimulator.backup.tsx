@@ -138,7 +138,7 @@ const COMPANY_SPECIFIC_QUESTIONS = {
 };
 
 // OpenAI API key
-const OPENAI_API_KEY = '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';
+const OPENAI_API_KEY = 'YOUR_OPENAI_API_KEY'; // Replace hardcoded key with placeholder
 
 const AIInterviewSimulator = () => {
   const [searchParams] = useSearchParams();
