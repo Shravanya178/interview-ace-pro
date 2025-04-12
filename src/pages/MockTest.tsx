@@ -1,12 +1,14 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Clock, CheckCircle, Info, AlertTriangle } from 'lucide-react';
+import SecureAptitudeTest from '@/components/mock-test/SecureAptitudeTest';
 
 const MockTest = () => {
+  const [selectedTest, setSelectedTest] = useState<string | null>(null);
+
   const mockTests = [
     {
       id: 'aptitude-general',
@@ -63,6 +65,10 @@ const MockTest = () => {
     },
   ];
 
+  if (selectedTest === 'aptitude-general') {
+    return <SecureAptitudeTest />;
+  }
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -90,23 +96,21 @@ const MockTest = () => {
                         {new Date(test.date).toLocaleDateString()}
                       </p>
                     </div>
-                    <div className="text-right">
-                      <div className="flex items-center space-x-1">
-                        {test.status === 'Passed' ? (
-                          <CheckCircle className="w-4 h-4 text-green-500" />
-                        ) : (
-                          <AlertTriangle className="w-4 h-4 text-amber-500" />
-                        )}
-                        <span 
-                          className={`font-medium ${
-                            test.status === 'Passed' 
-                              ? 'text-green-600' 
-                              : 'text-amber-600'
-                          }`}
-                        >
-                          {test.score}%
-                        </span>
-                      </div>
+                    <div className="flex items-center space-x-1">
+                      {test.status === 'Passed' ? (
+                        <CheckCircle className="w-4 h-4 text-green-500" />
+                      ) : (
+                        <AlertTriangle className="w-4 h-4 text-amber-500" />
+                      )}
+                      <span 
+                        className={`font-medium ${
+                          test.status === 'Passed' 
+                            ? 'text-green-600' 
+                            : 'text-amber-600'
+                        }`}
+                      >
+                        {test.score}%
+                      </span>
                       <p className="text-xs text-gray-500">{test.status}</p>
                     </div>
                   </div>
@@ -162,7 +166,12 @@ const MockTest = () => {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full">Start Test</Button>
+                  <Button 
+                    className="w-full"
+                    onClick={() => setSelectedTest(test.id)}
+                  >
+                    Start Test
+                  </Button>
                 </CardFooter>
               </Card>
             ))}
