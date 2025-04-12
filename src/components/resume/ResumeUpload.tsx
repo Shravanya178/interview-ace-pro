@@ -1,11 +1,14 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Upload, FileText, Check, AlertCircle } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
-const ResumeUpload: React.FC = () => {
+interface ResumeUploadProps {
+  onUploadComplete?: () => void;
+}
+
+const ResumeUpload: React.FC<ResumeUploadProps> = ({ onUploadComplete }) => {
   const [file, setFile] = useState<File | null>(null);
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -81,6 +84,11 @@ const ResumeUpload: React.FC = () => {
         title: "Resume uploaded successfully",
         description: "Your skills have been extracted and analyzed.",
       });
+      
+      // Call the onUploadComplete callback if provided
+      if (onUploadComplete) {
+        onUploadComplete();
+      }
     } catch (error) {
       setUploading(false);
       setStatus('error');
