@@ -58,10 +58,10 @@ const ResumeAnalysis = () => {
     },
   ]);
   const { toast } = useToast();
-  
+
   // Handle resume upload completion
   const handleUploadComplete = () => {
-    setAnalysisComplete(true);
+      setAnalysisComplete(true);
     
     // After some time, encourage the user to start the test
     setTimeout(() => {

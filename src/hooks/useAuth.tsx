@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -17,6 +16,14 @@ interface AuthContextType {
   isLoading: boolean;
 }
 
+// Demo user for auto-login
+const DEMO_USER: User = {
+  id: 'demo-user',
+  name: 'Demo User',
+  email: 'demo@example.com',
+  photoUrl: 'https://ui-avatars.com/api/?name=Demo+User&background=random'
+};
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -25,6 +32,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { toast } = useToast();
 
   useEffect(() => {
+    // For demo purposes, auto-login with demo user
+    setUser(DEMO_USER);
+    localStorage.setItem('user', JSON.stringify(DEMO_USER));
+    setIsLoading(false);
+    
+    // Uncomment this for actual authentication
+    /*
     // Check if user is logged in from localStorage
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
@@ -35,6 +49,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     }
     setIsLoading(false);
+    */
   }, []);
 
   // For demo purposes, we'll use mock user data
@@ -62,12 +77,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => {
+    // For demo, set back to demo user instead of logging out completely
+    setUser(DEMO_USER);
+    localStorage.setItem('user', JSON.stringify(DEMO_USER));
+    
+    toast({
+      title: "Demo mode active",
+      description: "Using demo account for demonstration.",
+    });
+    
+    // Uncomment for actual logout
+    /*
     setUser(null);
     localStorage.removeItem('user');
     toast({
       title: "Logged out",
       description: "You have been successfully logged out.",
     });
+    */
   };
 
   const updateProfile = async (data: Partial<User>) => {

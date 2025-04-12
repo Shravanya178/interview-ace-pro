@@ -1,5 +1,5 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,7 @@ const InterviewPrep = () => {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const { t } = useLanguage();
   const { toast } = useToast();
-  const [jitsiApiLoaded, setJitsiApiLoaded] = useState(false);
+  const navigate = useNavigate();
   
   // Extended company and role lists
   const companies = [
@@ -96,22 +96,7 @@ const InterviewPrep = () => {
     },
   ];
 
-  // Load Jitsi API script
-  useEffect(() => {
-    if (!jitsiApiLoaded) {
-      const script = document.createElement('script');
-      script.src = 'https://meet.jit.si/external_api.js';
-      script.async = true;
-      script.onload = () => setJitsiApiLoaded(true);
-      document.body.appendChild(script);
-      
-      return () => {
-        document.body.removeChild(script);
-      };
-    }
-  }, [jitsiApiLoaded]);
-
-  const startJitsiMeeting = (interviewType: string) => {
+  const startAIInterview = (interviewType: string) => {
     if (!selectedCompany || !selectedRole) {
       toast({
         title: t('selection_required'),
@@ -121,18 +106,31 @@ const InterviewPrep = () => {
       return;
     }
 
-    if (typeof window.JitsiMeetExternalAPI !== 'undefined') {
-      // Create unique room name based on selections
-      const roomName = `interview-${selectedCompany}-${selectedRole}-${interviewType}-${Date.now()}`;
+    try {
+      // Add a button to use the simple version if the AI version has issues
+      const useSimpleVersion = window.confirm(
+        "Would you like to use the simple reliable version instead of the AI version?\n\n" +
+        "Note: The AI version may have some issues with speech recognition and video."
+      );
       
-      // Redirect to interview page with parameters
-      window.location.href = `/interview-session?room=${roomName}&type=${interviewType}&company=${selectedCompany}&role=${selectedRole}`;
-    } else {
+      if (useSimpleVersion) {
+        // Navigate to the simple interview page
+        navigate(`/interview-simple?company=${selectedCompany}&role=${selectedRole}&type=${interviewType}`);
+      } else {
+        // Navigate to the AI Interview Simulator with the selected parameters
+        navigate(`/ai-interview-simulator?company=${selectedCompany}&role=${selectedRole}&type=${interviewType}`);
+      }
+    } catch (error) {
+      console.error("Error starting interview:", error);
+      
+      // Fallback to simple version if there's an error
       toast({
-        title: t('loading_error'),
-        description: t('jitsi_api_loading_error'),
+        title: "Error Starting AI Interview",
+        description: "Using the simpler version instead.",
         variant: "destructive",
       });
+      
+      navigate(`/interview-simple?company=${selectedCompany}&role=${selectedRole}&type=${interviewType}`);
     }
   };
 
@@ -227,8 +225,7 @@ const InterviewPrep = () => {
                 <CardFooter className="pt-0">
                   <Button 
                     className="w-full" 
-                    onClick={() => startJitsiMeeting(type.id)}
-                    disabled={!jitsiApiLoaded}
+                    onClick={() => startAIInterview(type.id)}
                   >
                     {t('start')} {type.title}
                   </Button>

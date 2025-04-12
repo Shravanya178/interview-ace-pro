@@ -1,8 +1,7 @@
-
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X, UserCircle, LogOut, Settings } from 'lucide-react';
+import { Menu, X, UserCircle, LogOut, Settings, Home } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useAuth } from '@/hooks/useAuth';
 import LanguageSelector from '@/components/layout/LanguageSelector';
@@ -22,7 +21,7 @@ const Navbar = () => {
   const { user, logout } = useAuth();
   
   const navigation = [
-    { name: t('dashboard'), href: '/' },
+    { name: t('dashboard'), href: '/dashboard' },
     { name: t('resume_analysis'), href: '/resume' },
     { name: t('interview_prep'), href: '/interview' },
     { name: t('mock_tests'), href: '/mock-test' },
@@ -83,6 +82,12 @@ const Navbar = () => {
                     </div>
                   </div>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link to="/dashboard" className="flex items-center">
+                      <Home className="mr-2 h-4 w-4" />
+                      <span>{t('dashboard')}</span>
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem asChild className="cursor-pointer">
                     <Link to="/profile" className="flex items-center">
                       <UserCircle className="mr-2 h-4 w-4" />
