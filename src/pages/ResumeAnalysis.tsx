@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import ResumeUpload from '@/components/resume/ResumeUpload';
@@ -26,7 +25,7 @@ const ResumeAnalysis = () => {
     { name: 'Git', level: 75, category: 'tool' },
     { name: 'Docker', level: 60, category: 'tool' },
     { name: 'AWS', level: 55, category: 'tool' },
-  ] as const;
+  ];
   
   const recommendations = [
     {
