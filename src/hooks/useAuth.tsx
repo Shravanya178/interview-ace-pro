@@ -1,5 +1,22 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
+import { createClient } from '@supabase/supabase-js';
+
+// Initialize Supabase client
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://your-project-url.supabase.co';
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key';
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// Define Supabase user type
+interface SupabaseUser {
+  id: string;
+  email?: string;
+  phone?: string;
+  user_metadata: {
+    full_name?: string;
+    avatar_url?: string;
+  };
+}
 
 interface User {
   id: string;

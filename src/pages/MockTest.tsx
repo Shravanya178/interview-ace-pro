@@ -3,11 +3,23 @@ import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Clock, CheckCircle, Info, AlertTriangle } from 'lucide-react';
+import { Clock, CheckCircle, Info, AlertTriangle, ExternalLink } from 'lucide-react';
 import SecureAptitudeTest from '@/components/mock-test/SecureAptitudeTest';
+import BehavioralTest from '@/components/mock-test/BehavioralTest';
+import TechnicalTest from '@/components/mock-test/TechnicalTest';
+// Note: Ensure the TechnicalTest component is properly created in src/components/mock-test/TechnicalTest.tsx
 
 const MockTest = () => {
   const [selectedTest, setSelectedTest] = useState<string | null>(null);
+
+  const handleTestSelection = (testId: string) => {
+    if (testId === 'coding-fundamentals') {
+      // Redirect to HackerRank
+      window.open('https://www.hackerrank.com/auth/login', '_blank');
+    } else {
+      setSelectedTest(testId);
+    }
+  };
 
   const mockTests = [
     {
@@ -29,13 +41,13 @@ const MockTest = () => {
       tags: ['Algorithms', 'Data Structures', 'Problem Solving'],
     },
     {
-      id: 'system-design-basics',
-      title: 'System Design Basics',
-      description: 'Fundamental concepts in system design and architecture',
-      duration: 45,
-      questions: 15,
+      id: 'technical-dsa-oop',
+      title: 'Technical Questions',
+      description: 'Assessment of Data Structures, Algorithms and Object-Oriented Programming concepts',
+      duration: 40,
+      questions: 20,
       difficulty: 'Hard',
-      tags: ['Architecture', 'Scalability', 'Design Patterns'],
+      tags: ['DSA', 'OOP', 'Technical', 'Algorithms'],
     },
     {
       id: 'behavioral-questions',
@@ -67,6 +79,10 @@ const MockTest = () => {
 
   if (selectedTest === 'aptitude-general') {
     return <SecureAptitudeTest />;
+  } else if (selectedTest === 'technical-dsa-oop') {
+    return <TechnicalTest />;
+  } else if (selectedTest === 'behavioral-questions') {
+    return <BehavioralTest />;
   }
 
   return (
@@ -129,7 +145,12 @@ const MockTest = () => {
                 <CardHeader>
                   <div className="flex justify-between items-start">
                     <div>
-                      <CardTitle>{test.title}</CardTitle>
+                      <CardTitle>
+                        {test.title}
+                        {test.id === 'coding-fundamentals' && (
+                          <ExternalLink className="h-4 w-4 inline ml-1 text-gray-400" />
+                        )}
+                      </CardTitle>
                       <CardDescription className="mt-1">{test.description}</CardDescription>
                     </div>
                     <Badge
@@ -168,9 +189,9 @@ const MockTest = () => {
                 <CardFooter>
                   <Button 
                     className="w-full"
-                    onClick={() => setSelectedTest(test.id)}
+                    onClick={() => handleTestSelection(test.id)}
                   >
-                    Start Test
+                    {test.id === 'coding-fundamentals' ? 'Start Test' : 'Start Test'}
                   </Button>
                 </CardFooter>
               </Card>
