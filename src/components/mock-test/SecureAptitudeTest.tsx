@@ -230,6 +230,16 @@ const SecureAptitudeTest = () => {
     }
   };
 
+  const handleSkipQuestion = () => {
+    // Move to the next question without requiring an answer
+    if (currentQuestionIndex < shuffledQuestions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+      setProgress(((currentQuestionIndex + 1) / shuffledQuestions.length) * 100);
+    } else {
+      completeTest();
+    }
+  };
+
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
@@ -290,29 +300,94 @@ const SecureAptitudeTest = () => {
   }
 
   if (testComplete) {
+    // Calculate score
+    const correctAnswers = shuffledQuestions.filter(
+      q => selectedAnswers[q.id] === q.correctAnswer
+    ).length;
+    
+    const score = (correctAnswers / shuffledQuestions.length) * 100;
+    
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Test Complete</CardTitle>
-          <CardDescription>
-            Thank you for completing the aptitude test.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Check className="h-8 w-8 text-green-600" />
+      <div className="p-4 max-w-4xl mx-auto">
+        <Card>
+          <CardHeader>
+            <CardTitle>Test Complete</CardTitle>
+            <CardDescription>
+              Thank you for completing the aptitude test.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-8">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Check className="h-8 w-8 text-green-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Test completed successfully!</h3>
+              <p className="text-gray-500 mb-4">
+                You scored {score.toFixed(2)}% ({correctAnswers} out of {shuffledQuestions.length} correct)
+              </p>
+              <div className="mt-4">
+                <Progress value={score} className="h-3" />
+              </div>
             </div>
-            <h3 className="text-xl font-semibold mb-2">Test completed successfully!</h3>
-            <p className="text-gray-500 mb-4">
-              Your results have been recorded. You can now exit fullscreen mode.
-            </p>
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Button onClick={handleRestartTest} className="w-full">Take Another Test</Button>
-        </CardFooter>
-      </Card>
+            
+            <div className="space-y-6 mt-8">
+              <h3 className="text-xl font-semibold">Review Your Answers</h3>
+              
+              {shuffledQuestions.map((question, index) => (
+                <Card key={question.id} className={
+                  selectedAnswers[question.id] === question.correctAnswer 
+                    ? "border-green-200 bg-green-50"
+                    : "border-red-200 bg-red-50"
+                }>
+                  <CardHeader className="pb-2">
+                    <div className="flex justify-between items-start">
+                      <CardTitle className="text-base">Question {index + 1}</CardTitle>
+                      {selectedAnswers[question.id] === question.correctAnswer 
+                        ? <span className="text-sm text-green-600 font-medium">Correct</span>
+                        : <span className="text-sm text-red-600 font-medium">Incorrect</span>
+                      }
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pb-2 pt-0">
+                    <p className="font-medium mb-2">{question.question}</p>
+                    
+                    <div className="space-y-1 mb-4">
+                      {question.options.map((option, i) => (
+                        <div 
+                          key={i} 
+                          className={`p-2 rounded ${
+                            option === question.correctAnswer
+                              ? "bg-green-100 border border-green-300" 
+                              : option === selectedAnswers[question.id] && option !== question.correctAnswer
+                                ? "bg-red-100 border border-red-300"
+                                : "bg-gray-100 border border-gray-200"
+                          }`}
+                        >
+                          {option}
+                          {option === question.correctAnswer && 
+                            <span className="text-green-600 text-xs ml-2">(Correct Answer)</span>
+                          }
+                          {option === selectedAnswers[question.id] && option !== question.correctAnswer && 
+                            <span className="text-red-600 text-xs ml-2">(Your Answer)</span>
+                          }
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <div className="text-sm bg-white p-3 rounded border">
+                      <p className="font-medium">Explanation:</p>
+                      <p>{question.explanation}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button onClick={handleRestartTest} className="w-full">Take Another Test</Button>
+          </CardFooter>
+        </Card>
+      </div>
     );
   }
 
@@ -385,14 +460,21 @@ const SecureAptitudeTest = () => {
           <Button
             variant="outline"
             onClick={handleExitTest}
-            className="w-1/3"
+            className="w-1/4"
           >
             Exit Test
           </Button>
           <Button
+            variant="secondary"
+            onClick={handleSkipQuestion}
+            className="w-1/4"
+          >
+            Skip Question
+          </Button>
+          <Button
             onClick={handleNextQuestion}
             disabled={selectedAnswers[currentQuestion.id] === undefined}
-            className="w-2/3"
+            className="w-2/4"
           >
             {currentQuestionIndex < shuffledQuestions.length - 1 ? 'Next Question' : 'Complete Test'}
           </Button>
