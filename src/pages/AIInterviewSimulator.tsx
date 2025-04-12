@@ -156,8 +156,8 @@ const COMPANY_SPECIFIC_QUESTIONS = {
   ]
 };
 
-// OpenAI API key
-const OPENAI_API_KEY = 'YOUR_OPENAI_API_KEY'; // Replace hardcoded key with placeholder
+// Configuration 
+const GOOGLE_API_KEY = 'AIzaSyAWQnzAUGIdovpR8CIGWbThyLe1d_uK6UY'; // Google Gemini API key
 
 const AIInterviewSimulator = () => {
   const [searchParams] = useSearchParams();
@@ -863,7 +863,7 @@ const AIInterviewSimulator = () => {
         {
           headers: {
             'Content-Type': 'application/json',
-            'x-goog-api-key': 'AIzaSyAWQnzAUGIdovpR8CIGWbThyLe1d_uK6UY'
+            'x-goog-api-key': GOOGLE_API_KEY
           }
         }
       );
