@@ -25,6 +25,14 @@ const InterviewPrep = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  // Helper function to capitalize each word in a string
+  const capitalizeEachWord = (str: string) => {
+    return str
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
   // Extended company and role lists
   const companies = [
     { id: "google", name: "Google" },
@@ -75,28 +83,28 @@ const InterviewPrep = () => {
   const interviewTypes = [
     {
       id: "technical",
-      title: t("technical interview"),
+      title: capitalizeEachWord(t("technical interview")),
       description: t("technical interview desc"),
       icon: Code,
       color: "bg-blue-100 text-blue-700",
     },
     {
       id: "behavioral",
-      title: t("behavioral interview"),
+      title: capitalizeEachWord(t("behavioral interview")),
       description: t("behavioral interview desc"),
       icon: MessageSquare,
       color: "bg-green-100 text-green-700",
     },
     {
       id: "system-design",
-      title: t("system design"),
+      title: capitalizeEachWord(t("system design")),
       description: t("system design desc"),
       icon: BookOpen,
       color: "bg-purple-100 text-purple-700",
     },
     {
       id: "mock",
-      title: t("full mock interview"),
+      title: capitalizeEachWord(t("full mock interview")),
       description: t("full mock interview desc"),
       icon: Video,
       color: "bg-orange-100 text-orange-700",
@@ -119,19 +127,19 @@ const InterviewPrep = () => {
           <CardTitle>Facial Emotion Analysis</CardTitle>
         </div>
         <CardDescription>
-          Analyze your facial expressions to improve your interview presence
+          Analyze Your Facial Expressions To Improve Your Interview Presence
         </CardDescription>
       </CardHeader>
       <CardContent>
         <ul className="space-y-1 text-sm">
           <li className="flex items-start gap-2">
             <span className="inline-block w-1 h-1 rounded-full bg-gray-500 mt-2"></span>
-            <span>Real-time facial expression analysis using AI</span>
+            <span>Real-Time Facial Expression Analysis Using AI</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="inline-block w-1 h-1 rounded-full bg-gray-500 mt-2"></span>
             <span>
-              Get feedback on how your expressions appear to interviewers
+              Get Feedback On How Your Expressions Appear To Interviewers
             </span>
           </li>
         </ul>
@@ -141,7 +149,7 @@ const InterviewPrep = () => {
           className="w-full"
           onClick={() => navigate("/facial-emotion-analysis")}
         >
-          {t("start")} Facial Analysis
+          {capitalizeEachWord(t("start"))} Facial Analysis
         </Button>
       </CardFooter>
     </Card>
@@ -150,8 +158,8 @@ const InterviewPrep = () => {
   const startAIInterview = (interviewType: string) => {
     if (!selectedCompany || !selectedRole) {
       toast({
-        title: t("selection required"),
-        description: t("select company and role"),
+        title: capitalizeEachWord(t("selection required")),
+        description: capitalizeEachWord(t("select company and role")),
         variant: "destructive",
       });
       return;
@@ -180,7 +188,7 @@ const InterviewPrep = () => {
       // Fallback to chat interview if there's an error
       toast({
         title: "Error Starting Interview",
-        description: "Using chat interview as fallback.",
+        description: "Using Chat Interview As Fallback.",
         variant: "destructive",
       });
 
@@ -195,21 +203,21 @@ const InterviewPrep = () => {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            {t("interview prep")}
+            {capitalizeEachWord(t("interview prep"))}
           </h1>
           <p className="text-gray-500 mt-1">{t("practice interview desc")}</p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>{t("customize interview")}</CardTitle>
+            <CardTitle>{capitalizeEachWord(t("customize interview"))}</CardTitle>
             <CardDescription>{t("customize interview desc")}</CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="company" className="w-full">
               <TabsList className="grid w-full max-w-md grid-cols-2">
-                <TabsTrigger value="company">{t("target company")}</TabsTrigger>
-                <TabsTrigger value="role">{t("job role")}</TabsTrigger>
+                <TabsTrigger value="company">{capitalizeEachWord(t("target company"))}</TabsTrigger>
+                <TabsTrigger value="role">{capitalizeEachWord(t("job role"))}</TabsTrigger>
               </TabsList>
 
               <TabsContent value="company" className="mt-4">
@@ -231,7 +239,7 @@ const InterviewPrep = () => {
 
             <div className="mt-6">
               <h3 className="font-medium text-gray-800 mb-3">
-                {t("selected options")}
+                {capitalizeEachWord(t("selected options"))}
               </h3>
               <div className="flex flex-wrap gap-2">
                 {selectedCompany && (
@@ -246,7 +254,7 @@ const InterviewPrep = () => {
                 )}
                 {!selectedCompany && !selectedRole && (
                   <p className="text-sm text-gray-500">
-                    {t("no options selected")}
+                    {capitalizeEachWord(t("no options selected"))}
                   </p>
                 )}
               </div>
@@ -274,11 +282,11 @@ const InterviewPrep = () => {
                   <ul className="space-y-1 text-sm">
                     <li className="flex items-start gap-2">
                       <span className="inline-block w-1 h-1 rounded-full bg-gray-500 mt-2"></span>
-                      <span>{t(`${type.id}_feature_1`)}</span>
+                      <span>{capitalizeEachWord(t(`${type.id}_feature_1`))}</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="inline-block w-1 h-1 rounded-full bg-gray-500 mt-2"></span>
-                      <span>{t(`${type.id}_feature_2`)}</span>
+                      <span>{capitalizeEachWord(t(`${type.id}_feature_2`))}</span>
                     </li>
                   </ul>
                 </CardContent>
@@ -287,7 +295,7 @@ const InterviewPrep = () => {
                     className="w-full"
                     onClick={() => startAIInterview(type.id)}
                   >
-                    {t("start")} {type.title}
+                    {capitalizeEachWord(t("start"))} {type.title}
                   </Button>
                 </CardFooter>
               </Card>

@@ -60,6 +60,14 @@ const Reports = () => {
   const reportRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
+  // Helper function to capitalize each word in a string
+  const capitalizeEachWord = (str: string) => {
+    return str
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
   const progressData = [
     { date: "2023-04-01", technical: 60, behavioral: 65 },
     { date: "2023-04-15", technical: 65, behavioral: 68 },
@@ -226,8 +234,8 @@ const Reports = () => {
     try {
       setIsGeneratingPDF(true);
       toast({
-        title: "Generating PDF",
-        description: "Please wait while we prepare your report...",
+        title: capitalizeEachWord("Generating PDF"),
+        description: capitalizeEachWord("Please wait while we prepare your report..."),
       });
 
       // Create PDF document
@@ -240,28 +248,28 @@ const Reports = () => {
       // Add title
       pdf.setFontSize(18);
       pdf.setTextColor(0, 0, 0);
-      pdf.text("Candidate Interview Report", 105, 15, { align: "center" });
+      pdf.text(capitalizeEachWord("Candidate Interview Report"), 105, 15, { align: "center" });
       pdf.setDrawColor(200, 200, 200);
       pdf.line(20, 20, 190, 20);
 
       // Add candidate information section
       pdf.setFontSize(16);
-      pdf.text("Candidate Information", 20, 30);
+      pdf.text(capitalizeEachWord("Candidate Information"), 20, 30);
 
       pdf.setFontSize(11);
-      pdf.text(`Name: ${candidateData.name}`, 20, 40);
-      pdf.text(`Email: ${candidateData.email}`, 20, 47);
-      pdf.text(`Applied Role: ${candidateData.role}`, 20, 54);
-      pdf.text(`Interview Date: ${candidateData.date}`, 20, 61);
-      pdf.text(`Interview Time: ${candidateData.time}`, 20, 68);
-      pdf.text(`Test Type: ${candidateData.testType}`, 20, 75);
+      pdf.text(`${capitalizeEachWord("Name")}: ${candidateData.name}`, 20, 40);
+      pdf.text(`${capitalizeEachWord("Email")}: ${candidateData.email}`, 20, 47);
+      pdf.text(`${capitalizeEachWord("Applied Role")}: ${candidateData.role}`, 20, 54);
+      pdf.text(`${capitalizeEachWord("Interview Date")}: ${candidateData.date}`, 20, 61);
+      pdf.text(`${capitalizeEachWord("Interview Time")}: ${candidateData.time}`, 20, 68);
+      pdf.text(`${capitalizeEachWord("Test Type")}: ${candidateData.testType}`, 20, 75);
 
       pdf.setFontSize(12);
       pdf.setTextColor(0, 0, 0);
-      pdf.text(`Total Score: ${candidateData.totalScore}%`, 20, 85);
+      pdf.text(`${capitalizeEachWord("Total Score")}: ${candidateData.totalScore}%`, 20, 85);
 
       // Status with colored rectangle
-      pdf.text(`Status: `, 20, 92);
+      pdf.text(`${capitalizeEachWord("Status")}: `, 20, 92);
       pdf.setFillColor(
         candidateData.status === "Pass" ? 0 : 255,
         candidateData.status === "Pass" ? 180 : 0,
@@ -273,7 +281,7 @@ const Reports = () => {
       pdf.setTextColor(0, 0, 0);
 
       // Recommendation with colored rectangle
-      pdf.text(`Recommendation: `, 20, 102);
+      pdf.text(`${capitalizeEachWord("Recommendation")}: `, 20, 102);
       pdf.setFillColor(
         candidateData.recommendation === "Hire" ? 0 : 255,
         candidateData.recommendation === "Hire" ? 180 : 0,
@@ -289,7 +297,7 @@ const Reports = () => {
 
       // Add bar chart (manually create it)
       pdf.setFontSize(16);
-      pdf.text("Performance Breakdown", 20, 120);
+      pdf.text(capitalizeEachWord("Performance Breakdown"), 20, 120);
 
       // Generate simple bar chart
       pdf.setDrawColor(0, 0, 0);
@@ -317,7 +325,7 @@ const Reports = () => {
 
       // Add skills pie chart representation (as text)
       pdf.setFontSize(16);
-      pdf.text("Skills Distribution", 20, barY);
+      pdf.text(capitalizeEachWord("Skills Distribution"), 20, barY);
       barY += 10;
 
       skillsData.forEach((skill, index) => {
@@ -340,7 +348,7 @@ const Reports = () => {
 
       // Add feedback section - ensure it's fully visible
       pdf.setFontSize(16);
-      pdf.text("Interviewer Feedback", 20, barY);
+      pdf.text(capitalizeEachWord("Interviewer Feedback"), 20, barY);
       barY += 10;
 
       // Check if we need to add a new page for feedback (if too close to bottom)
@@ -348,7 +356,7 @@ const Reports = () => {
         pdf.addPage();
         barY = 20;
         pdf.setFontSize(16);
-        pdf.text("Interviewer Feedback (continued)", 20, barY);
+        pdf.text(capitalizeEachWord("Interviewer Feedback (continued)"), 20, barY);
         barY += 10;
       }
 
@@ -400,16 +408,15 @@ const Reports = () => {
       );
 
       toast({
-        title: "PDF Generated Successfully",
-        description: "Your report has been downloaded.",
+        title: capitalizeEachWord("PDF Generated Successfully"),
+        description: capitalizeEachWord("Your report has been downloaded."),
         variant: "default",
       });
     } catch (error) {
       console.error("Error generating PDF:", error);
       toast({
-        title: "Error Generating PDF",
-        description:
-          "There was a problem creating your report. Please try again.",
+        title: capitalizeEachWord("Error Generating PDF"),
+        description: capitalizeEachWord("There was a problem creating your report. Please try again."),
         variant: "destructive",
       });
     } finally {
@@ -422,26 +429,26 @@ const Reports = () => {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            {t("performance reports")}
+            {capitalizeEachWord(t("performance reports"))}
           </h1>
-          <p className="text-gray-500 mt-1">{t("track progress")}</p>
+          <p className="text-gray-500 mt-1">{capitalizeEachWord(t("track progress"))}</p>
         </div>
 
         <Tabs defaultValue="progress" className="w-full">
           <TabsList className="grid w-full max-w-md grid-cols-3">
-            <TabsTrigger value="progress">{t("progress")}</TabsTrigger>
-            <TabsTrigger value="candidate">{t("candidate report")}</TabsTrigger>
+            <TabsTrigger value="progress">{capitalizeEachWord(t("progress"))}</TabsTrigger>
+            <TabsTrigger value="candidate">{capitalizeEachWord(t("candidate report"))}</TabsTrigger>
             <TabsTrigger value="recommendations">
-              {t("recommendations")}
+              {capitalizeEachWord(t("recommendations"))}
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="progress" className="mt-6">
             <Card>
               <CardHeader>
-                <CardTitle>{t("progress over time")}</CardTitle>
+                <CardTitle>{capitalizeEachWord(t("progress over time"))}</CardTitle>
                 <CardDescription>
-                  {t("interview skills progress")}
+                  {capitalizeEachWord(t("interview skills progress"))}
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-2">
@@ -462,14 +469,14 @@ const Reports = () => {
                       <Line
                         type="monotone"
                         dataKey="technical"
-                        name={t("technical skills")}
+                        name={capitalizeEachWord(t("technical skills"))}
                         stroke="hsl(var(--secondary))"
                         activeDot={{ r: 8 }}
                       />
                       <Line
                         type="monotone"
                         dataKey="behavioral"
-                        name={t("behavioral skills")}
+                        name={capitalizeEachWord(t("behavioral skills"))}
                         stroke="#8884d8"
                       />
                     </LineChart>
@@ -484,7 +491,7 @@ const Reports = () => {
               {/* Candidate Info Card */}
               <Card className="md:col-span-1">
                 <CardHeader>
-                  <CardTitle>Candidate Information</CardTitle>
+                  <CardTitle>{capitalizeEachWord("Candidate Information")}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="flex items-center">
@@ -513,7 +520,7 @@ const Reports = () => {
                     <div className="flex items-center">
                       <Briefcase className="h-4 w-4 mr-2 text-gray-500" />
                       <div>
-                        <p className="text-sm text-gray-500">Applied For</p>
+                        <p className="text-sm text-gray-500">{capitalizeEachWord("Applied For")}</p>
                         <p className="font-medium">{candidateData.role}</p>
                       </div>
                     </div>
@@ -521,7 +528,7 @@ const Reports = () => {
                     <div className="flex items-center">
                       <Calendar className="h-4 w-4 mr-2 text-gray-500" />
                       <div>
-                        <p className="text-sm text-gray-500">Interview Date</p>
+                        <p className="text-sm text-gray-500">{capitalizeEachWord("Interview Date")}</p>
                         <p className="font-medium">{candidateData.date}</p>
                       </div>
                     </div>
@@ -529,7 +536,7 @@ const Reports = () => {
                     <div className="flex items-center">
                       <Clock className="h-4 w-4 mr-2 text-gray-500" />
                       <div>
-                        <p className="text-sm text-gray-500">Interview Time</p>
+                        <p className="text-sm text-gray-500">{capitalizeEachWord("Interview Time")}</p>
                         <p className="font-medium">{candidateData.time}</p>
                       </div>
                     </div>
@@ -537,7 +544,7 @@ const Reports = () => {
                     <div className="flex items-center">
                       <FileText className="h-4 w-4 mr-2 text-gray-500" />
                       <div>
-                        <p className="text-sm text-gray-500">Test Type</p>
+                        <p className="text-sm text-gray-500">{capitalizeEachWord("Test Type")}</p>
                         <p className="font-medium">{candidateData.testType}</p>
                       </div>
                     </div>
@@ -547,14 +554,14 @@ const Reports = () => {
 
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-500">Total Score</span>
+                      <span className="text-sm text-gray-500">{capitalizeEachWord("Total Score")}</span>
                       <span className="font-medium text-lg">
                         {candidateData.totalScore}%
                       </span>
                     </div>
 
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-500">Status</span>
+                      <span className="text-sm text-gray-500">{capitalizeEachWord("Status")}</span>
                       <Badge className={statusColor(candidateData.status)}>
                         {candidateData.status}
                       </Badge>
@@ -562,7 +569,7 @@ const Reports = () => {
 
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-500">
-                        Recommendation
+                        {capitalizeEachWord("Recommendation")}
                       </span>
                       <Badge
                         className={recommendationColor(
@@ -578,7 +585,7 @@ const Reports = () => {
 
                   <div>
                     <h4 className="font-medium text-gray-900 mb-2">
-                      Interviewer Feedback
+                      {capitalizeEachWord("Interviewer Feedback")}
                     </h4>
                     <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded-md">
                       {candidateData.feedback}
@@ -593,8 +600,8 @@ const Reports = () => {
                   >
                     <FileDown className="h-4 w-4 mr-2" />
                     {isGeneratingPDF
-                      ? "Generating PDF..."
-                      : "Download PDF Report"}
+                      ? capitalizeEachWord("Generating PDF...")
+                      : capitalizeEachWord("Download PDF Report")}
                   </Button>
                 </CardFooter>
               </Card>
@@ -604,9 +611,9 @@ const Reports = () => {
                 {/* Performance Bar Chart */}
                 <Card>
                   <CardHeader>
-                    <CardTitle>Performance Breakdown</CardTitle>
+                    <CardTitle>{capitalizeEachWord("Performance Breakdown")}</CardTitle>
                     <CardDescription>
-                      Score by assessment category
+                      {capitalizeEachWord("Score by assessment category")}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -650,9 +657,9 @@ const Reports = () => {
                 {/* Skills Pie Chart */}
                 <Card>
                   <CardHeader>
-                    <CardTitle>Skills Distribution</CardTitle>
+                    <CardTitle>{capitalizeEachWord("Skills Distribution")}</CardTitle>
                     <CardDescription>
-                      Analysis of skills demonstrated during interview
+                      {capitalizeEachWord("Analysis of skills demonstrated during interview")}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -695,7 +702,7 @@ const Reports = () => {
               <div className="max-w-4xl mx-auto bg-white p-8">
                 <div className="mb-8">
                   <h1 className="text-2xl font-bold text-center mb-2">
-                    Candidate Interview Report
+                    {capitalizeEachWord("Candidate Interview Report")}
                   </h1>
                   <Separator className="my-4" />
                 </div>
@@ -703,13 +710,13 @@ const Reports = () => {
                 {/* 1. Candidate Information Section */}
                 <div className="mb-8">
                   <h2 className="text-xl font-semibold mb-4">
-                    Candidate Information
+                    {capitalizeEachWord("Candidate Information")}
                   </h2>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="flex items-center">
                       <User className="h-4 w-4 mr-2 text-gray-500" />
                       <div>
-                        <p className="text-sm text-gray-500">Name</p>
+                        <p className="text-sm text-gray-500">{capitalizeEachWord("Name")}</p>
                         <p className="font-medium">{candidateData.name}</p>
                       </div>
                     </div>
@@ -717,7 +724,7 @@ const Reports = () => {
                     <div className="flex items-center">
                       <FileText className="h-4 w-4 mr-2 text-gray-500" />
                       <div>
-                        <p className="text-sm text-gray-500">Email</p>
+                        <p className="text-sm text-gray-500">{capitalizeEachWord("Email")}</p>
                         <p className="font-medium">{candidateData.email}</p>
                       </div>
                     </div>
@@ -725,7 +732,7 @@ const Reports = () => {
                     <div className="flex items-center">
                       <Briefcase className="h-4 w-4 mr-2 text-gray-500" />
                       <div>
-                        <p className="text-sm text-gray-500">Applied For</p>
+                        <p className="text-sm text-gray-500">{capitalizeEachWord("Applied For")}</p>
                         <p className="font-medium">{candidateData.role}</p>
                       </div>
                     </div>
@@ -733,7 +740,7 @@ const Reports = () => {
                     <div className="flex items-center">
                       <Calendar className="h-4 w-4 mr-2 text-gray-500" />
                       <div>
-                        <p className="text-sm text-gray-500">Interview Date</p>
+                        <p className="text-sm text-gray-500">{capitalizeEachWord("Interview Date")}</p>
                         <p className="font-medium">{candidateData.date}</p>
                       </div>
                     </div>
@@ -741,7 +748,7 @@ const Reports = () => {
                     <div className="flex items-center">
                       <Clock className="h-4 w-4 mr-2 text-gray-500" />
                       <div>
-                        <p className="text-sm text-gray-500">Interview Time</p>
+                        <p className="text-sm text-gray-500">{capitalizeEachWord("Interview Time")}</p>
                         <p className="font-medium">{candidateData.time}</p>
                       </div>
                     </div>
@@ -749,7 +756,7 @@ const Reports = () => {
                     <div className="flex items-center">
                       <FileText className="h-4 w-4 mr-2 text-gray-500" />
                       <div>
-                        <p className="text-sm text-gray-500">Test Type</p>
+                        <p className="text-sm text-gray-500">{capitalizeEachWord("Test Type")}</p>
                         <p className="font-medium">{candidateData.testType}</p>
                       </div>
                     </div>
@@ -757,14 +764,14 @@ const Reports = () => {
 
                   <div className="grid grid-cols-3 gap-4 mt-4">
                     <div className="bg-gray-50 p-3 rounded-md">
-                      <p className="text-sm text-gray-500 mb-1">Total Score</p>
+                      <p className="text-sm text-gray-500 mb-1">{capitalizeEachWord("Total Score")}</p>
                       <p className="font-medium text-lg">
                         {candidateData.totalScore}%
                       </p>
                     </div>
 
                     <div className="bg-gray-50 p-3 rounded-md">
-                      <p className="text-sm text-gray-500 mb-1">Status</p>
+                      <p className="text-sm text-gray-500 mb-1">{capitalizeEachWord("Status")}</p>
                       <p
                         className={`px-2 py-1 rounded text-sm inline-block ${statusColor(
                           candidateData.status
@@ -776,7 +783,7 @@ const Reports = () => {
 
                     <div className="bg-gray-50 p-3 rounded-md">
                       <p className="text-sm text-gray-500 mb-1">
-                        Recommendation
+                        {capitalizeEachWord("Recommendation")}
                       </p>
                       <p
                         className={`px-2 py-1 rounded text-sm inline-block ${recommendationColor(
@@ -794,7 +801,7 @@ const Reports = () => {
                 {/* 2. Performance Bar Chart */}
                 <div className="mb-8">
                   <h2 className="text-xl font-semibold mb-4">
-                    Performance Breakdown
+                    {capitalizeEachWord("Performance Breakdown")}
                   </h2>
                   <div className="h-72">
                     <ResponsiveContainer width="100%" height="100%">
@@ -837,7 +844,7 @@ const Reports = () => {
                 {/* 3. Skills Pie Chart */}
                 <div className="mb-8">
                   <h2 className="text-xl font-semibold mb-4">
-                    Skills Distribution
+                    {capitalizeEachWord("Skills Distribution")}
                   </h2>
                   <div className="h-72">
                     <ResponsiveContainer width="100%" height="100%">
@@ -875,7 +882,7 @@ const Reports = () => {
                 {/* 4. Interviewer Feedback */}
                 <div>
                   <h2 className="text-xl font-semibold mb-4">
-                    Interviewer Feedback
+                    {capitalizeEachWord("Interviewer Feedback")}
                   </h2>
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <p className="text-gray-700">{candidateData.feedback}</p>
@@ -888,8 +895,8 @@ const Reports = () => {
           <TabsContent value="recommendations" className="mt-6">
             <Card>
               <CardHeader>
-                <CardTitle>{t("learning resources")}</CardTitle>
-                <CardDescription>{t("recommended resources")}</CardDescription>
+                <CardTitle>{capitalizeEachWord(t("learning resources"))}</CardTitle>
+                <CardDescription>{capitalizeEachWord(t("recommended resources"))}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-8">
@@ -900,14 +907,14 @@ const Reports = () => {
                     >
                       <div className="flex justify-between mb-4">
                         <h3 className="font-medium text-lg">
-                          {category.category}
+                          {capitalizeEachWord(category.category)}
                         </h3>
                         <span
                           className={`text-sm px-2 py-1 rounded ${priorityColor(
                             category.priority
                           )}`}
                         >
-                          {category.priority} {t("priority")}
+                          {capitalizeEachWord(category.priority)} {capitalizeEachWord(t("priority"))}
                         </span>
                       </div>
 
@@ -928,10 +935,10 @@ const Reports = () => {
                                   </div>
                                   <div className="ml-3">
                                     <h4 className="font-medium text-gray-900">
-                                      {resource.title}
+                                      {capitalizeEachWord(resource.title)}
                                     </h4>
                                     <p className="text-sm text-gray-500">
-                                      {resource.type} • {resource.author}
+                                      {capitalizeEachWord(resource.type)} • {capitalizeEachWord(resource.author)}
                                     </p>
                                   </div>
                                 </div>
@@ -942,7 +949,7 @@ const Reports = () => {
                                     rel="noopener noreferrer"
                                   >
                                     <ExternalLink className="h-4 w-4 mr-2" />
-                                    {t("view")}
+                                    {capitalizeEachWord(t("view"))}
                                   </a>
                                 </Button>
                               </div>

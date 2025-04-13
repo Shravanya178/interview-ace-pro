@@ -59,9 +59,16 @@ const LandingPage = () => {
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </Link>
+                  <Link to="/resume">
+                    <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                      Try Resume Analysis
+                      <Upload className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
                   <Link to="/interview">
                     <Button size="lg" variant="outline" className="w-full sm:w-auto">
                       Try Mock Interview
+                      <Video className="ml-2 h-4 w-4" />
                     </Button>
                   </Link>
                 </div>
@@ -244,8 +251,9 @@ const LandingPage = () => {
                 </Button>
               </Link>
               <Link to="/resume">
-                <Button size="lg" variant="outline" className="border-white text-white hover:text-primary hover:bg-white w-full sm:w-auto">
+                <Button size="lg" variant="secondary" className="w-full sm:w-auto bg-white text-primary hover:bg-gray-100">
                   Try Resume Analysis
+                  <Upload className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
             </div>
