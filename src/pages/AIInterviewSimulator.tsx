@@ -99,6 +99,34 @@ const QUESTION_SETS = {
       { question: "How would you implement real-time features in a web application?", delay: 3000 },
       { question: "Describe your experience with containerization and deployment pipelines.", delay: 3000 },
       { question: "How do you manage state in a complex application with multiple user roles?", delay: 3000 }
+    ],
+    'data-scientist': [
+      { question: "Explain the difference between supervised and unsupervised learning.", delay: 3000 },
+      { question: "How do you handle imbalanced datasets in classification problems?", delay: 3000 },
+      { question: "Explain the bias-variance trade-off in machine learning models.", delay: 3000 },
+      { question: "What evaluation metrics would you use for a regression problem?", delay: 3000 },
+      { question: "How would you approach feature selection for a machine learning model?", delay: 3000 }
+    ],
+    'devops': [
+      { question: "Explain your experience with CI/CD pipelines.", delay: 3000 },
+      { question: "How do you approach infrastructure as code?", delay: 3000 },
+      { question: "What strategies do you use for monitoring and alerting in production systems?", delay: 3000 },
+      { question: "How do you handle container orchestration in Kubernetes?", delay: 3000 },
+      { question: "Explain your approach to disaster recovery and high availability.", delay: 3000 }
+    ],
+    'mobile': [
+      { question: "How do you ensure performance in mobile applications?", delay: 3000 },
+      { question: "Explain the differences between native and cross-platform development.", delay: 3000 },
+      { question: "How do you handle offline functionality in mobile apps?", delay: 3000 },
+      { question: "What strategies do you use for testing mobile applications?", delay: 3000 },
+      { question: "How do you approach state management in a mobile application?", delay: 3000 }
+    ],
+    'ui-ux': [
+      { question: "Describe your design process from research to implementation.", delay: 3000 },
+      { question: "How do you test the usability of your designs?", delay: 3000 },
+      { question: "Explain how you create accessible designs.", delay: 3000 },
+      { question: "How do you collaborate with developers to implement your designs?", delay: 3000 },
+      { question: "What metrics do you use to evaluate the success of a design?", delay: 3000 }
     ]
   },
   behavioral: {
@@ -108,6 +136,41 @@ const QUESTION_SETS = {
       { question: "How do you handle conflicts within a team?", delay: 3000 },
       { question: "Can you give an example of a time when you had to adapt to a significant change at work?", delay: 3000 },
       { question: "Tell me about a time when you failed at something. How did you handle it?", delay: 3000 }
+    ],
+    frontend: [
+      { question: "Tell me about a time you had to optimize a complex UI component for performance.", delay: 3000 },
+      { question: "Describe a situation where you had to balance design requirements with technical constraints.", delay: 3000 },
+      { question: "How do you approach learning new frontend frameworks or libraries?", delay: 3000 },
+      { question: "Tell me about a time you had to refactor a large portion of frontend code.", delay: 3000 },
+      { question: "Describe how you collaborated with designers to implement a challenging UI feature.", delay: 3000 }
+    ],
+    backend: [
+      { question: "Tell me about a time you had to scale a backend service to handle more traffic.", delay: 3000 },
+      { question: "Describe a situation where you improved the performance of a database query.", delay: 3000 },
+      { question: "How do you approach debugging complex backend issues in production?", delay: 3000 },
+      { question: "Tell me about a time you had to implement a complex business logic in your backend code.", delay: 3000 },
+      { question: "Describe how you've ensured the security of sensitive data in your applications.", delay: 3000 }
+    ],
+    fullstack: [
+      { question: "Tell me about a project where you built both the frontend and backend components.", delay: 3000 },
+      { question: "Describe a situation where you had to coordinate changes across the full stack.", delay: 3000 },
+      { question: "How do you prioritize your work when dealing with both frontend and backend tasks?", delay: 3000 },
+      { question: "Tell me about a time you identified and fixed a performance issue spanning both frontend and backend.", delay: 3000 },
+      { question: "Describe your experience mentoring junior developers in full stack development.", delay: 3000 }
+    ],
+    'data-scientist': [
+      { question: "Tell me about a challenging data analysis project you worked on.", delay: 3000 },
+      { question: "Describe a situation where you had to explain complex data findings to non-technical stakeholders.", delay: 3000 },
+      { question: "How do you keep up with the rapidly evolving field of data science?", delay: 3000 },
+      { question: "Tell me about a time when your data analysis led to a significant business decision.", delay: 3000 },
+      { question: "Describe a situation where you had to work with incomplete or messy data.", delay: 3000 }
+    ],
+    'devops': [
+      { question: "Tell me about a time you automated a complex deployment process.", delay: 3000 },
+      { question: "Describe a situation where you had to troubleshoot a critical production issue.", delay: 3000 },
+      { question: "How do you balance system stability with the need for new features?", delay: 3000 },
+      { question: "Tell me about a time you improved the security posture of your infrastructure.", delay: 3000 },
+      { question: "Describe your experience implementing DevOps practices in a team new to the concept.", delay: 3000 }
     ]
   },
   system_design: {
@@ -117,6 +180,41 @@ const QUESTION_SETS = {
       { question: "How would you design Twitter's news feed functionality?", delay: 3000 },
       { question: "Design a content delivery network (CDN).", delay: 3000 },
       { question: "How would you design a real-time chat application?", delay: 3000 }
+    ],
+    frontend: [
+      { question: "Design a component system for a complex dashboard application.", delay: 3000 },
+      { question: "How would you architect a state management solution for a large-scale SPA?", delay: 3000 },
+      { question: "Design a system for efficiently loading and rendering large datasets in the browser.", delay: 3000 },
+      { question: "How would you implement a real-time collaborative editor in the browser?", delay: 3000 },
+      { question: "Design a frontend architecture that supports multiple themes and white-labeling.", delay: 3000 }
+    ],
+    backend: [
+      { question: "Design a high-throughput API gateway service.", delay: 3000 },
+      { question: "How would you architect a microservice-based e-commerce backend?", delay: 3000 },
+      { question: "Design a job processing queue system that ensures exactly-once delivery.", delay: 3000 },
+      { question: "How would you design a recommendation engine for an online retailer?", delay: 3000 },
+      { question: "Design a backend system for a ride-sharing application.", delay: 3000 }
+    ],
+    fullstack: [
+      { question: "Design an end-to-end architecture for a social media platform.", delay: 3000 },
+      { question: "How would you implement real-time notifications across multiple platforms?", delay: 3000 },
+      { question: "Design a full-stack system for a food delivery application.", delay: 3000 },
+      { question: "How would you architect a subscription-based content platform?", delay: 3000 },
+      { question: "Design a system for a collaborative project management tool.", delay: 3000 }
+    ],
+    'data-scientist': [
+      { question: "Design a real-time anomaly detection system.", delay: 3000 },
+      { question: "How would you architect a recommendation system that balances accuracy and diversity?", delay: 3000 },
+      { question: "Design a system for processing and analyzing large volumes of streaming data.", delay: 3000 },
+      { question: "How would you implement a fraud detection system for an e-commerce platform?", delay: 3000 },
+      { question: "Design a data pipeline for a machine learning model in production.", delay: 3000 }
+    ],
+    'devops': [
+      { question: "Design a CI/CD pipeline for a microservice architecture.", delay: 3000 },
+      { question: "How would you architect a monitoring and alerting system for a global application?", delay: 3000 },
+      { question: "Design an infrastructure that can automatically scale based on traffic patterns.", delay: 3000 },
+      { question: "How would you implement zero-downtime deployments for a critical service?", delay: 3000 },
+      { question: "Design a disaster recovery system with minimal data loss and downtime.", delay: 3000 }
     ]
   }
 };
@@ -558,13 +656,13 @@ const AIInterviewSimulator = () => {
     debug(`Getting questions for ${interviewType} interview, ${role} role`);
     
     try {
-      // First try to get role-specific questions
-      if (interviewType === 'technical' && role in QUESTION_SETS.technical) {
-        return QUESTION_SETS.technical[role];
+      // Check if there are role-specific questions for this interview type
+      if (interviewType in QUESTION_SETS && role in QUESTION_SETS[interviewType]) {
+        return QUESTION_SETS[interviewType][role];
       }
       
       // Fall back to general questions for the interview type
-      if (interviewType === 'behavioral' || interviewType === 'system_design') {
+      if (interviewType in QUESTION_SETS && 'general' in QUESTION_SETS[interviewType]) {
         return QUESTION_SETS[interviewType].general;
       }
       
@@ -918,7 +1016,6 @@ const AIInterviewSimulator = () => {
     const lowEffortResponse = userResponse.toLowerCase().trim();
     if (
       lowEffortResponse === "i don't know" || 
-      lowEffortResponse === "i have no idea" || 
       lowEffortResponse === "no idea" ||
       lowEffortResponse === "idk" ||
       lowEffortResponse.length < 15
@@ -960,30 +1057,44 @@ const AIInterviewSimulator = () => {
       const prompt = `You are an AI interviewer conducting a ${interviewType} interview for a ${role} position at ${company}. 
       
       IMPORTANT CONTEXT: 
-      - You are interviewing for a ${role} developer role at ${company}
+      - You are interviewing for a ${role} developer/professional role at ${company}
+      - This is a ${interviewType} interview
       - The candidate is currently at question #${currentQuestionIndex + 1}
       - The current question is: "${currentQuestion}"
       - The candidate just responded with: "${userResponse}"
       
       I need you to:
       1. Analyze this response on a scale of 1-10
-      2. Provide specific feedback relevant to ${company}'s expectations for ${role} developers
-      3. For the next question, ask something SPECIFICALLY relevant to ${company} and ${role}
+      2. Provide specific, detailed feedback relevant to ${company}'s expectations for ${role} professionals
+      3. For the next question, create a question that is HIGHLY SPECIFIC to the ${role} role at ${company}
       
-      For example:
-      - If interviewing for Amazon backend, ask about scalability, microservices, or AWS
-      - If interviewing for Google frontend, ask about performance optimization or modern JS frameworks
-      - If interviewing for Microsoft fullstack, ask about .NET, Azure, or cross-platform development
+      IMPORTANT INSTRUCTIONS FOR NEXT QUESTIONS:
+      - Do NOT ask generic questions that could apply to any role
+      - Do NOT ask general React questions unless the role specifically requires React
+      - Instead, focus on skills, technologies, and knowledge areas that are CENTRAL to the ${role} role
+      - Tailor questions to the specific nature of the ${interviewType} interview for the ${role} position
       
-      Be critical and challenging, like a real interviewer. Don't just be polite - push the candidate to think deeper.
-      If the answer is completely wrong or shows significant misunderstanding, point that out directly.
+      For ${role} roles, focus on these types of questions:
+      - Frontend: UI/UX, component architecture, state management, accessibility, performance optimization
+      - Backend: API design, database optimization, security, microservices, server architecture
+      - Fullstack: Full application architecture, API integration, frontend-backend communication
+      - Data Scientist: Data analysis, statistical modeling, machine learning algorithms, data visualization
+      - DevOps: CI/CD pipelines, infrastructure as code, monitoring, containerization, cloud platforms
+      - Mobile: Native development, cross-platform solutions, mobile UI/UX, performance, offline functionality
+      - UI/UX: Design systems, user research, prototyping, interaction design, accessibility
+      
+      For ${company}, incorporate their known technical stack and company values when appropriate:
+      - Google: High scalability, distributed systems, algorithm efficiency
+      - Microsoft: .NET ecosystem, Azure, enterprise integration
+      - Amazon: AWS, microservices, scalability, operational excellence
+      - Apple: High-quality UX, performance optimization, ecosystem integration
       
       Format your response as JSON with these fields:
       - score: numerical score from 1-10
-      - feedback: your assessment and feedback (2-3 sentences)
+      - feedback: your specific assessment and feedback (2-3 sentences)
       - quality: one of "excellent", "good", "average", or "poor"
       - challenge: a follow-up question that challenges the candidate to elaborate or think deeper
-      - next_question: a NEW question specifically relevant to ${company} and the ${role} position`;
+      - next_question: a NEW question specifically tailored to the ${role} position at ${company} for this ${interviewType} interview type`;
       
       debug("Sending request to Gemini API");
       // Using Google's AI API with updated endpoint
