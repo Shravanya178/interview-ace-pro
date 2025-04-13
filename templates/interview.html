@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Interview Simulator</title>
+    <style>
+      :root {
+        --primary-color: #4f46e5;
+        --secondary-color: #818cf8;
+        --background-color: #f9fafb;
+        --card-background: #ffffff;
+        --text-color: #1f2937;
+        --light-text: #6b7280;
+        --border-color: #e5e7eb;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      }
+
+      body {
+        font-family: var(--font-family);
+        background-color: var(--background-color);
+        color: var(--text-color);
+        margin: 0;
+        padding: 0;
+        line-height: 1.6;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      h1 {
+        color: var(--primary-color);
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .subtitle {
+        color: var(--light-text);
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+      }
+
+      .card {
+        background-color: var(--card-background);
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+      }
+
+      select,
+      input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--border-color);
+        border-radius: 0.375rem;
+        font-size: 1rem;
+        background-color: white;
+      }
+
+      button {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 0.375rem;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+
+      button:hover {
+        background-color: var(--secondary-color);
+      }
+
+      button:disabled {
+        background-color: var(--light-text);
+        cursor: not-allowed;
+      }
+
+      .interview-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .video-container {
+        width: 100%;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+      }
+
+      video {
+        width: 100%;
+        height: auto;
+        background-color: #000;
+      }
+
+      .question-section,
+      .answer-section,
+      .feedback-section {
+        margin-bottom: 2rem;
+      }
+
+      .mic-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        background-color: var(--warning-color);
+        margin-top: 1rem;
+      }
+
+      .mic-button.active {
+        background-color: var(--success-color);
+      }
+
+      .report-content {
+        white-space: pre-wrap;
+        background-color: #f3f4f6;
+        padding: 1.5rem;
+        border-radius: 0.375rem;
+        font-size: 0.95rem;
+        line-height: 1.7;
+      }
+
+      .reset-button {
+        background-color: var(--light-text);
+      }
+
+      .interview-main {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 2rem;
+      }
+
+      @media (max-width: 768px) {
+        .interview-main {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .loading {
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+        margin-left: 0.5rem;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .speaking-indicator {
+        display: inline-block;
+        margin-left: 10px;
+        color: var(--success-color);
+        font-weight: bold;
+      }
+
+      .permissions-warning {
+        background-color: #fff3cd;
+        border: 1px solid #ffecb5;
+        color: #664d03;
+        padding: 1rem;
+        border-radius: 0.375rem;
+        margin-bottom: 1rem;
+      }
+
+      .transcript {
+        background-color: #f9fafb;
+        padding: 1rem;
+        border-radius: 0.375rem;
+        margin-top: 1rem;
+        max-height: 150px;
+        overflow-y: auto;
+      }
+
+      .debug-info {
+        font-size: 0.8rem;
+        color: #6b7280;
+        margin-top: 1rem;
+        padding: 0.5rem;
+        background-color: #f3f4f6;
+        border-radius: 0.375rem;
+      }
+
+      .anti-cheating-requirements {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 20px;
+        border-radius: 8px;
+        max-width: 600px;
+        z-index: 9999;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        transition: opacity 1s;
+      }
+
+      .anti-cheating-requirements h3 {
+        color: #ff5252;
+        margin-top: 0;
+      }
+
+      .anti-cheating-requirements ul {
+        text-align: left;
+        margin-bottom: 20px;
+      }
+
+      .anti-cheating-requirements li {
+        padding: 5px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>AI Interview Simulator</h1>
+        <p class="subtitle">
+          Practice your interview skills with AI-powered feedback
+        </p>
+      </header>
+
+      <div id="app" class="card">
+        <div id="loading">Loading Interview Simulator...</div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="/static/js/anti-cheating.js"></script>
+
+    <script type="text/babel">
+      // Check for browser speech support
+      const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+      const SpeechGrammarList =
+        window.SpeechGrammarList || window.webkitSpeechGrammarList;
+      const SpeechRecognitionEvent =
+        window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
+
+      const hasSpeechRecognition = !!SpeechRecognition;
+      const hasSpeechSynthesis = "speechSynthesis" in window;
+
+      console.log("Speech Recognition available:", hasSpeechRecognition);
+      console.log("Speech Synthesis available:", hasSpeechSynthesis);
+
+      const App = () => {
+        // State variables
+        const [company, setCompany] = React.useState("");
+        const [role, setRole] = React.useState("");
+        const [isListening, setIsListening] = React.useState(false);
+        const [question, setQuestion] = React.useState("");
+        const [answer, setAnswer] = React.useState("");
+        const [interviewStarted, setInterviewStarted] = React.useState(false);
+        const [interviewComplete, setInterviewComplete] = React.useState(false);
+        const [report, setReport] = React.useState("");
+        const [questionCounter, setQuestionCounter] = React.useState(0);
+        const [isProcessing, setIsProcessing] = React.useState(false);
+        const [sessionId, setSessionId] = React.useState("");
+        const [isSpeaking, setIsSpeaking] = React.useState(false);
+        const [permissionState, setPermissionState] = React.useState("unknown");
+        const [transcript, setTranscript] = React.useState("");
+        const [debugMessage, setDebugMessage] = React.useState("");
+
+        // References
+        const recognitionRef = React.useRef(null);
+        const videoRef = React.useRef(null);
+
+        // Initialize speech recognition when component mounts
+        React.useEffect(() => {
+          // Check microphone permission
+          if (navigator.permissions) {
+            navigator.permissions
+              .query({ name: "microphone" })
+              .then((permissionStatus) => {
+                setPermissionState(permissionStatus.state);
+
+                permissionStatus.onchange = () => {
+                  setPermissionState(permissionStatus.state);
+                };
+              })
+              .catch((error) => {
+                console.error("Permission query error:", error);
+              });
+          }
+
+          // Initialize voices
+          if (hasSpeechSynthesis) {
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+              speechSynthesis.onvoiceschanged = () => {
+                const voices = speechSynthesis.getVoices();
+                console.log("Voices loaded:", voices.length);
+              };
+            }
+
+            // Load voices
+            speechSynthesis.getVoices();
+          }
+        }, []);
+
+        // Handle speech recognition
+        React.useEffect(() => {
+          if (!hasSpeechRecognition) {
+            setDebugMessage("Speech recognition not supported in this browser");
+            return;
+          }
+
+          if (isListening) {
+            try {
+              // Create a new recognition instance
+              const recognition = new SpeechRecognition();
+              recognition.continuous = true;
+              recognition.interimResults = true;
+              recognition.lang = "en-US";
+
+              // Set up handlers
+              recognition.onstart = () => {
+                setDebugMessage("Speech recognition started");
+              };
+
+              recognition.onresult = (event) => {
+                let interimTranscript = "";
+                let finalTranscript = "";
+
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                  const transcript = event.results[i][0].transcript;
+                  if (event.results[i].isFinal) {
+                    finalTranscript += transcript;
+                  } else {
+                    interimTranscript += transcript;
+                  }
+                }
+
+                if (finalTranscript) {
+                  setAnswer((prev) => (prev + " " + finalTranscript).trim());
+                  setDebugMessage("Recognized: " + finalTranscript);
+                }
+
+                setTranscript(interimTranscript);
+              };
+
+              recognition.onerror = (event) => {
+                setDebugMessage(`Error: ${event.error}`);
+                console.error("Recognition error:", event.error);
+
+                if (event.error === "not-allowed") {
+                  setPermissionState("denied");
+                  setIsListening(false);
+                }
+              };
+
+              recognition.onend = () => {
+                setDebugMessage("Recognition ended, restarting...");
+
+                // If we're still supposed to be listening, restart
+                if (isListening) {
+                  try {
+                    recognition.start();
+                  } catch (err) {
+                    console.error("Failed to restart:", err);
+                    setIsListening(false);
+                  }
+                }
+              };
+
+              // Start recognition
+              recognitionRef.current = recognition;
+              recognition.start();
+
+              // Set a timeout to submit answer if silence is detected
+              const silenceTimeout = setTimeout(() => {
+                if (isListening && answer.trim()) {
+                  setDebugMessage("Silence detected, submitting answer");
+                  setIsListening(false);
+                  submitAnswer();
+                }
+              }, 5000);
+
+              // Clean up the timeout
+              return () => clearTimeout(silenceTimeout);
+            } catch (err) {
+              setDebugMessage(`Recognition setup error: ${err.message}`);
+              console.error("Error setting up recognition:", err);
+              setIsListening(false);
+            }
+          } else if (recognitionRef.current) {
+            // Stop recognition if we're not listening
+            try {
+              recognitionRef.current.stop();
+              setDebugMessage("Recognition stopped");
+            } catch (err) {
+              console.error("Error stopping recognition:", err);
+            }
+          }
+
+          // Clean up on unmount
+          return () => {
+            if (recognitionRef.current) {
+              try {
+                recognitionRef.current.stop();
+              } catch (err) {
+                console.error("Error in cleanup:", err);
+              }
+            }
+          };
+        }, [isListening, answer]);
+
+        // Setup camera
+        React.useEffect(() => {
+          if (interviewStarted && videoRef.current) {
+            navigator.mediaDevices
+              .getUserMedia({ video: true })
+              .then((stream) => {
+                if (videoRef.current) {
+                  videoRef.current.srcObject = stream;
+                }
+              })
+              .catch((err) => {
+                console.error("Error accessing camera:", err);
+              });
+          }
+
+          return () => {
+            if (videoRef.current && videoRef.current.srcObject) {
+              const stream = videoRef.current.srcObject;
+              const tracks = stream.getTracks();
+              tracks.forEach((track) => track.stop());
+            }
+          };
+        }, [interviewStarted]);
+
+        // Speak the question when it changes
+        React.useEffect(() => {
+          if (question && interviewStarted && !isProcessing) {
+            speakText(question);
+          }
+        }, [question, interviewStarted, isProcessing]);
+
+        // Update anti-cheating system when sessionId changes
+        React.useEffect(() => {
+          if (sessionId && window.antiCheatingSystem) {
+            console.log(
+              "Updating anti-cheating system with session ID:",
+              sessionId
+            );
+            // The system will use the sessionId via component.state.sessionId
+          }
+        }, [sessionId]);
+
+        // Text-to-speech function
+        const speakText = (text) => {
+          if (!text || !hasSpeechSynthesis) return;
+
+          // Cancel any ongoing speech
+          window.speechSynthesis.cancel();
+
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.rate = 1.0;
+          utterance.pitch = 1.0;
+          utterance.volume = 1.0;
+
+          // Get all available voices
+          const voices = window.speechSynthesis.getVoices();
+          console.log(`Available voices: ${voices.length}`);
+
+          // Find a suitable voice
+          const preferredVoice = voices.find(
+            (voice) =>
+              voice.name.includes("Female") ||
+              voice.name.includes("Google") ||
+              voice.name.includes("English")
+          );
+
+          if (preferredVoice) {
+            utterance.voice = preferredVoice;
+            console.log(`Using voice: ${preferredVoice.name}`);
+          }
+
+          setIsSpeaking(true);
+          setDebugMessage(`Speaking: ${text.substring(0, 50)}...`);
+
+          utterance.onend = () => {
+            setIsSpeaking(false);
+            setDebugMessage("Finished speaking");
+
+            // If this was a question being spoken, start listening
+            if (text === question) {
+              setIsListening(true);
+            }
+          };
+
+          utterance.onerror = (event) => {
+            console.error("Speech synthesis error:", event);
+            setIsSpeaking(false);
+            setDebugMessage(`Speech error: ${event.error}`);
+          };
+
+          window.speechSynthesis.speak(utterance);
+        };
+
+        // Request microphone permission
+        const requestMicrophonePermission = () => {
+          navigator.mediaDevices
+            .getUserMedia({ audio: true })
+            .then((stream) => {
+              // Stop all tracks immediately
+              stream.getTracks().forEach((track) => track.stop());
+              setPermissionState("granted");
+              return true;
+            })
+            .catch((err) => {
+              console.error("Microphone permission error:", err);
+              setPermissionState("denied");
+              return false;
+            });
+        };
+
+        // Start interview
+        const startInterview = async () => {
+          if (!company || !role) {
+            alert("Please select a company and role");
+            return;
+          }
+
+          // Request microphone permission
+          const hasPermission = await requestMicrophonePermission();
+          if (!hasPermission) {
+            alert("Microphone access is required for the interview");
+            return;
+          }
+
+          setInterviewStarted(true);
+          setIsProcessing(true);
+
+          try {
+            const response = await axios.post("/api/start_interview", {
+              company,
+              role,
+            });
+
+            setSessionId(response.data.session_id);
+            setQuestion(response.data.question);
+            setQuestionCounter(1);
+            setIsProcessing(false);
+            setDebugMessage("Interview started");
+
+            // Greet the user before asking the first question
+            const greeting = `Welcome to your interview for ${role} at ${company}. I'll ask you a series of questions. Please speak your answers naturally.`;
+            speakText(greeting);
+          } catch (error) {
+            console.error("Error starting interview:", error);
+            setIsProcessing(false);
+            setDebugMessage(`Error: ${error.message}`);
+          }
+        };
+
+        // Toggle listening
+        const toggleListening = () => {
+          if (!hasSpeechRecognition) {
+            alert("Speech recognition is not supported in your browser");
+            return;
+          }
+
+          if (isListening) {
+            setIsListening(false);
+
+            if (answer.trim()) {
+              submitAnswer();
+            }
+          } else {
+            if (permissionState !== "granted") {
+              requestMicrophonePermission().then((hasPermission) => {
+                if (hasPermission) {
+                  setAnswer("");
+                  setIsListening(true);
+                }
+              });
+            } else {
+              setAnswer("");
+              setIsListening(true);
+            }
+          }
+        };
+
+        // Submit answer
+        const submitAnswer = async () => {
+          if (!answer.trim()) return;
+
+          setIsProcessing(true);
+          setIsListening(false);
+          setDebugMessage("Submitting answer");
+
+          try {
+            const response = await axios.post("/api/submit_response", {
+              company,
+              role,
+              question,
+              answer,
+              question_number: questionCounter,
+              session_id: sessionId,
+            });
+
+            if (response.data.session_id) {
+              setSessionId(response.data.session_id);
+            }
+
+            // Check if interview is complete
+            if (questionCounter >= 5 || response.data.complete) {
+              setInterviewComplete(true);
+              speakText(
+                "Thank you for completing the interview. I'm now generating your report."
+              );
+              getReport();
+            } else {
+              // Speak transition and next question
+              speakText("Thank you for your answer. Here's the next question.");
+
+              // Set next question
+              setQuestion(response.data.next_question);
+              setQuestionCounter((prev) => prev + 1);
+              setAnswer("");
+              setTranscript("");
+            }
+
+            setIsProcessing(false);
+          } catch (error) {
+            console.error("Error submitting answer:", error);
+            setIsProcessing(false);
+            setDebugMessage(`Error: ${error.message}`);
+          }
+        };
+
+        // Get report
+        const getReport = async () => {
+          setDebugMessage("Generating report");
+          try {
+            const response = await axios.post("/api/get_report", {
+              company,
+              role,
+              session_id: sessionId,
+            });
+
+            setReport(response.data.report);
+            setDebugMessage("Report generated");
+
+            // Read summary
+            const reportSummary =
+              "Your interview assessment is ready. Here's a summary: " +
+              response.data.report
+                .split("\n")
+                .slice(0, 10)
+                .join(" ")
+                .substring(0, 200) +
+              "... You can read the full report on the screen.";
+
+            speakText(reportSummary);
+          } catch (error) {
+            console.error("Error getting report:", error);
+            setDebugMessage(`Error: ${error.message}`);
+          }
+        };
+
+        // Reset interview
+        const resetInterview = () => {
+          // Cancel any speech
+          if (hasSpeechSynthesis) {
+            window.speechSynthesis.cancel();
+          }
+
+          setCompany("");
+          setRole("");
+          setQuestion("");
+          setAnswer("");
+          setTranscript("");
+          setInterviewStarted(false);
+          setInterviewComplete(false);
+          setReport("");
+          setQuestionCounter(0);
+          setIsListening(false);
+          setIsSpeaking(false);
+          setDebugMessage("Interview reset");
+
+          if (recognitionRef.current) {
+            try {
+              recognitionRef.current.stop();
+            } catch (err) {
+              console.error("Error stopping recognition:", err);
+            }
+          }
+        };
+
+        // Render setup screen
+        if (!interviewStarted) {
+          return (
+            <div className="interview-setup">
+              <h2>Get Started</h2>
+
+              {permissionState === "denied" && (
+                <div className="permissions-warning">
+                  <p>
+                    <strong>Microphone access denied!</strong> This application
+                    requires microphone access to function properly.
+                  </p>
+                  <p>
+                    Please allow microphone access in your browser settings and
+                    refresh the page.
+                  </p>
+                </div>
+              )}
+
+              <p>
+                Select a company and role to start your interview preparation
+              </p>
+
+              <div className="form-group">
+                <label>Target Company:</label>
+                <select
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
+                >
+                  <option value="">-- Select Company --</option>
+                  <option value="Google">Google</option>
+                  <option value="Amazon">Amazon</option>
+                  <option value="Microsoft">Microsoft</option>
+                  <option value="Apple">Apple</option>
+                  <option value="Meta">Meta</option>
+                  <option value="Netflix">Netflix</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label>Target Role:</label>
+                <select value={role} onChange={(e) => setRole(e.target.value)}>
+                  <option value="">-- Select Role --</option>
+                  <option value="Software Engineer">Software Engineer</option>
+                  <option value="Frontend Developer">Frontend Developer</option>
+                  <option value="Backend Developer">Backend Developer</option>
+                  <option value="Full Stack Developer">
+                    Full Stack Developer
+                  </option>
+                  <option value="Data Scientist">Data Scientist</option>
+                  <option value="ML Engineer">ML Engineer</option>
+                  <option value="DevOps Engineer">DevOps Engineer</option>
+                </select>
+              </div>
+
+              <button
+                className="start-button"
+                onClick={startInterview}
+                disabled={!company || !role || isProcessing}
+              >
+                {isProcessing ? "Starting..." : "Start Interview"}
+                {isProcessing && <span className="loading"></span>}
+              </button>
+
+              <div className="debug-info">
+                Speech Recognition:{" "}
+                {hasSpeechRecognition ? "Available" : "Not Available"} | Speech
+                Synthesis: {hasSpeechSynthesis ? "Available" : "Not Available"}{" "}
+                | Microphone: {permissionState}
+              </div>
+            </div>
+          );
+        }
+
+        // Render report screen
+        if (interviewComplete) {
+          return (
+            <div className="interview-report">
+              <h2>Interview Complete</h2>
+              <h3>Performance Report</h3>
+
+              <div className="report-content">
+                <pre>{report}</pre>
+              </div>
+
+              <button className="reset-button" onClick={resetInterview}>
+                Start New Interview
+              </button>
+
+              <div className="debug-info">{debugMessage}</div>
+            </div>
+          );
+        }
+
+        // Render interview screen
+        return (
+          <div className="interview-session">
+            <div className="interview-header">
+              <h2>
+                AI Interview for {role} at {company}
+              </h2>
+              <p>Question {questionCounter}/5</p>
+            </div>
+
+            <div className="interview-main">
+              <div className="video-container">
+                <video ref={videoRef} autoPlay muted playsInline />
+              </div>
+
+              <div className="interview-content">
+                <div className="question-section">
+                  <h3>
+                    Question:{" "}
+                    {isSpeaking && (
+                      <span className="speaking-indicator">(Speaking...)</span>
+                    )}
+                  </h3>
+                  <p>{question || "Loading question..."}</p>
+                </div>
+
+                <div className="answer-section">
+                  <h3>
+                    Your Answer:{" "}
+                    {isListening && (
+                      <span className="speaking-indicator">(Listening...)</span>
+                    )}
+                  </h3>
+                  <p>{answer || "(Start speaking your answer)"}</p>
+
+                  {transcript && (
+                    <div className="transcript">
+                      <em>{transcript}</em>
+                    </div>
+                  )}
+
+                  <button
+                    className={`mic-button ${isListening ? "active" : ""}`}
+                    onClick={toggleListening}
+                    disabled={isProcessing || isSpeaking}
+                  >
+                    {isListening ? "Stop Speaking" : "Start Speaking"}
+                    {isProcessing && <span className="loading"></span>}
+                  </button>
+                </div>
+
+                <div className="debug-info">{debugMessage}</div>
+              </div>
+            </div>
+          </div>
+        );
+      };
+
+      // Add anti-cheating integration to the existing React component
+      const originalStartInterview = App.prototype.startInterview;
+      App.prototype.startInterview = async function () {
+        // Initialize anti-cheating system with a reference to the component
+        const component = this;
+        const interviewServerProxy = {
+          update_camera_status: async (status) => {
+            console.log("Camera status updated:", status);
+            try {
+              const response = await axios.post(
+                "/api/anti_cheating/camera_status",
+                {
+                  is_active: status,
+                  session_id: component.state.sessionId,
+                }
+              );
+              return response.data;
+            } catch (error) {
+              console.error("Error updating camera status:", error);
+              return { success: false };
+            }
+          },
+          update_microphone_status: async (status) => {
+            console.log("Microphone status updated:", status);
+            try {
+              const response = await axios.post(
+                "/api/anti_cheating/microphone_status",
+                {
+                  is_active: status,
+                  session_id: component.state.sessionId,
+                }
+              );
+              return response.data;
+            } catch (error) {
+              console.error("Error updating microphone status:", error);
+              return { success: false };
+            }
+          },
+          update_tab_focus: async (isFocused) => {
+            console.log("Tab focus updated:", isFocused);
+            try {
+              const response = await axios.post(
+                "/api/anti_cheating/tab_focus",
+                {
+                  is_focused: isFocused,
+                  session_id: component.state.sessionId,
+                }
+              );
+              return response.data;
+            } catch (error) {
+              console.error("Error updating tab focus:", error);
+              return { success: false };
+            }
+          },
+          report_copy_paste_attempt: async () => {
+            console.log("Copy-paste attempt reported");
+            try {
+              const response = await axios.post(
+                "/api/anti_cheating/copy_paste_attempt",
+                {
+                  session_id: component.state.sessionId,
+                }
+              );
+              return response.data;
+            } catch (error) {
+              console.error("Error reporting copy-paste attempt:", error);
+              return { success: false };
+            }
+          },
+          terminate_interview: async (data) => {
+            console.log("Terminating interview due to violations:", data);
+            try {
+              const response = await axios.post(
+                "/api/anti_cheating/terminate_interview",
+                {
+                  session_id: component.state.sessionId,
+                  reason: data.reason,
+                  violations: data.violations,
+                }
+              );
+
+              // Force interview termination in the UI
+              if (response.data.success) {
+                // Use component state setters
+                component.setState({
+                  interviewComplete: true,
+                  report:
+                    "Your interview has been terminated due to policy violations:\n\n" +
+                    "- Anti-cheating measures detected rule violations\n" +
+                    "- The system recorded " +
+                    data.violations.total_warnings +
+                    " warnings\n\n" +
+                    "Please ensure you follow all interview guidelines in future sessions.",
+                });
+              }
+
+              return response.data;
+            } catch (error) {
+              console.error("Error terminating interview:", error);
+              return { success: false };
+            }
+          },
+        };
+
+        // Initialize anti-cheating system
+        try {
+          const antiCheatingInitialized = await window.initializeAntiCheating(
+            interviewServerProxy
+          );
+          if (!antiCheatingInitialized) {
+            alert(
+              "Unable to initialize interview security measures. Please ensure camera and microphone permissions are granted."
+            );
+            return;
+          }
+        } catch (error) {
+          console.error("Error initializing anti-cheating:", error);
+          alert(
+            "Error initializing interview security measures. Please reload the page and try again."
+          );
+          return;
+        }
+
+        // Continue with original start interview function
+        originalStartInterview.apply(this, arguments);
+      };
+
+      // Override the resetInterview method to clean up anti-cheating resources
+      const originalResetInterview = App.prototype.resetInterview;
+      App.prototype.resetInterview = function () {
+        // Clean up anti-cheating resources
+        if (window.antiCheatingSystem) {
+          window.antiCheatingSystem.cleanup();
+        }
+
+        // Continue with original reset
+        originalResetInterview.apply(this, arguments);
+      };
+
+      ReactDOM.render(<App />, document.getElementById("app"));
+    </script>
+  </body>
+</html>

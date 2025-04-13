@@ -442,7 +442,251 @@ def save_interview():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/anti_cheating/camera_status', methods=['POST'])
+def update_camera_status():
+    """Update camera status and log potential violations"""
+    try:
+        data = request.json
+        is_active = data.get('is_active', False)
+        session_id = data.get('session_id', '')
+        
+        # Log the camera status change
+        if not is_active:
+            print(f"WARNING: Camera disabled for session {session_id}")
+            
+            # Log the violation in session data if available
+            if session_id:
+                session_file = f"sessions/{session_id}.json"
+                
+                # Create the session file if it doesn't exist
+                if not os.path.exists(session_file):
+                    with open(session_file, 'w') as f:
+                        json.dump({
+                            'session_id': session_id,
+                            'timestamp': datetime.now().isoformat(),
+                            'violations': []
+                        }, f, indent=4)
+                
+                try:
+                    with open(session_file, 'r') as f:
+                        session_data = json.load(f)
+                        
+                    # Add violation to session data
+                    if 'violations' not in session_data:
+                        session_data['violations'] = []
+                        
+                    session_data['violations'].append({
+                        'type': 'camera_off',
+                        'timestamp': datetime.now().isoformat()
+                    })
+                    
+                    # Save updated session data
+                    with open(session_file, 'w') as f:
+                        json.dump(session_data, f, indent=4)
+                except Exception as e:
+                    print(f"Error updating session data: {str(e)}")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Camera status updated'
+        })
+    except Exception as e:
+        print(f"Error updating camera status: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+@app.route('/api/anti_cheating/microphone_status', methods=['POST'])
+def update_microphone_status():
+    """Update microphone status and log potential violations"""
+    try:
+        data = request.json
+        is_active = data.get('is_active', False)
+        session_id = data.get('session_id', '')
+        
+        # Log the microphone status change
+        if not is_active:
+            print(f"WARNING: Microphone disabled for session {session_id}")
+            
+            # Log the violation in session data if available
+            if session_id:
+                session_file = f"sessions/{session_id}.json"
+                
+                # Create the session file if it doesn't exist
+                if not os.path.exists(session_file):
+                    with open(session_file, 'w') as f:
+                        json.dump({
+                            'session_id': session_id,
+                            'timestamp': datetime.now().isoformat(),
+                            'violations': []
+                        }, f, indent=4)
+                
+                try:
+                    with open(session_file, 'r') as f:
+                        session_data = json.load(f)
+                        
+                    # Add violation to session data
+                    if 'violations' not in session_data:
+                        session_data['violations'] = []
+                        
+                    session_data['violations'].append({
+                        'type': 'microphone_off',
+                        'timestamp': datetime.now().isoformat()
+                    })
+                    
+                    # Save updated session data
+                    with open(session_file, 'w') as f:
+                        json.dump(session_data, f, indent=4)
+                except Exception as e:
+                    print(f"Error updating session data: {str(e)}")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Microphone status updated'
+        })
+    except Exception as e:
+        print(f"Error updating microphone status: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+@app.route('/api/anti_cheating/tab_focus', methods=['POST'])
+def update_tab_focus():
+    """Update tab focus status and log potential violations"""
+    try:
+        data = request.json
+        is_focused = data.get('is_focused', True)
+        session_id = data.get('session_id', '')
+        
+        # Log the tab focus change
+        if not is_focused:
+            print(f"WARNING: Tab focus lost for session {session_id}")
+            
+            # Log the violation in session data if available
+            if session_id:
+                session_file = f"sessions/{session_id}.json"
+                if os.path.exists(session_file):
+                    try:
+                        with open(session_file, 'r') as f:
+                            session_data = json.load(f)
+                            
+                        # Add violation to session data
+                        if 'violations' not in session_data:
+                            session_data['violations'] = []
+                            
+                        session_data['violations'].append({
+                            'type': 'tab_switch',
+                            'timestamp': datetime.now().isoformat()
+                        })
+                        
+                        # Save updated session data
+                        with open(session_file, 'w') as f:
+                            json.dump(session_data, f)
+                    except Exception as e:
+                        print(f"Error updating session data: {str(e)}")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Tab focus status updated'
+        })
+    except Exception as e:
+        print(f"Error updating tab focus: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+@app.route('/api/anti_cheating/copy_paste_attempt', methods=['POST'])
+def report_copy_paste_attempt():
+    """Report copy-paste attempts and log violations"""
+    try:
+        data = request.json
+        session_id = data.get('session_id', '')
+        
+        print(f"WARNING: Copy-paste attempt detected for session {session_id}")
+        
+        # Log the violation in session data if available
+        if session_id:
+            session_file = f"sessions/{session_id}.json"
+            if os.path.exists(session_file):
+                try:
+                    with open(session_file, 'r') as f:
+                        session_data = json.load(f)
+                        
+                    # Add violation to session data
+                    if 'violations' not in session_data:
+                        session_data['violations'] = []
+                        
+                    session_data['violations'].append({
+                        'type': 'copy_paste',
+                        'timestamp': datetime.now().isoformat()
+                    })
+                    
+                    # Save updated session data
+                    with open(session_file, 'w') as f:
+                        json.dump(session_data, f)
+                except Exception as e:
+                    print(f"Error updating session data: {str(e)}")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Copy-paste attempt recorded'
+        })
+    except Exception as e:
+        print(f"Error recording copy-paste attempt: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+@app.route('/api/anti_cheating/terminate_interview', methods=['POST'])
+def terminate_interview():
+    """Terminate an interview due to excessive violations"""
+    try:
+        data = request.json
+        session_id = data.get('session_id', '')
+        reason = data.get('reason', 'excessive_violations')
+        violations = data.get('violations', {})
+        
+        print(f"Interview terminated for session {session_id} due to {reason}")
+        print(f"Violation counts: {violations}")
+        
+        # Update session data if available
+        if session_id:
+            session_file = f"sessions/{session_id}.json"
+            if os.path.exists(session_file):
+                try:
+                    with open(session_file, 'r') as f:
+                        session_data = json.load(f)
+                    
+                    # Add termination information
+                    session_data['terminated'] = True
+                    session_data['termination_reason'] = reason
+                    session_data['termination_timestamp'] = datetime.now().isoformat()
+                    session_data['violation_counts'] = violations
+                    
+                    # Save updated session data
+                    with open(session_file, 'w') as f:
+                        json.dump(session_data, f)
+                except Exception as e:
+                    print(f"Error updating session data: {str(e)}")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Interview terminated'
+        })
+    except Exception as e:
+        print(f"Error terminating interview: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
 if __name__ == '__main__':
     # Create frontend directory if it doesn't exist
     os.makedirs('frontend', exist_ok=True)
+    # Create sessions directory if it doesn't exist
+    os.makedirs('sessions', exist_ok=True)
     app.run(port=8000, debug=True) 
