@@ -1,11 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useToast } from '@/components/ui/use-toast';
-import { createClient } from '@supabase/supabase-js';
-
-// Initialize Supabase client
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://your-project-url.supabase.co';
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key';
-const supabase = createClient(supabaseUrl, supabaseKey);
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 // Define Supabase user type
 interface SupabaseUser {
@@ -29,6 +24,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
+  signup: (email: string, password: string, name?: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   loginWithPhone: (phone: string) => Promise<void>;
   verifyPhoneOtp: (phone: string, token: string) => Promise<void>;
@@ -36,14 +32,6 @@ interface AuthContextType {
   updateProfile: (data: Partial<User>) => Promise<void>;
   isLoading: boolean;
 }
-
-// Demo user for auto-login
-const DEMO_USER: User = {
-  id: 'demo-user',
-  name: 'Demo User',
-  email: 'demo@example.com',
-  photoUrl: 'https://ui-avatars.com/api/?name=Demo+User&background=random'
-};
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -55,31 +43,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const { toast } = useToast();
 
   useEffect(() => {
-    // For demo purposes, auto-login with demo user
-    setUser(DEMO_USER);
-    localStorage.setItem('user', JSON.stringify(DEMO_USER));
-    setIsLoading(false);
-    
-    // Uncomment this for actual authentication
-    /*
-    // Check if user is logged in from localStorage
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
+    // Check for an existing session
+    const checkSession = async () => {
       try {
         const { data } = await supabase.auth.getSession();
         if (data.session) {
           setUserFromSupabase(data.session.user);
+        } else {
+          // No active session
+          setUser(null);
+          localStorage.removeItem("user");
         }
       } catch (error) {
-        console.error('Failed to parse user data:', error);
+        console.error("Failed to get session:", error);
+        setUser(null);
+      } finally {
+        setIsLoading(false);
       }
-    }
-    setIsLoading(false);
-    */
+    };
+
+    // Set up auth state change listener
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setUserFromSupabase(session.user);
+      } else {
+        setUser(null);
+        localStorage.removeItem("user");
+      }
+    });
+
+    checkSession();
+
+    // Cleanup subscription
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   // Helper function to transform Supabase user to our User interface
-  const setUserFromSupabase = (supabaseUser: SupabaseUser | null) => {
+  const setUserFromSupabase = (supabaseUser: any) => {
     if (!supabaseUser) {
       setUser(null);
       return;
@@ -89,21 +93,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const userData: User = {
       id: supabaseUser.id,
       name:
-        supabaseUser.user_metadata.full_name ||
+        supabaseUser.user_metadata?.full_name ||
         supabaseUser.email?.split("@")[0] ||
         "",
       email: supabaseUser.email || "",
-      photoUrl: supabaseUser.user_metadata.avatar_url,
+      photoUrl: supabaseUser.user_metadata?.avatar_url,
       phone: supabaseUser.phone || "",
     };
 
     setUser(userData);
+    // Also store in localStorage for persistence
+    localStorage.setItem("user", JSON.stringify(userData));
   };
 
   const login = async (email: string, password: string) => {
     setIsLoading(true);
 
     try {
+      // Sign in with password
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -114,11 +121,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       if (data.user) {
+        // Set user in state
         setUserFromSupabase(data.user);
+
+        // Show success message
         toast({
           title: "Login successful",
           description: `Welcome back, ${
-            data.user.user_metadata.full_name ||
+            data.user.user_metadata?.full_name ||
             data.user.email?.split("@")[0] ||
             "user"
           }!`,
@@ -137,18 +147,60 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const loginWithGoogle = async () => {
+  const signup = async (email: string, password: string, name?: string) => {
+    setIsLoading(true);
+
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
         options: {
-          redirectTo: `${window.location.origin}/`,
+          data: {
+            full_name: name,
+          },
         },
       });
 
       if (error) {
         throw error;
       }
+
+      if (data.user) {
+        setUserFromSupabase(data.user);
+        toast({
+          title: "Signup successful",
+          description: "You have been successfully signed up!",
+        });
+      }
+    } catch (error: any) {
+      console.error("Signup error:", error);
+      toast({
+        title: "Signup failed",
+        description: error.message || "An error occurred during signup.",
+        variant: "destructive",
+      });
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loginWithGoogle = async () => {
+    try {
+      // Sign in with Google OAuth
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      // The user will be redirected to Google for authentication
+      // After authentication, they'll be redirected back to the callback URL
     } catch (error: any) {
       console.error("Google login error:", error);
       toast({
@@ -223,31 +275,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const logout = () => {
-    // For demo, set back to demo user instead of logging out completely
-    setUser(DEMO_USER);
-    localStorage.setItem('user', JSON.stringify(DEMO_USER));
-    
-    toast({
-      title: "Demo mode active",
-      description: "Using demo account for demonstration.",
-    });
-    
-    // Uncomment for actual logout
-    /*
-    setUser(null);
-    localStorage.removeItem('user');
-    toast({
-      title: "Logged out",
-      description: "You have been successfully logged out.",
-    });
-    */
+  const logout = async () => {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        throw error;
+      }
+
+      setUser(null);
+      localStorage.removeItem("user");
+
+      toast({
+        title: "Logged out",
+        description: "You have been successfully logged out.",
+      });
+    } catch (error: any) {
+      console.error("Logout error:", error);
+      toast({
+        title: "Logout failed",
+        description: error.message || "An error occurred during logout.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const updateProfile = async (data: Partial<User>) => {
     setIsLoading(true);
 
     try {
+      // First check if we have an active session
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        throw new Error("You must be logged in to update your profile");
+      }
+
+      // Update user profile through Supabase
       const { error } = await supabase.auth.updateUser({
         data: {
           full_name: data.name,
@@ -260,8 +325,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       if (user) {
+        // Update local user state
         const updatedUser = { ...user, ...data };
         setUser(updatedUser);
+        localStorage.setItem("user", JSON.stringify(updatedUser));
 
         toast({
           title: "Profile updated",
@@ -286,6 +353,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         user,
         login,
+        signup,
         loginWithGoogle,
         loginWithPhone,
         verifyPhoneOtp,

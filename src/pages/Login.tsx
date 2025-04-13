@@ -21,13 +21,16 @@ import { useLanguage } from "@/hooks/useLanguage";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [isSigningUp, setIsSigningUp] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [showPhoneLogin, setShowPhoneLogin] = useState(false);
-  const { login, loginWithGoogle, loginWithPhone, verifyPhoneOtp } = useAuth();
+  const { login, signup, loginWithGoogle, loginWithPhone, verifyPhoneOtp } =
+    useAuth();
   const navigate = useNavigate();
   const { t } = useLanguage();
 
@@ -79,6 +82,20 @@ const Login = () => {
       console.error("OTP verification error:", error);
     } finally {
       setIsVerifying(false);
+    }
+  };
+
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSigningUp(true);
+
+    try {
+      await signup(email, password, name);
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Signup error:", error);
+    } finally {
+      setIsSigningUp(false);
     }
   };
 
@@ -293,7 +310,7 @@ const Login = () => {
 
           <TabsContent value="signup">
             <Card>
-              <form onSubmit={handleEmailLogin}>
+              <form onSubmit={handleSignup}>
                 <CardHeader>
                   <CardTitle>Create Account</CardTitle>
                   <CardDescription>
@@ -301,6 +318,17 @@ const Login = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  <div className="space-y-1">
+                    <Label htmlFor="signup-name">Full Name</Label>
+                    <Input
+                      id="signup-name"
+                      type="text"
+                      placeholder="John Doe"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                    />
+                  </div>
                   <div className="space-y-1">
                     <Label htmlFor="signup-email">Email</Label>
                     <Input
@@ -328,9 +356,9 @@ const Login = () => {
                   <Button
                     className="w-full"
                     type="submit"
-                    disabled={isLoggingIn}
+                    disabled={isSigningUp}
                   >
-                    {isLoggingIn ? (
+                    {isSigningUp ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Creating account...

@@ -19,6 +19,7 @@ import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import LandingPage from "./pages/LandingPage";
 import FacialEmotionAnalysis from "./pages/FacialEmotionAnalysis";
+import AuthCallback from "./pages/auth/callback";
 
 const queryClient = new QueryClient();
 
@@ -37,18 +38,56 @@ const App = () => (
             <Sonner />
             <Routes>
               <Route path="/" element={<LandingPage />} />
-              <Route path="/dashboard" element={<DirectAccess element={<Dashboard />} />} />
-              <Route path="/resume" element={<DirectAccess element={<ResumeAnalysis />} />} />
-              <Route path="/interview" element={<DirectAccess element={<InterviewPrep />} />} />
-              <Route path="/interview-session" element={<DirectAccess element={<InterviewSession />} />} />
-              <Route path="/ai-interview-simulator" element={<DirectAccess element={<AIInterviewSimulator />} />} />
-              <Route path="/interview-simple" element={<DirectAccess element={<InterviewPage />} />} />
-              <Route path="/mock-test" element={<DirectAccess element={<MockTest />} />} />
-              <Route path="/reports" element={<DirectAccess element={<Reports />} />} />
-              <Route path="/profile" element={<DirectAccess element={<Profile />} />} />
-              <Route path="/settings" element={<DirectAccess element={<Settings />} />} />
-              <Route path="/facial-emotion-analysis" element={<DirectAccess element={<FacialEmotionAnalysis />} />} />
+              <Route
+                path="/dashboard"
+                element={<DirectAccess element={<Dashboard />} />}
+              />
+              <Route
+                path="/resume"
+                element={<DirectAccess element={<ResumeAnalysis />} />}
+              />
+              <Route
+                path="/interview"
+                element={<DirectAccess element={<InterviewPrep />} />}
+              />
+              <Route
+                path="/interview-session"
+                element={
+                  <DirectAccess
+                    element={<InterviewSession roomName="interview-pro" />}
+                  />
+                }
+              />
+              <Route
+                path="/ai-interview-simulator"
+                element={<DirectAccess element={<AIInterviewSimulator />} />}
+              />
+              <Route
+                path="/interview-simple"
+                element={<DirectAccess element={<InterviewPage />} />}
+              />
+              <Route
+                path="/mock-test"
+                element={<DirectAccess element={<MockTest />} />}
+              />
+              <Route
+                path="/reports"
+                element={<DirectAccess element={<Reports />} />}
+              />
+              <Route
+                path="/profile"
+                element={<DirectAccess element={<Profile />} />}
+              />
+              <Route
+                path="/settings"
+                element={<DirectAccess element={<Settings />} />}
+              />
+              <Route
+                path="/facial-emotion-analysis"
+                element={<DirectAccess element={<FacialEmotionAnalysis />} />}
+              />
               <Route path="/login" element={<Login />} />
+              <Route path="/auth/callback" element={<AuthCallback />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
