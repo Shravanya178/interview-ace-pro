@@ -101,6 +101,34 @@ const QUESTION_SETS = {
       { question: "How would you implement real-time features in a web application?", delay: 3000 },
       { question: "Describe your experience with containerization and deployment pipelines.", delay: 3000 },
       { question: "How do you manage state in a complex application with multiple user roles?", delay: 3000 }
+    ],
+    'data-scientist': [
+      { question: "Explain the difference between supervised and unsupervised learning.", delay: 3000 },
+      { question: "How do you handle imbalanced datasets in classification problems?", delay: 3000 },
+      { question: "Explain the bias-variance trade-off in machine learning models.", delay: 3000 },
+      { question: "What evaluation metrics would you use for a regression problem?", delay: 3000 },
+      { question: "How would you approach feature selection for a machine learning model?", delay: 3000 }
+    ],
+    'devops': [
+      { question: "Explain your experience with CI/CD pipelines.", delay: 3000 },
+      { question: "How do you approach infrastructure as code?", delay: 3000 },
+      { question: "What strategies do you use for monitoring and alerting in production systems?", delay: 3000 },
+      { question: "How do you handle container orchestration in Kubernetes?", delay: 3000 },
+      { question: "Explain your approach to disaster recovery and high availability.", delay: 3000 }
+    ],
+    'mobile': [
+      { question: "How do you ensure performance in mobile applications?", delay: 3000 },
+      { question: "Explain the differences between native and cross-platform development.", delay: 3000 },
+      { question: "How do you handle offline functionality in mobile apps?", delay: 3000 },
+      { question: "What strategies do you use for testing mobile applications?", delay: 3000 },
+      { question: "How do you approach state management in a mobile application?", delay: 3000 }
+    ],
+    'ui-ux': [
+      { question: "Describe your design process from research to implementation.", delay: 3000 },
+      { question: "How do you test the usability of your designs?", delay: 3000 },
+      { question: "Explain how you create accessible designs.", delay: 3000 },
+      { question: "How do you collaborate with developers to implement your designs?", delay: 3000 },
+      { question: "What metrics do you use to evaluate the success of a design?", delay: 3000 }
     ]
   },
   behavioral: {
@@ -110,6 +138,41 @@ const QUESTION_SETS = {
       { question: "How do you handle conflicts within a team?", delay: 3000 },
       { question: "Can you give an example of a time when you had to adapt to a significant change at work?", delay: 3000 },
       { question: "Tell me about a time when you failed at something. How did you handle it?", delay: 3000 }
+    ],
+    frontend: [
+      { question: "Tell me about a time you had to optimize a complex UI component for performance.", delay: 3000 },
+      { question: "Describe a situation where you had to balance design requirements with technical constraints.", delay: 3000 },
+      { question: "How do you approach learning new frontend frameworks or libraries?", delay: 3000 },
+      { question: "Tell me about a time you had to refactor a large portion of frontend code.", delay: 3000 },
+      { question: "Describe how you collaborated with designers to implement a challenging UI feature.", delay: 3000 }
+    ],
+    backend: [
+      { question: "Tell me about a time you had to scale a backend service to handle more traffic.", delay: 3000 },
+      { question: "Describe a situation where you improved the performance of a database query.", delay: 3000 },
+      { question: "How do you approach debugging complex backend issues in production?", delay: 3000 },
+      { question: "Tell me about a time you had to implement a complex business logic in your backend code.", delay: 3000 },
+      { question: "Describe how you've ensured the security of sensitive data in your applications.", delay: 3000 }
+    ],
+    fullstack: [
+      { question: "Tell me about a project where you built both the frontend and backend components.", delay: 3000 },
+      { question: "Describe a situation where you had to coordinate changes across the full stack.", delay: 3000 },
+      { question: "How do you prioritize your work when dealing with both frontend and backend tasks?", delay: 3000 },
+      { question: "Tell me about a time you identified and fixed a performance issue spanning both frontend and backend.", delay: 3000 },
+      { question: "Describe your experience mentoring junior developers in full stack development.", delay: 3000 }
+    ],
+    'data-scientist': [
+      { question: "Tell me about a challenging data analysis project you worked on.", delay: 3000 },
+      { question: "Describe a situation where you had to explain complex data findings to non-technical stakeholders.", delay: 3000 },
+      { question: "How do you keep up with the rapidly evolving field of data science?", delay: 3000 },
+      { question: "Tell me about a time when your data analysis led to a significant business decision.", delay: 3000 },
+      { question: "Describe a situation where you had to work with incomplete or messy data.", delay: 3000 }
+    ],
+    'devops': [
+      { question: "Tell me about a time you automated a complex deployment process.", delay: 3000 },
+      { question: "Describe a situation where you had to troubleshoot a critical production issue.", delay: 3000 },
+      { question: "How do you balance system stability with the need for new features?", delay: 3000 },
+      { question: "Tell me about a time you improved the security posture of your infrastructure.", delay: 3000 },
+      { question: "Describe your experience implementing DevOps practices in a team new to the concept.", delay: 3000 }
     ]
   },
   system_design: {
@@ -119,6 +182,41 @@ const QUESTION_SETS = {
       { question: "How would you design Twitter's news feed functionality?", delay: 3000 },
       { question: "Design a content delivery network (CDN).", delay: 3000 },
       { question: "How would you design a real-time chat application?", delay: 3000 }
+    ],
+    frontend: [
+      { question: "Design a component system for a complex dashboard application.", delay: 3000 },
+      { question: "How would you architect a state management solution for a large-scale SPA?", delay: 3000 },
+      { question: "Design a system for efficiently loading and rendering large datasets in the browser.", delay: 3000 },
+      { question: "How would you implement a real-time collaborative editor in the browser?", delay: 3000 },
+      { question: "Design a frontend architecture that supports multiple themes and white-labeling.", delay: 3000 }
+    ],
+    backend: [
+      { question: "Design a high-throughput API gateway service.", delay: 3000 },
+      { question: "How would you architect a microservice-based e-commerce backend?", delay: 3000 },
+      { question: "Design a job processing queue system that ensures exactly-once delivery.", delay: 3000 },
+      { question: "How would you design a recommendation engine for an online retailer?", delay: 3000 },
+      { question: "Design a backend system for a ride-sharing application.", delay: 3000 }
+    ],
+    fullstack: [
+      { question: "Design an end-to-end architecture for a social media platform.", delay: 3000 },
+      { question: "How would you implement real-time notifications across multiple platforms?", delay: 3000 },
+      { question: "Design a full-stack system for a food delivery application.", delay: 3000 },
+      { question: "How would you architect a subscription-based content platform?", delay: 3000 },
+      { question: "Design a system for a collaborative project management tool.", delay: 3000 }
+    ],
+    'data-scientist': [
+      { question: "Design a real-time anomaly detection system.", delay: 3000 },
+      { question: "How would you architect a recommendation system that balances accuracy and diversity?", delay: 3000 },
+      { question: "Design a system for processing and analyzing large volumes of streaming data.", delay: 3000 },
+      { question: "How would you implement a fraud detection system for an e-commerce platform?", delay: 3000 },
+      { question: "Design a data pipeline for a machine learning model in production.", delay: 3000 }
+    ],
+    'devops': [
+      { question: "Design a CI/CD pipeline for a microservice architecture.", delay: 3000 },
+      { question: "How would you architect a monitoring and alerting system for a global application?", delay: 3000 },
+      { question: "Design an infrastructure that can automatically scale based on traffic patterns.", delay: 3000 },
+      { question: "How would you implement zero-downtime deployments for a critical service?", delay: 3000 },
+      { question: "Design a disaster recovery system with minimal data loss and downtime.", delay: 3000 }
     ]
   }
 };
@@ -621,7 +719,7 @@ const AIInterviewSimulator = () => {
     
     try {
       // Create speech recognition instance
-      const SpeechRecognitionAPI = window.webkitSpeechRecognition || window.SpeechRecognition;
+      const SpeechRecognitionAPI: any = window.webkitSpeechRecognition || window.SpeechRecognition;
       const recognition = new SpeechRecognitionAPI();
       
       recognition.continuous = true;
@@ -800,21 +898,18 @@ const AIInterviewSimulator = () => {
       // First try to get company and role-specific questions
       if (company && role && 
           COMPANY_SPECIFIC_QUESTIONS[company] && 
-          COMPANY_SPECIFIC_QUESTIONS[company][role]) {
-        
-        const companyRoleQuestions = COMPANY_SPECIFIC_QUESTIONS[company][role];
-        
-        // Transform string questions into question objects
-        return companyRoleQuestions.map(q => ({ question: q, delay: 3000 }));
+          COMPANY_SPECIFIC_QUESTIONS[company][role] && 
+          COMPANY_SPECIFIC_QUESTIONS[company][role][interviewType]) {
+        return COMPANY_SPECIFIC_QUESTIONS[company][role][interviewType];
       }
       
-      // Fallback to technical questions for this role if no company-specific ones
-      if (interviewType === 'technical' && role in QUESTION_SETS.technical) {
-        return QUESTION_SETS.technical[role];
+      // Check if there are role-specific questions for this interview type
+      if (interviewType in QUESTION_SETS && role in QUESTION_SETS[interviewType]) {
+        return QUESTION_SETS[interviewType][role];
       }
       
       // Fall back to general questions for the interview type
-      if (interviewType === 'behavioral' || interviewType === 'system_design') {
+      if (interviewType in QUESTION_SETS && QUESTION_SETS[interviewType].general) {
         return QUESTION_SETS[interviewType].general;
       }
       
@@ -825,7 +920,7 @@ const AIInterviewSimulator = () => {
       debug(`Error getting questions: ${error}`);
       // Ultimate fallback
       return [
-        { question: "Tell me about your background and experience.", delay: 3000 },
+        { question: "Tell me about yourself and your experience.", delay: 3000 },
         { question: "What are your strengths and weaknesses?", delay: 3000 },
         { question: "Why are you interested in this position?", delay: 3000 }
       ];
@@ -1638,7 +1733,7 @@ const AIInterviewSimulator = () => {
         { name: 'videoElement', feature: typeof HTMLVideoElement !== 'undefined' },
         { name: 'MediaDevices', feature: !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) },
         { name: 'WebRTC', feature: typeof RTCPeerConnection !== 'undefined' },
-        { name: 'SpeechRecognition', feature: !!(window.SpeechRecognition || window.webkitSpeechRecognition) },
+        { name: 'Speech Recognition', feature: !!(window.webkitSpeechRecognition || (window as any).SpeechRecognition) },
         { name: 'SpeechSynthesis', feature: 'speechSynthesis' in window }
       ];
       
@@ -1646,9 +1741,9 @@ const AIInterviewSimulator = () => {
       
       if (missingFeatures.length > 0) {
         const missingFeaturesStr = missingFeatures.join(', ');
-        const errorMessage = `Your browser doesn't support required features: ${missingFeaturesStr}. Please use a modern browser like Chrome or Edge.`;
-        debug(`Browser compatibility issue: ${errorMessage}`);
-        setComponentError(errorMessage);
+        const errorMsg = `Your browser doesn't support required features: ${missingFeaturesStr}. Please use a modern browser like Chrome or Edge.`;
+        debug(`Browser compatibility issue: ${errorMsg}`);
+        setComponentError(errorMsg);
         return false;
       }
       

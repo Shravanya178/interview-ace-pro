@@ -107,26 +107,25 @@ const InterviewPrep = () => {
     }
 
     try {
-      // Add a button to use the simple version if the AI version has issues
-      const useSimpleVersion = window.confirm(
-        "Would you like to use the simple reliable version instead of the AI version?\n\n" +
-        "Note: The AI version may have some issues with speech recognition and video."
+      // Show popup with chat and video interview options
+      const useVideoInterview = window.confirm(
+        "Choose Interview Type:\n\nClick 'OK' for Video Interview\nClick 'Cancel' for Chat Interview"
       );
       
-      if (useSimpleVersion) {
-        // Navigate to the simple interview page
-        navigate(`/interview-simple?company=${selectedCompany}&role=${selectedRole}&type=${interviewType}`);
-      } else {
-        // Navigate to the AI Interview Simulator with the selected parameters
+      if (useVideoInterview) {
+        // Navigate to the AI Interview Simulator (video interview)
         navigate(`/ai-interview-simulator?company=${selectedCompany}&role=${selectedRole}&type=${interviewType}`);
+      } else {
+        // Navigate to the simple interview page (chat interview)
+        navigate(`/interview-simple?company=${selectedCompany}&role=${selectedRole}&type=${interviewType}`);
       }
     } catch (error) {
       console.error("Error starting interview:", error);
       
-      // Fallback to simple version if there's an error
+      // Fallback to chat interview if there's an error
       toast({
-        title: "Error Starting AI Interview",
-        description: "Using the simpler version instead.",
+        title: "Error Starting Interview",
+        description: "Using chat interview as fallback.",
         variant: "destructive",
       });
       
