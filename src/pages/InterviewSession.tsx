@@ -402,19 +402,19 @@ const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessi
     logDebug(`Setting up Jitsi Meet with room: ${roomName}`);
     
     try {
-      // Set up config for Jitsi Meet
-      const domain = "meet.jit.si";
-      const options = {
-        roomName: roomName,
-        width: "100%",
-        height: "100%",
-        parentNode: containerRef.current,
-        lang: "en",
-        configOverwrite: {
-          prejoinPageEnabled: false,
-          disableDeepLinking: true,
-          startWithAudioMuted: true,
-          startWithVideoMuted: false,
+        // Set up config for Jitsi Meet
+        const domain = "meet.jit.si";
+        const options = {
+          roomName: roomName,
+          width: "100%",
+          height: "100%",
+          parentNode: containerRef.current,
+          lang: "en",
+          configOverwrite: {
+            prejoinPageEnabled: false,
+            disableDeepLinking: true,
+            startWithAudioMuted: true,
+            startWithVideoMuted: false,
           resolution: 720,
           constraints: {
             video: {
@@ -425,33 +425,33 @@ const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessi
               }
             }
           }
-        },
-        interfaceConfigOverwrite: {
-          SHOW_JITSI_WATERMARK: false,
-          APP_NAME: "Interview Ace Pro",
-          NATIVE_APP_NAME: "Interview Ace Pro",
-          PROVIDER_NAME: "Interview Ace Pro",
+          },
+          interfaceConfigOverwrite: {
+            SHOW_JITSI_WATERMARK: false,
+            APP_NAME: "Interview Ace Pro",
+            NATIVE_APP_NAME: "Interview Ace Pro",
+            PROVIDER_NAME: "Interview Ace Pro",
           DEFAULT_BACKGROUND: "#111111",
           TILE_VIEW_MAX_COLUMNS: 2,
-          TOOLBAR_BUTTONS: [
-            "microphone",
-            "camera",
-            "closedcaptions",
-            "desktop",
-            "fullscreen",
-            "fodeviceselection",
-            "hangup",
-            "chat",
-            "recording",
-            "settings",
-            "raisehand",
-            "videoquality",
-          ],
-        },
-        userInfo: {
-          displayName: "Candidate",
-        },
-      };
+            TOOLBAR_BUTTONS: [
+              "microphone",
+              "camera",
+              "closedcaptions",
+              "desktop",
+              "fullscreen",
+              "fodeviceselection",
+              "hangup",
+              "chat",
+              "recording",
+              "settings",
+              "raisehand",
+              "videoquality",
+            ],
+          },
+          userInfo: {
+            displayName: "Candidate",
+          },
+        };
 
       // Create the Jitsi Meet external API instance
       logDebug("Creating new JitsiMeetExternalAPI instance");
@@ -489,12 +489,12 @@ const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessi
       logDebug(`ERROR: Failed to initialize Jitsi: ${error instanceof Error ? error.message : 'Unknown error'}`);
       setJitsiError(`Failed to initialize Jitsi: ${error instanceof Error ? error.message : 'Unknown error'}`);
       setIsLoading(false);
-      toast({
-        title: t("error"),
-        description: t("failed_to_initialize_interview"),
-        variant: "destructive",
-      });
-    }
+          toast({
+            title: t("error"),
+            description: t("failed_to_initialize_interview"),
+            variant: "destructive",
+          });
+        }
   }, [roomName, t, logDebug]);
 
   useEffect(() => {
@@ -554,7 +554,7 @@ const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessi
                 title: "Gemini API Connected",
                 description: "AI interviewer is ready to start",
               });
-            } else {
+    } else {
               console.error("Gemini interviewer failed to initialize");
               setApiError("Failed to initialize Gemini interviewer. Please check your API key.");
               toast({

@@ -23,9 +23,14 @@ interface SpeechRecognitionErrorEvent extends Event {
   message?: string;
 }
 
-interface SpeechRecognitionAlternative {
-  transcript: string;
-  confidence: number;
+interface SpeechRecognitionEvent extends Event {
+  resultIndex: number;
+  results: SpeechRecognitionResultList;
+}
+
+interface SpeechRecognitionResultList {
+  [index: number]: SpeechRecognitionResult;
+  length: number;
 }
 
 interface SpeechRecognitionResult {
@@ -34,14 +39,9 @@ interface SpeechRecognitionResult {
   length: number;
 }
 
-interface SpeechRecognitionResultList {
-  [index: number]: SpeechRecognitionResult;
-  length: number;
-}
-
-interface SpeechRecognitionEvent extends Event {
-  resultIndex: number;
-  results: SpeechRecognitionResultList;
+interface SpeechRecognitionAlternative {
+  transcript: string;
+  confidence: number;
 }
 
 interface SpeechRecognition extends EventTarget {
@@ -51,11 +51,17 @@ interface SpeechRecognition extends EventTarget {
   start(): void;
   stop(): void;
   abort(): void;
-  
-  onresult: ((event: SpeechRecognitionEvent) => void) | null;
-  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
-  onend: (() => void) | null;
-  onstart: (() => void) | null;
+  onresult: (event: SpeechRecognitionEvent) => void;
+  onerror: (event: SpeechRecognitionErrorEvent) => void;
+  onend: () => void;
+  onstart: () => void;
+  onspeechstart?: () => void;
+  onspeechend?: () => void;
+  onnomatch?: () => void;
+  onaudiostart?: () => void;
+  onaudioend?: () => void;
+  onsoundstart?: () => void;
+  onsoundend?: () => void;
 }
 
 // Declare global window properties
@@ -63,7 +69,6 @@ declare global {
   interface Window {
     SpeechRecognition: { new(): SpeechRecognition };
     webkitSpeechRecognition: { new(): SpeechRecognition };
-    tempQuestionSet?: any[];
     TEMP_API_KEY?: string;
   }
 }
@@ -550,38 +555,22 @@ const AIInterviewSimulator = () => {
   
   // Get questions based on interview type and role
   const getQuestionSet = useCallback(() => {
-    debug(`Getting questions for ${interviewType} interview, ${role} role at ${company}`);
+    debug(`Getting questions for ${interviewType} interview, ${role} role`);
     
     try {
-      // Start with an empty array
-      let questionSet = [];
-      
-      // First get role-specific questions based on interview type
+      // First try to get role-specific questions
       if (interviewType === 'technical' && role in QUESTION_SETS.technical) {
-        questionSet = [...QUESTION_SETS.technical[role]];
-      } else if (interviewType === 'behavioral') {
-        questionSet = [...QUESTION_SETS.behavioral.general];
-      } else if (interviewType === 'system_design') {
-        questionSet = [...QUESTION_SETS.system_design.general];
-      } else {
-        // Fallback to frontend technical questions
-        questionSet = [...QUESTION_SETS.technical.frontend];
+        return QUESTION_SETS.technical[role];
       }
       
-      // Then add company-specific questions
-      if (company in COMPANY_SPECIFIC_QUESTIONS) {
-        // Convert string questions to question objects with delay
-        const companyQuestions = COMPANY_SPECIFIC_QUESTIONS[company as keyof typeof COMPANY_SPECIFIC_QUESTIONS]
-          .map(q => ({ question: q, delay: 3000 }));
-        
-        // Add company questions to the beginning to prioritize them
-        questionSet = [...companyQuestions, ...questionSet];
-        
-        debug(`Added ${companyQuestions.length} ${company}-specific questions`);
+      // Fall back to general questions for the interview type
+      if (interviewType === 'behavioral' || interviewType === 'system_design') {
+        return QUESTION_SETS[interviewType].general;
       }
       
-      debug(`Final question set has ${questionSet.length} questions`);
-      return questionSet;
+      // Last resort - return first available question set
+      debug("Using fallback questions");
+      return QUESTION_SETS.technical.frontend;
     } catch (error) {
       debug(`Error getting questions: ${error}`);
       // Ultimate fallback
@@ -591,7 +580,7 @@ const AIInterviewSimulator = () => {
         { question: "Why are you interested in this position?", delay: 3000 }
       ];
     }
-  }, [interviewType, role, company, debug]);
+  }, [interviewType, role, debug]);
 
   // Current question fixed
   const currentQuestion = useMemo(() => {
@@ -743,22 +732,9 @@ const AIInterviewSimulator = () => {
     }
   }, [isApiConnected, debug, startUserVideo, currentQuestion, company, speakText, toast, checkApiConnection, initSpeechRecognition, setTimer, setInterviewDuration]);
 
-  // Type-safe access to window object
-  const customWindow = window as unknown as Window;
-
-  // Replace window as any with customWindow
+  // Move to the next question
   const nextQuestion = useCallback(() => {
-    // Check if we have a temporarily modified question set
-    let questions;
-    if (customWindow.tempQuestionSet) {
-      debug("Using AI-modified question set");
-      questions = customWindow.tempQuestionSet;
-      // Clear the temporary question set after using it once
-      delete customWindow.tempQuestionSet;
-    } else {
-      questions = getQuestionSet();
-    }
-    
+    const questions = getQuestionSet();
     debug("Moving to next question");
     
     // Stop listening while AI responds
@@ -879,6 +855,10 @@ const AIInterviewSimulator = () => {
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
   
+  // Add company-specific questions
+  const companyQuestions = COMPANY_SPECIFIC_QUESTIONS[company as keyof typeof COMPANY_SPECIFIC_QUESTIONS] || [];
+  const allQuestions = [...getQuestionSet(), ...companyQuestions.map(q => ({ question: q, delay: 3000 }))];
+  
   // Replace the entire useEffect that references startUserVideo
   useEffect(() => {
     if (!isInterviewStarted) return;
@@ -934,67 +914,168 @@ const AIInterviewSimulator = () => {
     debug("Processing response with Google Gemini API");
     setAiResponding(true);
     
+    // Check for short or dismissive answers
+    const lowEffortResponse = userResponse.toLowerCase().trim();
+    if (
+      lowEffortResponse === "i don't know" || 
+      lowEffortResponse === "i have no idea" || 
+      lowEffortResponse === "no idea" ||
+      lowEffortResponse === "idk" ||
+      lowEffortResponse.length < 15
+    ) {
+      // Provide immediate critical feedback without API call
+      const criticalFeedback = [
+        "That's not the type of answer I'd expect in a real interview. Could you try to provide a more thoughtful response?",
+        "In an actual interview, saying 'I don't know' without attempting to answer would be a red flag. Let's try to work through this question.",
+        "I understand this might be challenging, but in a real interview, you should attempt to reason through the problem even if you're uncertain.",
+        "That response wouldn't impress an interviewer. Would you like to try again with a more detailed answer?"
+      ];
+      
+      const feedback = criticalFeedback[Math.floor(Math.random() * criticalFeedback.length)];
+      
+      // Set a low score for this type of answer
+      const score = 2;
+      setScores(prev => ({ ...prev, [currentQuestionIndex]: score }));
+      setFeedbackHistory(prev => ({ ...prev, [currentQuestionIndex]: feedback }));
+      
+      // Update overall score
+      const allScores = { ...scores, [currentQuestionIndex]: score };
+      const scoreValues = Object.values(allScores);
+      const newOverallScore = scoreValues.reduce((sum, val) => sum + val, 0) / scoreValues.length;
+      setOverallScore(newOverallScore);
+      
+      setAiResponse(feedback);
+      speakText(feedback);
+      setAiResponding(false);
+      
+      // Clear the user response to prevent mismatch with next question
+      setUserResponse('');
+      setTranscript('');
+      
+      return;
+    }
+    
     try {
-      // Check for short or dismissive answers
-      const lowEffortResponse = userResponse.toLowerCase().trim();
-      if (
-        lowEffortResponse === "i don't know" || 
-        lowEffortResponse === "i have no idea" || 
-        lowEffortResponse === "no idea" ||
-        lowEffortResponse === "idk" ||
-        lowEffortResponse.length < 15
-      ) {
-        // Provide immediate critical feedback without API call
-        const criticalFeedback = [
-          "That's not the type of answer I'd expect in a real interview. Could you try to provide a more thoughtful response?",
-          "In an actual interview, saying 'I don't know' without attempting to answer would be a red flag. Let's try to work through this question.",
-          "I understand this might be challenging, but in a real interview, you should attempt to reason through the problem even if you're uncertain.",
-          "That response wouldn't impress an interviewer. Would you like to try again with a more detailed answer?"
-        ];
-        
-        const feedback = criticalFeedback[Math.floor(Math.random() * criticalFeedback.length)];
-        
-        // Set a low score for this type of answer
-        const score = 2;
-        setScores(prev => ({ ...prev, [currentQuestionIndex]: score }));
-        setFeedbackHistory(prev => ({ ...prev, [currentQuestionIndex]: feedback }));
-        
-        // Update overall score
-        const allScores = { ...scores, [currentQuestionIndex]: score };
-        const scoreValues = Object.values(allScores);
-        const newOverallScore = scoreValues.reduce((sum, val) => sum + val, 0) / scoreValues.length;
-        setOverallScore(newOverallScore);
-        
-        // Update the next question in the question set
-        const newQuestions = [...getQuestionSet()];
-        
-        // If we're not at the last question, replace the next one with the AI-generated question
-        if (currentQuestionIndex + 1 < newQuestions.length) {
-          newQuestions[currentQuestionIndex + 1] = { 
-            question: feedback, 
-            delay: 3000,
-            isAiGenerated: true 
-          };
-          
-          // Create a new question set with the AI-generated question
-          // This is a workaround since we can't directly modify the result of getQuestionSet()
-          // The effect of this is that when nextQuestion is called, it will get this modified question
-          const modifiedQuestionSet = [...newQuestions];
-          
-          // Override the getQuestionSet function temporarily (for the next call)
-          customWindow.tempQuestionSet = modifiedQuestionSet;
+      // Create a prompt for the AI that's specific to the company and role
+      const prompt = `You are an AI interviewer conducting a ${interviewType} interview for a ${role} position at ${company}. 
+      
+      IMPORTANT CONTEXT: 
+      - You are interviewing for a ${role} developer role at ${company}
+      - The candidate is currently at question #${currentQuestionIndex + 1}
+      - The current question is: "${currentQuestion}"
+      - The candidate just responded with: "${userResponse}"
+      
+      I need you to:
+      1. Analyze this response on a scale of 1-10
+      2. Provide specific feedback relevant to ${company}'s expectations for ${role} developers
+      3. For the next question, ask something SPECIFICALLY relevant to ${company} and ${role}
+      
+      For example:
+      - If interviewing for Amazon backend, ask about scalability, microservices, or AWS
+      - If interviewing for Google frontend, ask about performance optimization or modern JS frameworks
+      - If interviewing for Microsoft fullstack, ask about .NET, Azure, or cross-platform development
+      
+      Be critical and challenging, like a real interviewer. Don't just be polite - push the candidate to think deeper.
+      If the answer is completely wrong or shows significant misunderstanding, point that out directly.
+      
+      Format your response as JSON with these fields:
+      - score: numerical score from 1-10
+      - feedback: your assessment and feedback (2-3 sentences)
+      - quality: one of "excellent", "good", "average", or "poor"
+      - challenge: a follow-up question that challenges the candidate to elaborate or think deeper
+      - next_question: a NEW question specifically relevant to ${company} and the ${role} position`;
+      
+      debug("Sending request to Gemini API");
+      // Using Google's AI API with updated endpoint
+      const response = await axios.post(
+        'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent',
+        {
+          contents: [
+            {
+              parts: [
+                { text: prompt }
+              ]
+            }
+          ],
+          generationConfig: {
+            temperature: 0.8,
+            maxOutputTokens: 1000
+          }
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': getActiveApiKey()
+          }
         }
+      );
+      
+      debug("Received response from Gemini API");
+      
+      let aiReply;
+      let score = 0;
+      let feedbackQuality = "average";
+      let challengeQuestion = "";
+      let nextQuestion = "";
+      
+      try {
+        // Parse the AI's response
+        const rawResponse = response.data.candidates[0].content.parts[0].text;
+        debug(`Raw AI response: ${rawResponse}`);
         
-        // Make the response more interactive by directly challenging the candidate
-        const fullResponse = `${feedback} ${feedback}`;
-        debug(`AI feedback: ${fullResponse}`);
-        setAiResponse(fullResponse);
-        speakText(fullResponse);
-        
-        // Clear the user response to prevent mismatch with next question
-        setUserResponse('');
-        setTranscript('');
+        // Extract JSON from the response (handling potential text before/after JSON)
+        const jsonMatch = rawResponse.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const jsonResponse = JSON.parse(jsonMatch[0]);
+          score = jsonResponse.score || 5;
+          feedbackQuality = jsonResponse.quality || "average";
+          aiReply = jsonResponse.feedback || "Thank you for your response.";
+          challengeQuestion = jsonResponse.challenge || "Could you elaborate more on your answer?";
+          nextQuestion = jsonResponse.next_question || null;
+        } else {
+          // Fallback if JSON parsing fails
+          aiReply = "I'm not fully convinced by that answer. Could you elaborate more?";
+          challengeQuestion = "What specific examples can you provide to support your point?";
+          score = 5;
+        }
+      } catch (parseError) {
+        debug(`Error parsing AI response: ${parseError}`);
+        aiReply = "I understand your approach, but I'd like to challenge your thinking on this.";
+        challengeQuestion = "Have you considered alternative perspectives?";
+        score = 5;
       }
+      
+      // Store the score for this question
+      setScores(prev => ({ ...prev, [currentQuestionIndex]: score }));
+      setFeedbackHistory(prev => ({ ...prev, [currentQuestionIndex]: aiReply }));
+      
+      // Update overall score
+      const allScores = { ...scores, [currentQuestionIndex]: score };
+      const scoreValues = Object.values(allScores);
+      const newOverallScore = scoreValues.reduce((sum, val) => sum + val, 0) / scoreValues.length;
+      setOverallScore(newOverallScore);
+      
+      // Store the next question if provided by the AI
+      if (nextQuestion) {
+        const newQuestions = [...getQuestionSet()];
+        if (currentQuestionIndex + 1 < newQuestions.length) {
+          // Replace the next question with the AI-generated one
+          newQuestions[currentQuestionIndex + 1] = { question: nextQuestion, delay: 3000 };
+          // We don't need to update the state here as we're using the question directly
+          debug(`AI provided next question: ${nextQuestion}`);
+        }
+      }
+      
+      // Make the response more interactive by directly challenging the candidate
+      const fullResponse = `${aiReply} ${challengeQuestion}`;
+      debug(`AI feedback: ${fullResponse}`);
+      setAiResponse(fullResponse);
+      speakText(fullResponse);
+      
+      // Clear the user response to prevent mismatch with next question
+      setUserResponse('');
+      setTranscript('');
+      
     } catch (error) {
       debug(`Error with AI API: ${error}`);
       // Fallback to challenging response
@@ -1011,7 +1092,7 @@ const AIInterviewSimulator = () => {
     } finally {
       setAiResponding(false);
     }
-  }, [interviewType, role, company, currentQuestion, currentQuestionIndex, userResponse, scores, speakText, debug, getQuestionSet]);
+  }, [interviewType, role, company, currentQuestion, currentQuestionIndex, userResponse, scores, speakText, debug, getActiveApiKey, getQuestionSet]);
 
   // Then declare submitResponse
   const submitResponse = useCallback(() => {
@@ -1060,7 +1141,7 @@ const AIInterviewSimulator = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Questions Answered:</span>
-                    <span className="font-medium">{currentQuestionIndex + 1} of {getQuestionSet().length}</span>
+                    <span className="font-medium">{currentQuestionIndex + 1} of {allQuestions.length}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Overall Score:</span>
@@ -1114,7 +1195,7 @@ const AIInterviewSimulator = () => {
                 <div className="space-y-4">
                   {Object.keys(scores).map((questionIndex) => {
                     const idx = parseInt(questionIndex);
-                    const questionObj = getQuestionSet()[idx];
+                    const questionObj = allQuestions[idx];
                     const question = typeof questionObj === 'object' ? questionObj.question : questionObj;
                     return (
                       <div key={idx} className="bg-gray-50 p-4 rounded-lg">
@@ -1323,7 +1404,7 @@ const AIInterviewSimulator = () => {
               </div>
               <div>
                 <p className="font-semibold mb-1">Interview Info</p>
-                <p>Question: {currentQuestionIndex + 1} / {getQuestionSet().length}</p>
+                <p>Question: {currentQuestionIndex + 1} / {getQuestionSet()?.length || 0}</p>
                 <p>Company: {company}</p>
                 <p>Role: {role}</p>
                 <p>Type: {interviewType}</p>
