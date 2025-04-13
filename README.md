@@ -53,6 +53,7 @@ npm run dev
 ## What technologies are used for this project?
 
 This project is built with:
+
 🎨 Frontend:
 
 React.js with TypeScript for a strong, component-based UI
