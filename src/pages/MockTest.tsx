@@ -7,6 +7,7 @@ import { Clock, CheckCircle, Info, AlertTriangle, ExternalLink } from 'lucide-re
 import SecureAptitudeTest from '@/components/mock-test/SecureAptitudeTest';
 import BehavioralTest from '@/components/mock-test/BehavioralTest';
 import TechnicalTest from '@/components/mock-test/TechnicalTest';
+import CodingTest from '@/components/mock-test/CodingTest';
 // Note: Ensure the TechnicalTest component is properly created in src/components/mock-test/TechnicalTest.tsx
 
 const MockTest = () => {
@@ -34,11 +35,20 @@ const MockTest = () => {
     {
       id: 'coding-fundamentals',
       title: 'Coding Fundamentals',
-      description: 'Basic programming problems and algorithm challenges',
+      description: 'Basic programming problems and algorithm challenges on HackerRank platform',
       duration: 60,
       questions: 5,
       difficulty: 'Medium',
       tags: ['Algorithms', 'Data Structures', 'Problem Solving'],
+    },
+    {
+      id: 'coding-test',
+      title: 'Advanced Coding Test',
+      description: 'Solve DSA problems with AI-powered code review and optimization suggestions',
+      duration: 90,
+      questions: 5,
+      difficulty: 'Hard',
+      tags: ['DSA', 'Algorithms', 'Problem Solving', 'AI Review'],
     },
     {
       id: 'technical-dsa-oop',
@@ -83,6 +93,8 @@ const MockTest = () => {
     return <TechnicalTest />;
   } else if (selectedTest === 'behavioral-questions') {
     return <BehavioralTest />;
+  } else if (selectedTest === 'coding-test') {
+    return <CodingTest />;
   }
 
   return (
@@ -147,7 +159,7 @@ const MockTest = () => {
                     <div>
                       <CardTitle>
                         {test.title}
-                        {test.id === 'coding-fundamentals' && (
+                        {(test.id === 'coding-fundamentals' || test.id === 'coding-test') && (
                           <ExternalLink className="h-4 w-4 inline ml-1 text-gray-400" />
                         )}
                       </CardTitle>
@@ -191,7 +203,7 @@ const MockTest = () => {
                     className="w-full"
                     onClick={() => handleTestSelection(test.id)}
                   >
-                    {test.id === 'coding-fundamentals' ? 'Start Test' : 'Start Test'}
+                    {test.id === 'coding-test' ? 'Start Test' : 'Start Test'}
                   </Button>
                 </CardFooter>
               </Card>
