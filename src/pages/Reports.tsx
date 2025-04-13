@@ -1,10 +1,29 @@
-import React, { useState, useRef } from 'react';
-import DashboardLayout from '@/components/layout/DashboardLayout';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Download, ExternalLink, BookOpen, Video, FileText, FileDown, Award, Clock, User, Briefcase, Calendar } from 'lucide-react';
-import { 
+import React, { useState, useRef } from "react";
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Download,
+  ExternalLink,
+  BookOpen,
+  Video,
+  FileText,
+  FileDown,
+  Award,
+  Clock,
+  User,
+  Briefcase,
+  Calendar,
+} from "lucide-react";
+import {
   LineChart,
   Line,
   XAxis,
@@ -22,183 +41,184 @@ import {
   PolarGrid,
   PolarAngleAxis,
   PolarRadiusAxis,
-  Radar
-} from 'recharts';
-import { useLanguage } from '@/hooks/useLanguage';
+  Radar,
+} from "recharts";
+import { useLanguage } from "@/hooks/useLanguage";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/use-toast";
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 const Reports = () => {
   const { t } = useLanguage();
-  const [selectedCandidate, setSelectedCandidate] = useState<string | null>(null);
+  const [selectedCandidate, setSelectedCandidate] = useState<string | null>(
+    null
+  );
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const reportRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
-  
+
   const progressData = [
-    { date: '2023-04-01', technical: 60, behavioral: 65 },
-    { date: '2023-04-15', technical: 65, behavioral: 68 },
-    { date: '2023-05-01', technical: 70, behavioral: 72 },
-    { date: '2023-05-15', technical: 75, behavioral: 70 },
-    { date: '2023-06-01', technical: 80, behavioral: 75 },
-    { date: '2023-06-15', technical: 82, behavioral: 78 },
+    { date: "2023-04-01", technical: 60, behavioral: 65 },
+    { date: "2023-04-15", technical: 65, behavioral: 68 },
+    { date: "2023-05-01", technical: 70, behavioral: 72 },
+    { date: "2023-05-15", technical: 75, behavioral: 70 },
+    { date: "2023-06-01", technical: 80, behavioral: 75 },
+    { date: "2023-06-15", technical: 82, behavioral: 78 },
   ];
 
   const performanceData = [
-    { category: 'DSA Knowledge', score: 85 },
-    { category: 'Problem Solving', score: 78 },
-    { category: 'Code Quality', score: 72 },
-    { category: 'Optimization', score: 68 },
-    { category: 'Testing Approach', score: 65 },
+    { category: "DSA Knowledge", score: 85 },
+    { category: "Problem Solving", score: 78 },
+    { category: "Code Quality", score: 72 },
+    { category: "Optimization", score: 68 },
+    { category: "Testing Approach", score: 65 },
   ];
-  
+
   const skillsData = [
-    { name: 'Algorithms', value: 35 },
-    { name: 'Data Structures', value: 25 },
-    { name: 'System Design', value: 15 },
-    { name: 'Debugging', value: 15 },
-    { name: 'OOP Concepts', value: 10 },
+    { name: "Algorithms", value: 35 },
+    { name: "Data Structures", value: 25 },
+    { name: "System Design", value: 15 },
+    { name: "Debugging", value: 15 },
+    { name: "OOP Concepts", value: 10 },
   ];
 
   const candidateData = {
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    role: 'Senior Frontend Developer',
-    date: '2023-07-12',
-    time: '14:30 - 15:45',
-    testType: 'Technical Interview + Coding Test',
+    name: "John Doe",
+    email: "john.doe@example.com",
+    role: "Senior Frontend Developer",
+    date: "2023-07-12",
+    time: "14:30 - 15:45",
+    testType: "Technical Interview + Coding Test",
     totalScore: 78,
-    status: 'Pass',
-    recommendation: 'Hire',
-    photoUrl: '',
-    feedback: 'Candidate showed strong problem-solving skills and deep knowledge of JavaScript. Could improve on system design concepts and optimization techniques. Overall, a solid performer who would be an asset to the team.'
+    status: "Pass",
+    recommendation: "Hire",
+    photoUrl: "",
+    feedback:
+      "Candidate showed strong problem-solving skills and deep knowledge of JavaScript. Could improve on system design concepts and optimization techniques. Overall, a solid performer who would be an asset to the team.",
   };
-  
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+
+  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 
   const learningResources = [
     {
-      category: 'Data Structures & Algorithms',
-      priority: 'High',
+      category: "Data Structures & Algorithms",
+      priority: "High",
       resources: [
-        { 
-          title: 'Introduction to Algorithms', 
-          type: 'Book',
-          author: 'Thomas H. Cormen',
-          link: 'https://www.amazon.com/Introduction-Algorithms-3rd-MIT-Press/dp/0262033844',
-          icon: BookOpen
+        {
+          title: "Introduction to Algorithms",
+          type: "Book",
+          author: "Thomas H. Cormen",
+          link: "https://www.amazon.com/Introduction-Algorithms-3rd-MIT-Press/dp/0262033844",
+          icon: BookOpen,
         },
-        { 
-          title: 'AlgoExpert - Algorithm Interview Preparation',
-          type: 'Course',
-          author: 'Clement Mihailescu',
-          link: 'https://www.algoexpert.io/',
-          icon: Video
+        {
+          title: "AlgoExpert - Algorithm Interview Preparation",
+          type: "Course",
+          author: "Clement Mihailescu",
+          link: "https://www.algoexpert.io/",
+          icon: Video,
         },
-        { 
-          title: 'Grokking Algorithms',
-          type: 'Book',
-          author: 'Aditya Bhargava',
-          link: 'https://www.manning.com/books/grokking-algorithms',
-          icon: BookOpen
+        {
+          title: "Grokking Algorithms",
+          type: "Book",
+          author: "Aditya Bhargava",
+          link: "https://www.manning.com/books/grokking-algorithms",
+          icon: BookOpen,
         },
-      ]
+      ],
     },
     {
-      category: 'System Design',
-      priority: 'Medium',
+      category: "System Design",
+      priority: "Medium",
       resources: [
-        { 
-          title: 'System Design Interview', 
-          type: 'Book',
-          author: 'Alex Xu',
-          link: 'https://www.amazon.com/System-Design-Interview-insiders-Second/dp/B08CMF2CQF',
-          icon: BookOpen
+        {
+          title: "System Design Interview",
+          type: "Book",
+          author: "Alex Xu",
+          link: "https://www.amazon.com/System-Design-Interview-insiders-Second/dp/B08CMF2CQF",
+          icon: BookOpen,
         },
-        { 
-          title: 'Grokking the System Design Interview',
-          type: 'Course',
-          author: 'Educative',
-          link: 'https://www.educative.io/courses/grokking-the-system-design-interview',
-          icon: Video
+        {
+          title: "Grokking the System Design Interview",
+          type: "Course",
+          author: "Educative",
+          link: "https://www.educative.io/courses/grokking-the-system-design-interview",
+          icon: Video,
         },
-      ]
+      ],
     },
     {
-      category: 'Behavioral Interviews',
-      priority: 'Low',
+      category: "Behavioral Interviews",
+      priority: "Low",
       resources: [
-        { 
-          title: 'Cracking the Coding Interview', 
-          type: 'Book',
-          author: 'Gayle Laakmann McDowell',
-          link: 'https://www.amazon.com/Cracking-Coding-Interview-Programming-Questions/dp/0984782850',
-          icon: BookOpen
+        {
+          title: "Cracking the Coding Interview",
+          type: "Book",
+          author: "Gayle Laakmann McDowell",
+          link: "https://www.amazon.com/Cracking-Coding-Interview-Programming-Questions/dp/0984782850",
+          icon: BookOpen,
         },
-        { 
-          title: 'STAR Method - Complete Guide',
-          type: 'Article',
-          author: 'Indeed Career Guide',
-          link: 'https://www.indeed.com/career-advice/interviewing/how-to-use-the-star-interview-response-technique',
-          icon: FileText
+        {
+          title: "STAR Method - Complete Guide",
+          type: "Article",
+          author: "Indeed Career Guide",
+          link: "https://www.indeed.com/career-advice/interviewing/how-to-use-the-star-interview-response-technique",
+          icon: FileText,
         },
-      ]
+      ],
     },
   ];
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric' 
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
     });
   };
 
   const priorityColor = (priority: string) => {
     switch (priority) {
-      case 'High':
-        return 'bg-red-100 text-red-600';
-      case 'Medium':
-        return 'bg-amber-100 text-amber-600';
-      case 'Low':
-        return 'bg-green-100 text-green-600';
+      case "High":
+        return "bg-red-100 text-red-600";
+      case "Medium":
+        return "bg-amber-100 text-amber-600";
+      case "Low":
+        return "bg-green-100 text-green-600";
       default:
-        return 'bg-gray-100 text-gray-600';
+        return "bg-gray-100 text-gray-600";
     }
   };
 
   const iconForType = (type: string, Icon: any) => {
-    return (
-      <Icon className="h-4 w-4 mr-2 text-secondary" />
-    );
+    return <Icon className="h-4 w-4 mr-2 text-secondary" />;
   };
 
   const statusColor = (status: string) => {
     switch (status) {
-      case 'Pass':
-        return 'bg-green-100 text-green-800';
-      case 'Fail':
-        return 'bg-red-100 text-red-800';
-      case 'Borderline':
-        return 'bg-amber-100 text-amber-800';
+      case "Pass":
+        return "bg-green-100 text-green-800";
+      case "Fail":
+        return "bg-red-100 text-red-800";
+      case "Borderline":
+        return "bg-amber-100 text-amber-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const recommendationColor = (recommendation: string) => {
     switch (recommendation) {
-      case 'Hire':
-        return 'bg-green-100 text-green-800';
-      case 'No Hire':
-        return 'bg-red-100 text-red-800';
-      case 'Borderline':
-        return 'bg-amber-100 text-amber-800';
+      case "Hire":
+        return "bg-green-100 text-green-800";
+      case "No Hire":
+        return "bg-red-100 text-red-800";
+      case "Borderline":
+        return "bg-amber-100 text-amber-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -209,25 +229,25 @@ const Reports = () => {
         title: "Generating PDF",
         description: "Please wait while we prepare your report...",
       });
-      
+
       // Create PDF document
       const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
       });
-      
+
       // Add title
       pdf.setFontSize(18);
       pdf.setTextColor(0, 0, 0);
-      pdf.text('Candidate Interview Report', 105, 15, { align: 'center' });
+      pdf.text("Candidate Interview Report", 105, 15, { align: "center" });
       pdf.setDrawColor(200, 200, 200);
       pdf.line(20, 20, 190, 20);
-      
+
       // Add candidate information section
       pdf.setFontSize(16);
-      pdf.text('Candidate Information', 20, 30);
-      
+      pdf.text("Candidate Information", 20, 30);
+
       pdf.setFontSize(11);
       pdf.text(`Name: ${candidateData.name}`, 20, 40);
       pdf.text(`Email: ${candidateData.email}`, 20, 47);
@@ -235,149 +255,161 @@ const Reports = () => {
       pdf.text(`Interview Date: ${candidateData.date}`, 20, 61);
       pdf.text(`Interview Time: ${candidateData.time}`, 20, 68);
       pdf.text(`Test Type: ${candidateData.testType}`, 20, 75);
-      
+
       pdf.setFontSize(12);
       pdf.setTextColor(0, 0, 0);
       pdf.text(`Total Score: ${candidateData.totalScore}%`, 20, 85);
-      
+
       // Status with colored rectangle
       pdf.text(`Status: `, 20, 92);
-      pdf.setFillColor(candidateData.status === 'Pass' ? 0 : 255, 
-                      candidateData.status === 'Pass' ? 180 : 0, 0);
-      pdf.rect(40, 89, 15, 6, 'F');
+      pdf.setFillColor(
+        candidateData.status === "Pass" ? 0 : 255,
+        candidateData.status === "Pass" ? 180 : 0,
+        0
+      );
+      pdf.rect(40, 89, 15, 6, "F");
       pdf.setTextColor(255, 255, 255);
       pdf.text(candidateData.status, 42, 93);
       pdf.setTextColor(0, 0, 0);
-      
+
       // Recommendation with colored rectangle
       pdf.text(`Recommendation: `, 20, 102);
-      pdf.setFillColor(candidateData.recommendation === 'Hire' ? 0 : 255, 
-                     candidateData.recommendation === 'Hire' ? 180 : 0, 0);
-      pdf.rect(60, 99, 20, 6, 'F');
+      pdf.setFillColor(
+        candidateData.recommendation === "Hire" ? 0 : 255,
+        candidateData.recommendation === "Hire" ? 180 : 0,
+        0
+      );
+      pdf.rect(60, 99, 20, 6, "F");
       pdf.setTextColor(255, 255, 255);
       pdf.text(candidateData.recommendation, 62, 103);
       pdf.setTextColor(0, 0, 0);
-      
+
       // Add separator
       pdf.line(20, 110, 190, 110);
-      
+
       // Add bar chart (manually create it)
       pdf.setFontSize(16);
-      pdf.text('Performance Breakdown', 20, 120);
-      
+      pdf.text("Performance Breakdown", 20, 120);
+
       // Generate simple bar chart
       pdf.setDrawColor(0, 0, 0);
-      
+
       let barY = 130;
       const barMaxWidth = 100;
-      
+
       performanceData.forEach((data, index) => {
         // Convert hex to RGB for PDF
-        const hexColor = COLORS[index % COLORS.length].replace('#', '');
+        const hexColor = COLORS[index % COLORS.length].replace("#", "");
         const r = parseInt(hexColor.substring(0, 2), 16);
         const g = parseInt(hexColor.substring(2, 4), 16);
         const b = parseInt(hexColor.substring(4, 6), 16);
-        
+
         pdf.setFontSize(10);
         pdf.text(`${data.category}: ${data.score}%`, 20, barY);
         pdf.setFillColor(r, g, b);
-        pdf.rect(20, barY + 2, (data.score / 100) * barMaxWidth, 6, 'F');
+        pdf.rect(20, barY + 2, (data.score / 100) * barMaxWidth, 6, "F");
         barY += 15;
       });
-      
+
       // Add separator
       pdf.line(20, barY, 190, barY);
       barY += 10;
-      
+
       // Add skills pie chart representation (as text)
       pdf.setFontSize(16);
-      pdf.text('Skills Distribution', 20, barY);
+      pdf.text("Skills Distribution", 20, barY);
       barY += 10;
 
       skillsData.forEach((skill, index) => {
         // Convert hex to RGB for PDF
-        const hexColor = COLORS[index % COLORS.length].replace('#', '');
+        const hexColor = COLORS[index % COLORS.length].replace("#", "");
         const r = parseInt(hexColor.substring(0, 2), 16);
         const g = parseInt(hexColor.substring(2, 4), 16);
         const b = parseInt(hexColor.substring(4, 6), 16);
-        
+
         pdf.setFillColor(r, g, b);
-        pdf.rect(20, barY, 8, 8, 'F');
+        pdf.rect(20, barY, 8, 8, "F");
         pdf.setFontSize(10);
         pdf.text(`${skill.name}: ${skill.value}%`, 35, barY + 5);
         barY += 12;
       });
-      
+
       // Add separator
       pdf.line(20, barY, 190, barY);
       barY += 10;
-      
+
       // Add feedback section - ensure it's fully visible
       pdf.setFontSize(16);
-      pdf.text('Interviewer Feedback', 20, barY);
+      pdf.text("Interviewer Feedback", 20, barY);
       barY += 10;
-      
+
       // Check if we need to add a new page for feedback (if too close to bottom)
       if (barY > 250) {
         pdf.addPage();
         barY = 20;
         pdf.setFontSize(16);
-        pdf.text('Interviewer Feedback (continued)', 20, barY);
+        pdf.text("Interviewer Feedback (continued)", 20, barY);
         barY += 10;
       }
-      
+
       // Create feedback background
       pdf.setFillColor(240, 240, 240);
-      
+
       // Handle multiline text for feedback
       const maxWidth = 160; // Wider text area
       const feedbackText = candidateData.feedback;
-      
+
       // Set font properties for feedback
       pdf.setFontSize(12);
       pdf.setTextColor(0, 0, 0);
-      
+
       // Split text to fit width
       const splitFeedback = pdf.splitTextToSize(feedbackText, maxWidth);
-      
+
       // Calculate needed height and ensure it fits on page
       const lineHeight = 7;
       const totalHeight = Math.min(splitFeedback.length * lineHeight + 10, 200);
-      
+
       // Draw background rectangle for feedback
-      pdf.rect(20, barY, 170, totalHeight, 'F');
-      
+      pdf.rect(20, barY, 170, totalHeight, "F");
+
       // Add the feedback text line by line with proper spacing
       for (let i = 0; i < splitFeedback.length; i++) {
         // Check if we need a new page
-        if (barY + 7 + (i * lineHeight) > 280) {
+        if (barY + 7 + i * lineHeight > 280) {
           pdf.addPage();
-          barY = 20 - (i * lineHeight);  // Reset position for the new page
-          
+          barY = 20 - i * lineHeight; // Reset position for the new page
+
           // Redraw background on new page if needed
           const remainingLines = splitFeedback.length - i;
-          const remainingHeight = Math.min(remainingLines * lineHeight + 10, 200);
+          const remainingHeight = Math.min(
+            remainingLines * lineHeight + 10,
+            200
+          );
           pdf.setFillColor(240, 240, 240);
-          pdf.rect(20, barY, 170, remainingHeight, 'F');
+          pdf.rect(20, barY, 170, remainingHeight, "F");
         }
-        
+
         // Add each line of text
-        pdf.text(splitFeedback[i], 25, barY + 7 + (i * lineHeight));
+        pdf.text(splitFeedback[i], 25, barY + 7 + i * lineHeight);
       }
-      
+
       // Save file
-      pdf.save(`${candidateData.name.replace(/\s+/g, '_')}_Interview_Report.pdf`);
-      
+      pdf.save(
+        `${candidateData.name.replace(/\s+/g, "_")}_Interview_Report.pdf`
+      );
+
       toast({
         title: "PDF Generated Successfully",
         description: "Your report has been downloaded.",
         variant: "default",
       });
     } catch (error) {
-      console.error('Error generating PDF:', error);
+      console.error("Error generating PDF:", error);
       toast({
         title: "Error Generating PDF",
-        description: "There was a problem creating your report. Please try again.",
+        description:
+          "There was a problem creating your report. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -389,32 +421,36 @@ const Reports = () => {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{t('Performance_reports')}</h1>
-          <p className="text-gray-500 mt-1">{t('Track_progress')}</p>
+          <h1 className="text-3xl font-bold text-gray-900">
+            {t("performance reports")}
+          </h1>
+          <p className="text-gray-500 mt-1">{t("track progress")}</p>
         </div>
 
         <Tabs defaultValue="progress" className="w-full">
           <TabsList className="grid w-full max-w-md grid-cols-3">
-            <TabsTrigger value="progress">{t('progress')}</TabsTrigger>
-            <TabsTrigger value="candidate">{t('candidate_report')}</TabsTrigger>
-            <TabsTrigger value="recommendations">{t('recommendations')}</TabsTrigger>
+            <TabsTrigger value="progress">{t("progress")}</TabsTrigger>
+            <TabsTrigger value="candidate">{t("candidate report")}</TabsTrigger>
+            <TabsTrigger value="recommendations">
+              {t("recommendations")}
+            </TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="progress" className="mt-6">
             <Card>
               <CardHeader>
-                <CardTitle>{t('progress_over_time')}</CardTitle>
+                <CardTitle>{t("progress over time")}</CardTitle>
                 <CardDescription>
-                  {t('interview_skills_progress')}
+                  {t("interview skills progress")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-2">
                 <div className="h-80">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart
-                      data={progressData.map(item => ({
+                      data={progressData.map((item) => ({
                         ...item,
-                        date: formatDate(item.date)
+                        date: formatDate(item.date),
                       }))}
                       margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                     >
@@ -423,18 +459,18 @@ const Reports = () => {
                       <YAxis domain={[0, 100]} />
                       <Tooltip />
                       <Legend />
-                      <Line 
-                        type="monotone" 
-                        dataKey="technical" 
-                        name={t('technical_skills')} 
-                        stroke="hsl(var(--secondary))" 
-                        activeDot={{ r: 8 }} 
+                      <Line
+                        type="monotone"
+                        dataKey="technical"
+                        name={t("technical skills")}
+                        stroke="hsl(var(--secondary))"
+                        activeDot={{ r: 8 }}
                       />
-                      <Line 
-                        type="monotone" 
-                        dataKey="behavioral" 
-                        name={t('behavioral_skills')} 
-                        stroke="#8884d8" 
+                      <Line
+                        type="monotone"
+                        dataKey="behavioral"
+                        name={t("behavioral skills")}
+                        stroke="#8884d8"
                       />
                     </LineChart>
                   </ResponsiveContainer>
@@ -453,12 +489,21 @@ const Reports = () => {
                 <CardContent className="space-y-6">
                   <div className="flex items-center">
                     <Avatar className="h-16 w-16">
-                      <AvatarImage src={candidateData.photoUrl} alt={candidateData.name} />
-                      <AvatarFallback className="text-lg">{candidateData.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                      <AvatarImage
+                        src={candidateData.photoUrl}
+                        alt={candidateData.name}
+                      />
+                      <AvatarFallback className="text-lg">
+                        {candidateData.name.substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
                     </Avatar>
                     <div className="ml-4">
-                      <h3 className="font-medium text-lg">{candidateData.name}</h3>
-                      <p className="text-sm text-gray-500">{candidateData.email}</p>
+                      <h3 className="font-medium text-lg">
+                        {candidateData.name}
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        {candidateData.email}
+                      </p>
                     </div>
                   </div>
 
@@ -472,7 +517,7 @@ const Reports = () => {
                         <p className="font-medium">{candidateData.role}</p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center">
                       <Calendar className="h-4 w-4 mr-2 text-gray-500" />
                       <div>
@@ -480,7 +525,7 @@ const Reports = () => {
                         <p className="font-medium">{candidateData.date}</p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center">
                       <Clock className="h-4 w-4 mr-2 text-gray-500" />
                       <div>
@@ -488,7 +533,7 @@ const Reports = () => {
                         <p className="font-medium">{candidateData.time}</p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center">
                       <FileText className="h-4 w-4 mr-2 text-gray-500" />
                       <div>
@@ -503,35 +548,53 @@ const Reports = () => {
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-500">Total Score</span>
-                      <span className="font-medium text-lg">{candidateData.totalScore}%</span>
+                      <span className="font-medium text-lg">
+                        {candidateData.totalScore}%
+                      </span>
                     </div>
-                    
+
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-500">Status</span>
                       <Badge className={statusColor(candidateData.status)}>
                         {candidateData.status}
                       </Badge>
                     </div>
-                    
+
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-500">Recommendation</span>
-                      <Badge className={recommendationColor(candidateData.recommendation)}>
+                      <span className="text-sm text-gray-500">
+                        Recommendation
+                      </span>
+                      <Badge
+                        className={recommendationColor(
+                          candidateData.recommendation
+                        )}
+                      >
                         {candidateData.recommendation}
                       </Badge>
                     </div>
                   </div>
 
                   <Separator />
-                  
+
                   <div>
-                    <h4 className="font-medium text-gray-900 mb-2">Interviewer Feedback</h4>
-                    <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded-md">{candidateData.feedback}</p>
+                    <h4 className="font-medium text-gray-900 mb-2">
+                      Interviewer Feedback
+                    </h4>
+                    <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded-md">
+                      {candidateData.feedback}
+                    </p>
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full" onClick={handleDownloadPDF} disabled={isGeneratingPDF}>
+                  <Button
+                    className="w-full"
+                    onClick={handleDownloadPDF}
+                    disabled={isGeneratingPDF}
+                  >
                     <FileDown className="h-4 w-4 mr-2" />
-                    {isGeneratingPDF ? "Generating PDF..." : "Download PDF Report"}
+                    {isGeneratingPDF
+                      ? "Generating PDF..."
+                      : "Download PDF Report"}
                   </Button>
                 </CardFooter>
               </Card>
@@ -542,7 +605,9 @@ const Reports = () => {
                 <Card>
                   <CardHeader>
                     <CardTitle>Performance Breakdown</CardTitle>
-                    <CardDescription>Score by assessment category</CardDescription>
+                    <CardDescription>
+                      Score by assessment category
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="h-72">
@@ -553,22 +618,27 @@ const Reports = () => {
                             top: 20,
                             right: 30,
                             left: 20,
-                            bottom: 50
+                            bottom: 50,
                           }}
                         >
                           <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis 
-                            dataKey="category" 
+                          <XAxis
+                            dataKey="category"
                             angle={-45}
                             textAnchor="end"
                             height={60}
                             tick={{ fontSize: 12 }}
                           />
                           <YAxis domain={[0, 100]} />
-                          <Tooltip formatter={(value) => [`${value}%`, 'Score']} />
+                          <Tooltip
+                            formatter={(value) => [`${value}%`, "Score"]}
+                          />
                           <Bar dataKey="score" fill="hsl(var(--primary))">
                             {performanceData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                              <Cell
+                                key={`cell-${index}`}
+                                fill={COLORS[index % COLORS.length]}
+                              />
                             ))}
                           </Bar>
                         </BarChart>
@@ -581,7 +651,9 @@ const Reports = () => {
                 <Card>
                   <CardHeader>
                     <CardTitle>Skills Distribution</CardTitle>
-                    <CardDescription>Analysis of skills demonstrated during interview</CardDescription>
+                    <CardDescription>
+                      Analysis of skills demonstrated during interview
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="h-72">
@@ -592,16 +664,23 @@ const Reports = () => {
                             cx="50%"
                             cy="50%"
                             labelLine={false}
-                            label={({name, percent}) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                            label={({ name, percent }) =>
+                              `${name}: ${(percent * 100).toFixed(0)}%`
+                            }
                             outerRadius={80}
                             fill="#8884d8"
                             dataKey="value"
                           >
                             {skillsData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                              <Cell
+                                key={`cell-${index}`}
+                                fill={COLORS[index % COLORS.length]}
+                              />
                             ))}
                           </Pie>
-                          <Tooltip formatter={(value) => [`${value}%`, 'Proficiency']} />
+                          <Tooltip
+                            formatter={(value) => [`${value}%`, "Proficiency"]}
+                          />
                           <Legend />
                         </PieChart>
                       </ResponsiveContainer>
@@ -615,13 +694,17 @@ const Reports = () => {
             <div ref={reportRef} className="hidden">
               <div className="max-w-4xl mx-auto bg-white p-8">
                 <div className="mb-8">
-                  <h1 className="text-2xl font-bold text-center mb-2">Candidate Interview Report</h1>
+                  <h1 className="text-2xl font-bold text-center mb-2">
+                    Candidate Interview Report
+                  </h1>
                   <Separator className="my-4" />
                 </div>
-                
+
                 {/* 1. Candidate Information Section */}
                 <div className="mb-8">
-                  <h2 className="text-xl font-semibold mb-4">Candidate Information</h2>
+                  <h2 className="text-xl font-semibold mb-4">
+                    Candidate Information
+                  </h2>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="flex items-center">
                       <User className="h-4 w-4 mr-2 text-gray-500" />
@@ -630,7 +713,7 @@ const Reports = () => {
                         <p className="font-medium">{candidateData.name}</p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center">
                       <FileText className="h-4 w-4 mr-2 text-gray-500" />
                       <div>
@@ -638,7 +721,7 @@ const Reports = () => {
                         <p className="font-medium">{candidateData.email}</p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center">
                       <Briefcase className="h-4 w-4 mr-2 text-gray-500" />
                       <div>
@@ -646,7 +729,7 @@ const Reports = () => {
                         <p className="font-medium">{candidateData.role}</p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center">
                       <Calendar className="h-4 w-4 mr-2 text-gray-500" />
                       <div>
@@ -654,7 +737,7 @@ const Reports = () => {
                         <p className="font-medium">{candidateData.date}</p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center">
                       <Clock className="h-4 w-4 mr-2 text-gray-500" />
                       <div>
@@ -662,7 +745,7 @@ const Reports = () => {
                         <p className="font-medium">{candidateData.time}</p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center">
                       <FileText className="h-4 w-4 mr-2 text-gray-500" />
                       <div>
@@ -671,34 +754,48 @@ const Reports = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-3 gap-4 mt-4">
                     <div className="bg-gray-50 p-3 rounded-md">
                       <p className="text-sm text-gray-500 mb-1">Total Score</p>
-                      <p className="font-medium text-lg">{candidateData.totalScore}%</p>
+                      <p className="font-medium text-lg">
+                        {candidateData.totalScore}%
+                      </p>
                     </div>
-                    
+
                     <div className="bg-gray-50 p-3 rounded-md">
                       <p className="text-sm text-gray-500 mb-1">Status</p>
-                      <p className={`px-2 py-1 rounded text-sm inline-block ${statusColor(candidateData.status)}`}>
+                      <p
+                        className={`px-2 py-1 rounded text-sm inline-block ${statusColor(
+                          candidateData.status
+                        )}`}
+                      >
                         {candidateData.status}
                       </p>
                     </div>
-                    
+
                     <div className="bg-gray-50 p-3 rounded-md">
-                      <p className="text-sm text-gray-500 mb-1">Recommendation</p>
-                      <p className={`px-2 py-1 rounded text-sm inline-block ${recommendationColor(candidateData.recommendation)}`}>
+                      <p className="text-sm text-gray-500 mb-1">
+                        Recommendation
+                      </p>
+                      <p
+                        className={`px-2 py-1 rounded text-sm inline-block ${recommendationColor(
+                          candidateData.recommendation
+                        )}`}
+                      >
                         {candidateData.recommendation}
                       </p>
                     </div>
                   </div>
                 </div>
-                
+
                 <Separator className="my-6" />
-                
+
                 {/* 2. Performance Bar Chart */}
                 <div className="mb-8">
-                  <h2 className="text-xl font-semibold mb-4">Performance Breakdown</h2>
+                  <h2 className="text-xl font-semibold mb-4">
+                    Performance Breakdown
+                  </h2>
                   <div className="h-72">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart
@@ -707,34 +804,41 @@ const Reports = () => {
                           top: 20,
                           right: 30,
                           left: 20,
-                          bottom: 50
+                          bottom: 50,
                         }}
                       >
                         <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis 
-                          dataKey="category" 
+                        <XAxis
+                          dataKey="category"
                           angle={-45}
                           textAnchor="end"
                           height={60}
                           tick={{ fontSize: 12 }}
                         />
                         <YAxis domain={[0, 100]} />
-                        <Tooltip formatter={(value) => [`${value}%`, 'Score']} />
+                        <Tooltip
+                          formatter={(value) => [`${value}%`, "Score"]}
+                        />
                         <Bar dataKey="score" fill="hsl(var(--primary))">
                           {performanceData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={COLORS[index % COLORS.length]}
+                            />
                           ))}
                         </Bar>
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
                 </div>
-                
+
                 <Separator className="my-6" />
-                
+
                 {/* 3. Skills Pie Chart */}
                 <div className="mb-8">
-                  <h2 className="text-xl font-semibold mb-4">Skills Distribution</h2>
+                  <h2 className="text-xl font-semibold mb-4">
+                    Skills Distribution
+                  </h2>
                   <div className="h-72">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
@@ -743,27 +847,36 @@ const Reports = () => {
                           cx="50%"
                           cy="50%"
                           labelLine={false}
-                          label={({name, percent}) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                          label={({ name, percent }) =>
+                            `${name}: ${(percent * 100).toFixed(0)}%`
+                          }
                           outerRadius={80}
                           fill="#8884d8"
                           dataKey="value"
                         >
                           {skillsData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={COLORS[index % COLORS.length]}
+                            />
                           ))}
                         </Pie>
-                        <Tooltip formatter={(value) => [`${value}%`, 'Proficiency']} />
+                        <Tooltip
+                          formatter={(value) => [`${value}%`, "Proficiency"]}
+                        />
                         <Legend />
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
                 </div>
-                
+
                 <Separator className="my-6" />
-                
+
                 {/* 4. Interviewer Feedback */}
                 <div>
-                  <h2 className="text-xl font-semibold mb-4">Interviewer Feedback</h2>
+                  <h2 className="text-xl font-semibold mb-4">
+                    Interviewer Feedback
+                  </h2>
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <p className="text-gray-700">{candidateData.feedback}</p>
                   </div>
@@ -771,47 +884,65 @@ const Reports = () => {
               </div>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="recommendations" className="mt-6">
             <Card>
               <CardHeader>
-                <CardTitle>{t('Learning_resources')}</CardTitle>
-                <CardDescription>
-                  {t('Recommended_resources')}
-                </CardDescription>
+                <CardTitle>{t("learning resources")}</CardTitle>
+                <CardDescription>{t("recommended resources")}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-8">
                   {learningResources.map((category, index) => (
-                    <div key={index} className="border-b pb-6 last:border-b-0 last:pb-0">
+                    <div
+                      key={index}
+                      className="border-b pb-6 last:border-b-0 last:pb-0"
+                    >
                       <div className="flex justify-between mb-4">
-                        <h3 className="font-medium text-lg">{category.category}</h3>
-                        <span className={`text-sm px-2 py-1 rounded ${priorityColor(category.priority)}`}>
-                          {category.priority} {t('priority')}
+                        <h3 className="font-medium text-lg">
+                          {category.category}
+                        </h3>
+                        <span
+                          className={`text-sm px-2 py-1 rounded ${priorityColor(
+                            category.priority
+                          )}`}
+                        >
+                          {category.priority} {t("priority")}
                         </span>
                       </div>
-                      
+
                       <div className="space-y-4">
                         {category.resources.map((resource, idx) => {
                           const ResourceIcon = resource.icon;
                           return (
-                            <div key={idx} className="bg-gray-50 rounded-lg p-4">
+                            <div
+                              key={idx}
+                              className="bg-gray-50 rounded-lg p-4"
+                            >
                               <div className="flex justify-between items-start">
                                 <div className="flex items-start">
                                   <div className="mt-0.5">
-                                    {ResourceIcon && <ResourceIcon className="h-5 w-5 text-secondary" />}
+                                    {ResourceIcon && (
+                                      <ResourceIcon className="h-5 w-5 text-secondary" />
+                                    )}
                                   </div>
                                   <div className="ml-3">
-                                    <h4 className="font-medium text-gray-900">{resource.title}</h4>
+                                    <h4 className="font-medium text-gray-900">
+                                      {resource.title}
+                                    </h4>
                                     <p className="text-sm text-gray-500">
                                       {resource.type} • {resource.author}
                                     </p>
                                   </div>
                                 </div>
                                 <Button variant="outline" size="sm" asChild>
-                                  <a href={resource.link} target="_blank" rel="noopener noreferrer">
+                                  <a
+                                    href={resource.link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
                                     <ExternalLink className="h-4 w-4 mr-2" />
-                                    {t('view')}
+                                    {t("view")}
                                   </a>
                                 </Button>
                               </div>

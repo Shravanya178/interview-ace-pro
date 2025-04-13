@@ -1,11 +1,22 @@
-
-import React from 'react';
-import DashboardLayout from '@/components/layout/DashboardLayout';
-import { useLanguage } from '@/hooks/useLanguage';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+import React from "react";
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { useLanguage } from "@/hooks/useLanguage";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 const Settings = () => {
   const { t, language, setLanguage, languages } = useLanguage();
@@ -14,23 +25,21 @@ const Settings = () => {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{t('settings')}</h1>
-          <p className="text-gray-500 mt-1">{t('settings_desc')}</p>
+          <h1 className="text-3xl font-bold text-gray-900">{t("settings")}</h1>
+          <p className="text-gray-500 mt-1">{t("settings desc")}</p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>{t('language_preferences')}</CardTitle>
-            <CardDescription>
-              {t('language_preferences_desc')}
-            </CardDescription>
+            <CardTitle>{t("language preferences")}</CardTitle>
+            <CardDescription>{t("language preferences desc")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-1">
-              <Label htmlFor="language">{t('select_language')}</Label>
+              <Label htmlFor="language">{t("select language")}</Label>
               <Select value={language} onValueChange={setLanguage}>
                 <SelectTrigger className="w-full md:w-[280px]">
-                  <SelectValue placeholder={t('select_language')} />
+                  <SelectValue placeholder={t("select language")} />
                 </SelectTrigger>
                 <SelectContent>
                   {languages.map((lang) => (
@@ -46,17 +55,17 @@ const Settings = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>{t('notification_preferences')}</CardTitle>
+            <CardTitle>{t("notification preferences")}</CardTitle>
             <CardDescription>
-              {t('notification_preferences_desc')}
+              {t("notification preferences desc")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label>{t('email_notifications')}</Label>
+                <Label>{t("email notifications")}</Label>
                 <p className="text-sm text-gray-500">
-                  {t('email_notifications_desc')}
+                  {t("email notifications desc")}
                 </p>
               </div>
               <Switch defaultChecked />
@@ -64,9 +73,9 @@ const Settings = () => {
 
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label>{t('browser_notifications')}</Label>
+                <Label>{t("browser notifications")}</Label>
                 <p className="text-sm text-gray-500">
-                  {t('browser_notifications_desc')}
+                  {t("browser notifications desc")}
                 </p>
               </div>
               <Switch defaultChecked />
@@ -76,17 +85,15 @@ const Settings = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>{t('privacy_settings')}</CardTitle>
-            <CardDescription>
-              {t('privacy_settings_desc')}
-            </CardDescription>
+            <CardTitle>{t("privacy settings")}</CardTitle>
+            <CardDescription>{t("privacy settings desc")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label>{t('data_collection')}</Label>
+                <Label>{t("data collection")}</Label>
                 <p className="text-sm text-gray-500">
-                  {t('data_collection_desc')}
+                  {t("data collection desc")}
                 </p>
               </div>
               <Switch defaultChecked />
@@ -94,9 +101,9 @@ const Settings = () => {
 
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label>{t('analytics_tracking')}</Label>
+                <Label>{t("analytics tracking")}</Label>
                 <p className="text-sm text-gray-500">
-                  {t('analytics_tracking_desc')}
+                  {t("analytics tracking desc")}
                 </p>
               </div>
               <Switch defaultChecked />
