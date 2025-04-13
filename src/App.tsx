@@ -18,6 +18,7 @@ import Settings from "./pages/Settings";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import LandingPage from "./pages/LandingPage";
+import FacialEmotionAnalysis from "./pages/FacialEmotionAnalysis";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const App = () => (
               <Route path="/reports" element={<DirectAccess element={<Reports />} />} />
               <Route path="/profile" element={<DirectAccess element={<Profile />} />} />
               <Route path="/settings" element={<DirectAccess element={<Settings />} />} />
+              <Route path="/facial-emotion-analysis" element={<DirectAccess element={<FacialEmotionAnalysis />} />} />
               <Route path="/login" element={<Login />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

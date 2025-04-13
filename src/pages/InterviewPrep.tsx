@@ -4,7 +4,7 @@ import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Video, Code, MessageSquare, BookOpen } from 'lucide-react';
+import { Video, Code, MessageSquare, BookOpen, Smile } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import CompanySelector from '@/components/interview/CompanySelector';
 import RoleSelector from '@/components/interview/RoleSelector';
@@ -232,6 +232,46 @@ const InterviewPrep = () => {
               </Card>
             );
           })}
+        </div>
+        
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Additional Interview Tools</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="overflow-hidden">
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-2">
+                  <div className={`p-2 rounded-md bg-rose-100 text-rose-700`}>
+                    <Smile className="h-5 w-5" />
+                  </div>
+                  <CardTitle>Facial Emotion Analysis</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-500 mb-4">
+                  Analyze your facial expressions during interviews to understand how you appear to recruiters. Get real-time feedback and tips to improve your non-verbal communication.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Badge variant="outline" className="px-2 py-1">
+                    Body Language
+                  </Badge>
+                  <Badge variant="outline" className="px-2 py-1">
+                    Facial Expression
+                  </Badge>
+                  <Badge variant="outline" className="px-2 py-1">
+                    Emotion Detection
+                  </Badge>
+                </div>
+              </CardContent>
+              <CardFooter className="border-t bg-gray-50 px-6 py-4">
+                <Button 
+                  className="w-full"
+                  onClick={() => navigate('/facial-emotion-analysis')}
+                >
+                  Analyze Facial Expressions
+                </Button>
+              </CardFooter>
+            </Card>
+          </div>
         </div>
       </div>
     </DashboardLayout>
