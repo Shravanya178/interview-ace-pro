@@ -12,6 +12,7 @@ import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 
 // Emotion colors for consistency
+
 const EMOTION_COLORS = {
   angry: 'bg-red-500',
   disgust: 'bg-purple-600',

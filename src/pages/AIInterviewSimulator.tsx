@@ -444,29 +444,21 @@ const AIInterviewSimulator = () => {
   const [componentError, setComponentError] = useState<string | null>(null);
   
   // Add state for emotion tracking
-  const [emotionData, setEmotionData] = useState<{ [key: string]: number }>({});
+  const [emotionData, setEmotionData] = useState<{ [key: string]: number }[]>([]);
+  const [emotionsByQuestion, setEmotionsByQuestion] = useState<{ [key: number]: { [key: string]: number } }>({});
   const [showEmotionReport, setShowEmotionReport] = useState(false);
   
   // Add handleEmotionCapture function
   const handleEmotionCapture = useCallback((emotions: { [key: string]: number }) => {
-    // Update emotion data state
-    setEmotionData(prevEmotions => {
-      const newEmotions = { ...prevEmotions };
-      
-      // If no previous data, just use the new data
-      if (Object.keys(newEmotions).length === 0) {
-        return emotions;
-      }
-      
-      // Otherwise, calculate a weighted average (90% old, 10% new)
-      Object.keys(emotions).forEach(emotion => {
-        const prevValue = prevEmotions[emotion] || 0;
-        newEmotions[emotion] = prevValue * 0.9 + emotions[emotion] * 0.1;
-      });
-      
-      return newEmotions;
-    });
-  }, []);
+    // Store emotion data with timestamp
+    setEmotionData(prev => [...prev, emotions]);
+    
+    // Also track emotions by current question
+    setEmotionsByQuestion(prev => ({
+      ...prev,
+      [currentQuestionIndex]: emotions
+    }));
+  }, [currentQuestionIndex]);
   
   // Add debug function - enhanced to also log to console
   const debug = useCallback((message: string) => {
@@ -1818,6 +1810,151 @@ const AIInterviewSimulator = () => {
                 </div>
               </div>
               
+              {/* Add Facial Emotion Analysis section right after the summary */}
+              <div className="mt-6 bg-blue-50 p-6 rounded-lg border border-blue-200">
+                <h3 className="text-lg font-medium text-blue-800 mb-3">Facial Emotion Analysis</h3>
+                
+                {emotionData.length > 0 ? (
+                  <div className="space-y-4">
+                    <p className="text-sm text-blue-700 mb-4">
+                      During your interview, we analyzed your facial expressions to provide insights into your non-verbal communication.
+                      Here's a summary of the emotions detected during your interview:
+                    </p>
+                    
+                    {/* Overall emotion distribution */}
+                    <div className="mb-4">
+                      <h4 className="text-sm font-medium mb-2">Overall Emotion Distribution</h4>
+                      {(() => {
+                        // Calculate average emotions
+                        const totalEmotions: Record<string, number> = {};
+                        const avgEmotions: Record<string, number> = {};
+                        
+                        // Sum up all emotions
+                        emotionData.forEach(item => {
+                          Object.entries(item).forEach(([emotion, value]) => {
+                            totalEmotions[emotion] = (totalEmotions[emotion] || 0) + value;
+                          });
+                        });
+                        
+                        // Calculate averages
+                        if (emotionData.length > 0) {
+                          Object.keys(totalEmotions).forEach(emotion => {
+                            avgEmotions[emotion] = totalEmotions[emotion] / emotionData.length;
+                          });
+                        }
+                        
+                        return (
+                          <div className="space-y-2">
+                            {Object.entries(avgEmotions)
+                              .sort(([, a], [, b]) => b - a) // Sort by highest value
+                              .map(([emotion, value]) => (
+                                <div key={emotion} className="flex items-center">
+                                  <div className="w-28 text-sm capitalize font-medium">{emotion}</div>
+                                  <div className="flex-1 h-5 bg-white rounded-full overflow-hidden shadow-inner">
+                                    <div 
+                                      className={`h-full ${
+                                        emotion === 'confident' ? 'bg-emerald-500' : 
+                                        emotion === 'nervous' ? 'bg-pink-500' : 
+                                        emotion === 'engaged' ? 'bg-blue-500' : 
+                                        emotion === 'disinterested' ? 'bg-gray-400' : 
+                                        emotion === 'thoughtful' ? 'bg-purple-500' : 
+                                        emotion === 'uncertain' ? 'bg-amber-500' : 
+                                        'bg-slate-400'
+                                      }`} 
+                                      style={{ width: `${(value * 100).toFixed(0)}%` }}
+                                    />
+                                  </div>
+                                  <div className="w-16 text-sm text-right font-medium">
+                                    {(value * 100).toFixed(0)}%
+                                  </div>
+                                </div>
+                              ))}
+                          </div>
+                        );
+                      })()}
+                    </div>
+                    
+                    {/* Key insights based on emotions */}
+                    <div>
+                      <h4 className="text-sm font-medium mb-2">Key Insights</h4>
+                      <ul className="list-disc pl-5 space-y-1 text-sm text-blue-700">
+                        {(() => {
+                          const insights = [];
+                          const avgEmotions = emotionData.reduce((acc, item) => {
+                            Object.entries(item).forEach(([emotion, value]) => {
+                              acc[emotion] = (acc[emotion] || 0) + value / emotionData.length;
+                            });
+                            return acc;
+                          }, {} as Record<string, number>);
+                          
+                          const topEmotions = Object.entries(avgEmotions)
+                            .sort(([, a], [, b]) => b - a)
+                            .slice(0, 2)
+                            .map(([emotion]) => emotion);
+                          
+                          // Add insights based on top emotions
+                          if (topEmotions.includes('confident')) {
+                            insights.push(
+                              <li key="confident">You displayed strong confidence throughout your interview, which is excellent!</li>
+                            );
+                          }
+                          
+                          if (topEmotions.includes('engaged')) {
+                            insights.push(
+                              <li key="engaged">You appeared highly engaged, showing interviewers you're interested and attentive.</li>
+                            );
+                          }
+                          
+                          if (topEmotions.includes('thoughtful')) {
+                            insights.push(
+                              <li key="thoughtful">Your thoughtful expressions suggest you took time to consider your answers carefully.</li>
+                            );
+                          }
+                          
+                          if (topEmotions.includes('nervous')) {
+                            insights.push(
+                              <li key="nervous">Some nervousness was detected. This is normal, but practicing more interviews may help reduce this.</li>
+                            );
+                          }
+                          
+                          if (topEmotions.includes('uncertain')) {
+                            insights.push(
+                              <li key="uncertain">Moments of uncertainty were detected. More preparation on technical topics might help increase confidence.</li>
+                            );
+                          }
+                          
+                          if (topEmotions.includes('disinterested')) {
+                            insights.push(
+                              <li key="disinterested">There were moments where you appeared less engaged. Maintaining consistent energy throughout is important.</li>
+                            );
+                          }
+                          
+                          // Add general insights
+                          insights.push(
+                            <li key="general">Your facial expressions and body language are important aspects of interview communication.</li>
+                          );
+                          
+                          return insights;
+                        })()}
+                      </ul>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-4">
+                    <p className="text-sm text-blue-700">
+                      No facial emotion data was collected during this interview. This may be because your camera was off or facial detection wasn't working properly.
+                    </p>
+                    <Button 
+                      className="mt-3" 
+                      variant="outline" 
+                      onClick={() => navigate("/facial-emotion-analysis")}
+                    >
+                      Try Our Facial Analysis Tool
+                    </Button>
+                  </div>
+                )}
+              </div>
+              
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">AI Feedback</h3>
                 <p className="text-gray-600">Based on your interview performance, here are some areas of strength and opportunities for improvement:</p>
@@ -1881,7 +2018,7 @@ const AIInterviewSimulator = () => {
               </div>
               
               {/* Add Emotion Analysis Report */}
-              {showEmotionReport && Object.keys(emotionData).length > 0 && (
+              {showEmotionReport && emotionData.length > 0 && (
                 <div className="mt-6 border-t pt-6">
                   <h3 className="text-lg font-medium mb-3">Facial Expression Analysis</h3>
                   <p className="text-sm text-gray-600 mb-4">
@@ -1889,14 +2026,23 @@ const AIInterviewSimulator = () => {
                     This can provide valuable insights into your non-verbal communication.
                   </p>
                   <EmotionReport 
-                    emotionData={emotionData}
+                    emotionData={emotionData.length > 0 ? 
+                      // Calculate average emotions
+                      emotionData.reduce((acc, item) => {
+                        Object.entries(item).forEach(([key, value]) => {
+                          acc[key] = (acc[key] || 0) + value / emotionData.length;
+                        });
+                        return acc;
+                      }, {} as Record<string, number>) : 
+                      {} // Empty object if no data
+                    }
                     title="Your Expression Profile"
                   />
                 </div>
               )}
               
               {/* Add a note if no emotion data was collected */}
-              {showEmotionReport && Object.keys(emotionData).length === 0 && (
+              {showEmotionReport && emotionData.length === 0 && (
                 <div className="mt-6 border-t pt-6">
                   <h3 className="text-lg font-medium mb-3">Facial Expression Analysis</h3>
                   <div className="bg-gray-100 p-4 rounded">
@@ -2203,22 +2349,13 @@ const AIInterviewSimulator = () => {
                   </div>
                 ) : (
                   <div className="relative w-full h-full">
-                    {/* Show the video element directly */}
-                    <video
-                      ref={videoRef}
-                      autoPlay
-                      muted
-                      className="w-full h-full object-cover"
+                    {/* Remove the video element and use EmotionDetector directly */}
+                    <EmotionDetector
+                      width={640}
+                      height={360}
+                      onEmotionCapture={handleEmotionCapture}
+                      isActive={isInterviewStarted && !interviewEnded}
                     />
-                    {/* Invisible EmotionDetector for analysis only */}
-                    <div className="absolute top-0 left-0 opacity-0 pointer-events-none">
-                      <EmotionDetector
-                        width={1}
-                        height={1}
-                        onEmotionCapture={handleEmotionCapture}
-                        isActive={!isVideoOff}
-                      />
-                    </div>
                   </div>
                 )}
                 
