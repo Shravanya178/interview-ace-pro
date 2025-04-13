@@ -42,3 +42,5 @@ Git + GitHub for version control
 
 Component-based architecture with custom hooks for reusable logic
 
+Vercel for Deployment.
+
