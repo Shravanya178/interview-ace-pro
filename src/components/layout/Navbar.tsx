@@ -26,11 +26,19 @@ const Navbar = () => {
   };
 
   const navigation = [
+<<<<<<< HEAD
     { name: "Dashboard", href: "/dashboard" },
     { name: "Resume Analysis", href: "/resume" },
     { name: "Interview Preparation", href: "/interview" },
     { name: "Mock Tests", href: "/mock-test" },
     { name: "Reports", href: "/reports" },
+=======
+    { name: t("Dashboard"), href: "/dashboard" },
+    { name: t("Resume analysis"), href: "/resume" },
+    { name: t("Interview prep"), href: "/interview" },
+    { name: t("Mock tests"), href: "/mock-test" },
+    { name: t("Reports"), href: "/reports" },
+>>>>>>> 3c612b13fdd72451a2aac4d205e644fdaabb1aa3
   ];
 
   const isActive = (path: string) => {

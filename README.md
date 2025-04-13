@@ -1,4 +1,6 @@
+**DEPLOYED PROJECT LINK**: https://interview-ace-pro-nu.vercel.app/
 
+**VIDEO LINK**: https://drive.google.com/drive/folders/161hR3IM-mUH8WbQ29jz6OCW704hidOvw
 ## What technologies are used for this project?
 
 This project is built with:
@@ -39,4 +41,6 @@ useToast for notifications
 Git + GitHub for version control
 
 Component-based architecture with custom hooks for reusable logic
+
+Vercel for Deployment.
 
