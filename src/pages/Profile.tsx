@@ -209,11 +209,11 @@ const Profile = () => {
       <DashboardLayout>
         <div className="space-y-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{t("profile")}</h1>
+            <h1 className="text-3xl font-bold text-gray-900">{t("Profile")}</h1>
           </div>
           <Card>
             <CardContent className="pt-6 text-center">
-              <p>{t("login required")}</p>
+              <p>{t("Login required")}</p>
             </CardContent>
           </Card>
         </div>
@@ -226,8 +226,8 @@ const Profile = () => {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{t("profile")}</h1>
-            <p className="text-gray-500 mt-1">{t("manage profile")}</p>
+            <h1 className="text-3xl font-bold text-gray-900">{t("Profile")}</h1>
+            <p className="text-gray-500 mt-1">{t("Manage profile")}</p>
           </div>
           <div>
             {isEditing ? (
@@ -275,7 +275,7 @@ const Profile = () => {
                   }}
                   disabled={isLoading}
                 >
-                  {t("cancel")}
+                  {t("Cancel")}
                 </Button>
                 <Button
                   onClick={(e) => handleSubmit(e as unknown as React.FormEvent)}
@@ -285,19 +285,19 @@ const Profile = () => {
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      {t("saving")}
+                      {t("Saving")}
                     </>
                   ) : (
                     <>
                       <Save className="mr-2 h-4 w-4" />
-                      {t("save")}
+                      {t("Save")}
                     </>
                   )}
                 </Button>
               </div>
             ) : (
               <Button onClick={() => setIsEditing(true)}>
-                {t("edit profile")}
+                {t("Edit profile")}
               </Button>
             )}
           </div>
@@ -307,11 +307,11 @@ const Profile = () => {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>{t("personal information")}</CardTitle>
+                <CardTitle>{t("Personal information")}</CardTitle>
                 <CardDescription>
                   {isEditing
-                    ? t("update profile info")
-                    : t("view profile info")}
+                    ? t("Update profile info")
+                    : t("View profile info")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -367,7 +367,7 @@ const Profile = () => {
                   <div className="space-y-4 md:w-3/4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="name">{t("name")}</Label>
+                        <Label htmlFor="name">{t("Name")}</Label>
                         {isEditing ? (
                           <Input
                             id="name"
@@ -382,7 +382,7 @@ const Profile = () => {
                       </div>
 
                       <div>
-                        <Label htmlFor="email">{t("email")}</Label>
+                        <Label htmlFor="email">{t("Email")}</Label>
                         {isEditing ? (
                           <Input
                             id="email"
@@ -1004,12 +1004,12 @@ const Profile = () => {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    {t("saving")}
+                    {t("Saving")}
                   </>
                 ) : (
                   <>
                     <Save className="mr-2 h-5 w-5" />
-                    {t("save")}
+                    {t("Save")}
                   </>
                 )}
               </Button>

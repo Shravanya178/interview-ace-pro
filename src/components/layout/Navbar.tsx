@@ -21,11 +21,11 @@ const Navbar = () => {
   const { user, logout } = useAuth();
 
   const navigation = [
-    { name: t("dashboard"), href: "/dashboard" },
-    { name: t("resume analysis"), href: "/resume" },
-    { name: t("interview prep"), href: "/interview" },
-    { name: t("mock tests"), href: "/mock-test" },
-    { name: t("reports"), href: "/reports" },
+    { name: t("Dashboard"), href: "/dashboard" },
+    { name: t("Resume analysis"), href: "/resume" },
+    { name: t("Interview prep"), href: "/interview" },
+    { name: t("Mock tests"), href: "/mock-test" },
+    { name: t("Reports"), href: "/reports" },
   ];
 
   const isActive = (path: string) => {

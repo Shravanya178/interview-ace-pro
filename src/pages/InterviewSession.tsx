@@ -6,7 +6,11 @@ import { ArrowLeft, Loader2, Video, Mic, Settings, X } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useToast } from "@/components/ui/use-toast";
 import { useTranslation } from "react-i18next";
-import { GoogleGenerativeAI, GenerativeModel, ChatSession } from "@google/generative-ai";
+import {
+  GoogleGenerativeAI,
+  GenerativeModel,
+  ChatSession,
+} from "@google/generative-ai";
 
 // Types for Gemini API
 interface GenModel {
@@ -19,8 +23,8 @@ interface ChatOptions {
 }
 
 interface ChatMessage {
-  role: 'user' | 'model';
-  parts: string | {text: string}[];
+  role: "user" | "model";
+  parts: string | { text: string }[];
 }
 
 interface ChatResponse {
@@ -96,7 +100,10 @@ interface JitsiMeetExternalAPI {
 
 declare global {
   interface Window {
-    JitsiMeetExternalAPI: new (domain: string, options: JitsiMeetOptions) => JitsiMeetExternalAPI;
+    JitsiMeetExternalAPI: new (
+      domain: string,
+      options: JitsiMeetOptions
+    ) => JitsiMeetExternalAPI;
     SpeechRecognition: new () => SpeechRecognition;
     webkitSpeechRecognition: new () => SpeechRecognition;
   }
@@ -114,23 +121,25 @@ class GeminiInterviewer {
   private model: GenModel | null = null;
   private isInitialized: boolean = false;
   private conversation: GenChatSession | null = null;
-  
+
   constructor(apiKey: string) {
     this.apiKey = apiKey;
     this.initialize();
   }
-  
+
   async initialize(): Promise<boolean> {
     try {
       // Dynamically import the Google Generative AI SDK
       const { GoogleGenerativeAI } = await import("@google/generative-ai");
-      
+
       // Initialize the API with the provided key
       const genAI = new GoogleGenerativeAI(this.apiKey);
-      
+
       // Create the model instance
-      this.model = genAI.getGenerativeModel({ model: "gemini-pro" }) as unknown as GenModel;
-      
+      this.model = genAI.getGenerativeModel({
+        model: "gemini-pro",
+      }) as unknown as GenModel;
+
       // Create a new chat session with a much more specific prompt
       this.conversation = this.model.startChat({
         history: [
@@ -152,21 +161,22 @@ class GeminiInterviewer {
             9. Maintain a professional, conversational tone
             10. IMPORTANT: Ensure every question is unique - DO NOT ask similar questions repeatedly
             
-            The candidate is applying for a senior software engineer position. Evaluate both technical depth and communication skills.`
+            The candidate is applying for a senior software engineer position. Evaluate both technical depth and communication skills.`,
           },
           {
             role: "model",
-            parts: "I understand my role as a technical interviewer for a senior software engineering position. I'll conduct a dynamic interview covering diverse topics, ensuring I never repeat questions and avoiding React DOM entirely. I'll ask specific, detailed questions, provide brief feedback after answers, and make questions progressively challenging. I'll occasionally follow up on technologies the candidate mentions, maintain a professional tone, and ensure every question is unique. I'm ready to begin the interview when you are."
-          }
+            parts:
+              "I understand my role as a technical interviewer for a senior software engineering position. I'll conduct a dynamic interview covering diverse topics, ensuring I never repeat questions and avoiding React DOM entirely. I'll ask specific, detailed questions, provide brief feedback after answers, and make questions progressively challenging. I'll occasionally follow up on technologies the candidate mentions, maintain a professional tone, and ensure every question is unique. I'm ready to begin the interview when you are.",
+          },
         ],
         generationConfig: {
-          temperature: 0.9,  // Increased for more variety
+          temperature: 0.9, // Increased for more variety
           topK: 40,
           topP: 0.95,
           maxOutputTokens: 800,
         },
       });
-      
+
       this.isInitialized = true;
       console.log("Gemini interviewer initialized successfully");
       return true;
@@ -176,20 +186,21 @@ class GeminiInterviewer {
       return false;
     }
   }
-  
+
   isReady(): boolean {
     return this.isInitialized && this.conversation !== null;
   }
-  
+
   async startInterview(): Promise<string> {
     if (!this.isReady()) {
       throw new Error("Gemini interviewer not initialized");
     }
-    
+
     try {
       const result = await this.conversation!.sendMessage({
-        role: "user", 
-        parts: "Let's start the interview now. Please introduce yourself briefly as the interviewer and ask your first technical question. Make sure it's a challenging and specific question about software engineering fundamentals. Do NOT ask about React DOM."
+        role: "user",
+        parts:
+          "Let's start the interview now. Please introduce yourself briefly as the interviewer and ask your first technical question. Make sure it's a challenging and specific question about software engineering fundamentals. Do NOT ask about React DOM.",
       });
       return result.response.text();
     } catch (error) {
@@ -197,18 +208,18 @@ class GeminiInterviewer {
       throw error;
     }
   }
-  
+
   async sendResponse(userAnswer: string): Promise<string> {
     if (!this.isReady()) {
       throw new Error("Gemini interviewer not initialized");
     }
-    
+
     try {
       const result = await this.conversation!.sendMessage({
         role: "user",
         parts: `My answer: ${userAnswer}
 
-        Now, provide brief feedback on my answer (1-2 sentences) and then ask a completely different technical question. Make sure it's not repetitive and covers a different area of software engineering than previous questions. DO NOT ask about React DOM.`
+        Now, provide brief feedback on my answer (1-2 sentences) and then ask a completely different technical question. Make sure it's not repetitive and covers a different area of software engineering than previous questions. DO NOT ask about React DOM.`,
       });
       return result.response.text();
     } catch (error) {
@@ -218,7 +229,11 @@ class GeminiInterviewer {
   }
 }
 
-const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessionProps) => {
+const InterviewSession = ({
+  roomName,
+  language = "en",
+  onClose,
+}: InterviewSessionProps) => {
   const apiRef = useRef<JitsiMeetExternalAPI | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [searchParams] = useSearchParams();
@@ -235,16 +250,18 @@ const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessi
   const [interviewStarted, setInterviewStarted] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState("");
-  
+
   // Speech synthesis and recognition
   const synthesis = window.speechSynthesis;
   const recognitionRef = useRef<SpeechRecognition | null>(null);
-  
+
   // Gemini AI setup
-  const [interviewer, setInterviewer] = useState<GeminiInterviewer | null>(null);
+  const [interviewer, setInterviewer] = useState<GeminiInterviewer | null>(
+    null
+  );
   const [isProcessing, setIsProcessing] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
-  
+
   const interviewType = searchParams.get("type") || "mock";
   const company = searchParams.get("company") || "";
   const role = searchParams.get("role") || "";
@@ -259,7 +276,7 @@ const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessi
       language: navigator.language,
     };
     logDebug(`Browser Information: ${JSON.stringify(browserInfo, null, 2)}`);
-    
+
     return new Promise<void>((resolve, reject) => {
       if (typeof window.JitsiMeetExternalAPI !== "undefined") {
         logDebug("Jitsi Meet External API already loaded");
@@ -272,7 +289,7 @@ const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessi
       const script = document.createElement("script");
       script.src = "https://meet.jit.si/external_api.js";
       script.async = true;
-      
+
       script.onload = () => {
         logDebug("Jitsi Meet External API script loaded successfully");
         // Add a small delay to ensure the API is fully initialized
@@ -280,7 +297,9 @@ const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessi
           if (typeof window.JitsiMeetExternalAPI === "undefined") {
             const error = "Script loaded but JitsiMeetExternalAPI is undefined";
             logDebug(`ERROR: ${error}`);
-            setJitsiError("Script loaded but Jitsi API is not available. Please try refreshing the page.");
+            setJitsiError(
+              "Script loaded but Jitsi API is not available. Please try refreshing the page."
+            );
             setIsLoading(false);
             reject(new Error(error));
           } else {
@@ -289,14 +308,18 @@ const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessi
           }
         }, 500);
       };
-      
+
       script.onerror = (error) => {
-        logDebug(`ERROR: Failed to load Jitsi Meet External API script: ${error}`);
-        setJitsiError("Failed to load Jitsi Meet API script. Please check your network connection.");
+        logDebug(
+          `ERROR: Failed to load Jitsi Meet External API script: ${error}`
+        );
+        setJitsiError(
+          "Failed to load Jitsi Meet API script. Please check your network connection."
+        );
         setIsLoading(false);
         reject(error);
       };
-      
+
       document.body.appendChild(script);
     });
   };
@@ -306,22 +329,24 @@ const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessi
     if (jitsiError && retryCount < 2) {
       // Auto-retry after 5 seconds
       const retryTimeout = setTimeout(() => {
-        console.log(`Auto-retrying Jitsi connection (attempt ${retryCount + 1})...`);
-        setDebugInfo(prev => `${prev}\nAuto-retry attempt ${retryCount + 1}`);
+        console.log(
+          `Auto-retrying Jitsi connection (attempt ${retryCount + 1})...`
+        );
+        setDebugInfo((prev) => `${prev}\nAuto-retry attempt ${retryCount + 1}`);
         setJitsiError(null);
         setIsLoading(true);
-        setRetryCount(prev => prev + 1);
-        
+        setRetryCount((prev) => prev + 1);
+
         if (apiRef.current) {
           apiRef.current.dispose();
           apiRef.current = null;
         }
-        
+
         // Re-initialize by triggering the script loaded effect
         setScriptLoaded(false);
         const cleanup = loadJitsiScript();
       }, 5000);
-      
+
       return () => clearTimeout(retryTimeout);
     }
   }, [jitsiError, retryCount]);
@@ -329,13 +354,13 @@ const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessi
   // Log and capture debug info
   const logDebug = useCallback((message: string) => {
     console.log(message);
-    setDebugInfo(prev => `${prev}\n${message}`);
+    setDebugInfo((prev) => `${prev}\n${message}`);
   }, []);
 
   // Load Jitsi script when component mounts
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
-    
+
     const initJitsi = async () => {
       try {
         await loadJitsiScript();
@@ -343,23 +368,27 @@ const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessi
       } catch (error) {
         console.error("Error loading Jitsi script:", error);
       }
-      
+
       // Set a timeout to check if script loading is taking too long
       timeoutId = setTimeout(() => {
         if (!scriptLoaded) {
           console.warn("Jitsi script loading timeout after 10 seconds");
-          setJitsiError("Jitsi script loading timed out. Your network connection may be slow or blocked.");
+          setJitsiError(
+            "Jitsi script loading timed out. Your network connection may be slow or blocked."
+          );
           setIsLoading(false);
         }
       }, 10000);
     };
-    
+
     initJitsi();
-    
+
     return () => {
       clearTimeout(timeoutId);
       // Clean up script tag if needed
-      const scriptTag = document.querySelector('script[src="https://meet.jit.si/external_api.js"]');
+      const scriptTag = document.querySelector(
+        'script[src="https://meet.jit.si/external_api.js"]'
+      );
       if (scriptTag && scriptTag.parentNode) {
         scriptTag.parentNode.removeChild(scriptTag);
       }
@@ -400,58 +429,58 @@ const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessi
     }
 
     logDebug(`Setting up Jitsi Meet with room: ${roomName}`);
-    
+
     try {
-        // Set up config for Jitsi Meet
-        const domain = "meet.jit.si";
-        const options = {
-          roomName: roomName,
-          width: "100%",
-          height: "100%",
-          parentNode: containerRef.current,
-          lang: "en",
-          configOverwrite: {
-            prejoinPageEnabled: false,
-            disableDeepLinking: true,
-            startWithAudioMuted: true,
-            startWithVideoMuted: false,
+      // Set up config for Jitsi Meet
+      const domain = "meet.jit.si";
+      const options = {
+        roomName: roomName,
+        width: "100%",
+        height: "100%",
+        parentNode: containerRef.current,
+        lang: "en",
+        configOverwrite: {
+          prejoinPageEnabled: false,
+          disableDeepLinking: true,
+          startWithAudioMuted: true,
+          startWithVideoMuted: false,
           resolution: 720,
           constraints: {
             video: {
               height: {
                 ideal: 720,
                 max: 720,
-                min: 240
-              }
-            }
-          }
+                min: 240,
+              },
+            },
           },
-          interfaceConfigOverwrite: {
-            SHOW_JITSI_WATERMARK: false,
-            APP_NAME: "Interview Ace Pro",
-            NATIVE_APP_NAME: "Interview Ace Pro",
-            PROVIDER_NAME: "Interview Ace Pro",
+        },
+        interfaceConfigOverwrite: {
+          SHOW_JITSI_WATERMARK: false,
+          APP_NAME: "Interview Ace Pro",
+          NATIVE_APP_NAME: "Interview Ace Pro",
+          PROVIDER_NAME: "Interview Ace Pro",
           DEFAULT_BACKGROUND: "#111111",
           TILE_VIEW_MAX_COLUMNS: 2,
-            TOOLBAR_BUTTONS: [
-              "microphone",
-              "camera",
-              "closedcaptions",
-              "desktop",
-              "fullscreen",
-              "fodeviceselection",
-              "hangup",
-              "chat",
-              "recording",
-              "settings",
-              "raisehand",
-              "videoquality",
-            ],
-          },
-          userInfo: {
-            displayName: "Candidate",
-          },
-        };
+          TOOLBAR_BUTTONS: [
+            "microphone",
+            "camera",
+            "closedcaptions",
+            "desktop",
+            "fullscreen",
+            "fodeviceselection",
+            "hangup",
+            "chat",
+            "recording",
+            "settings",
+            "raisehand",
+            "videoquality",
+          ],
+        },
+        userInfo: {
+          displayName: "Candidate",
+        },
+      };
 
       // Create the Jitsi Meet external API instance
       logDebug("Creating new JitsiMeetExternalAPI instance");
@@ -468,55 +497,77 @@ const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessi
             participantJoined: handleParticipantJoined,
             error: (error: unknown) => {
               logDebug(`ERROR: Jitsi error: ${JSON.stringify(error)}`);
-              setJitsiError(`Jitsi error: ${error ? JSON.stringify(error) : 'Unknown error'}`);
+              setJitsiError(
+                `Jitsi error: ${
+                  error ? JSON.stringify(error) : "Unknown error"
+                }`
+              );
               toast({
                 title: t("error"),
                 description: t("jitsi_error_occurred"),
                 variant: "destructive",
               });
-            }
+            },
           });
-          
+
           setIsLoading(false);
           logDebug("Jitsi Meet setup completed successfully");
         } catch (error) {
-          logDebug(`ERROR: Failed to create Jitsi instance: ${error instanceof Error ? error.message : 'Unknown error'}`);
-          setJitsiError(`Failed to create Jitsi instance: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          logDebug(
+            `ERROR: Failed to create Jitsi instance: ${
+              error instanceof Error ? error.message : "Unknown error"
+            }`
+          );
+          setJitsiError(
+            `Failed to create Jitsi instance: ${
+              error instanceof Error ? error.message : "Unknown error"
+            }`
+          );
           setIsLoading(false);
         }
       }, 100);
     } catch (error) {
-      logDebug(`ERROR: Failed to initialize Jitsi: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      setJitsiError(`Failed to initialize Jitsi: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      logDebug(
+        `ERROR: Failed to initialize Jitsi: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+      setJitsiError(
+        `Failed to initialize Jitsi: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
       setIsLoading(false);
-          toast({
-            title: t("error"),
-            description: t("failed_to_initialize_interview"),
-            variant: "destructive",
-          });
-        }
+      toast({
+        title: t("error"),
+        description: t("failed_to_initialize_interview"),
+        variant: "destructive",
+      });
+    }
   }, [roomName, t, logDebug]);
 
   useEffect(() => {
     if (isJoined && apiRef.current) {
       // Add logging to track command execution
       logDebug("User joined conference, applying video settings");
-      
+
       try {
         // Ensure commands are run after a short delay to allow Jitsi to fully initialize
         setTimeout(() => {
           try {
             // Setting video quality to 720p
             logDebug("Setting video quality to 720p");
-            apiRef.current?.executeCommand('setVideoQuality', 720);
-            
+            apiRef.current?.executeCommand("setVideoQuality", 720);
+
             // Enable tile view
             logDebug("Enabling tile view");
-            apiRef.current?.executeCommand('enableTileView');
-            
+            apiRef.current?.executeCommand("enableTileView");
+
             logDebug("Video settings applied successfully");
           } catch (innerError) {
-            logDebug(`ERROR: Error applying delayed video settings: ${innerError}`);
+            logDebug(
+              `ERROR: Error applying delayed video settings: ${innerError}`
+            );
           }
         }, 2000);
       } catch (error) {
@@ -533,19 +584,21 @@ const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessi
   useEffect(() => {
     try {
       const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-      
+
       if (!apiKey) {
-        setApiError("Gemini API key not found. Please add it to your .env file.");
+        setApiError(
+          "Gemini API key not found. Please add it to your .env file."
+        );
         setIsLoading(false);
         return;
       }
-      
+
       const initInterviewer = async () => {
         try {
           console.log("Initializing Gemini interviewer with API key...");
           const interviewer = new GeminiInterviewer(apiKey);
           setInterviewer(interviewer);
-          
+
           // Wait to ensure initialization completes
           setTimeout(async () => {
             if (interviewer.isReady()) {
@@ -554,9 +607,11 @@ const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessi
                 title: "Gemini API Connected",
                 description: "AI interviewer is ready to start",
               });
-    } else {
+            } else {
               console.error("Gemini interviewer failed to initialize");
-              setApiError("Failed to initialize Gemini interviewer. Please check your API key.");
+              setApiError(
+                "Failed to initialize Gemini interviewer. Please check your API key."
+              );
               toast({
                 title: "API Connection Failed",
                 description: "Could not connect to Gemini API",
@@ -576,35 +631,38 @@ const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessi
           });
         }
       };
-      
+
       initInterviewer();
-      
+
       // Initialize speech recognition
-      if (typeof window !== 'undefined') {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        
+      if (typeof window !== "undefined") {
+        const SpeechRecognition =
+          window.SpeechRecognition || window.webkitSpeechRecognition;
+
         if (SpeechRecognition) {
           recognitionRef.current = new SpeechRecognition();
           recognitionRef.current.continuous = true;
           recognitionRef.current.interimResults = true;
-          
+
           recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
-            let finalTranscript = '';
-            
+            let finalTranscript = "";
+
             for (let i = 0; i < event.results.length; i++) {
               const result = event.results[i];
               if (result.isFinal) {
                 finalTranscript += result[0].transcript;
               }
             }
-            
+
             if (finalTranscript) {
               setCurrentQuestion(finalTranscript);
             }
           };
-          
-          recognitionRef.current.onerror = (event: SpeechRecognitionErrorEvent) => {
-            console.error('Speech recognition error:', event.error);
+
+          recognitionRef.current.onerror = (
+            event: SpeechRecognitionErrorEvent
+          ) => {
+            console.error("Speech recognition error:", event.error);
             setIsListening(false);
           };
         }
@@ -651,9 +709,9 @@ const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessi
       });
       return;
     }
-    
+
     setIsProcessing(true);
-    
+
     try {
       const introQuestion = await interviewer.startInterview();
       setCurrentQuestion(introQuestion);
@@ -675,10 +733,10 @@ const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessi
     if (!interviewer || !interviewer.isReady() || !currentQuestion.trim()) {
       return;
     }
-    
+
     setIsProcessing(true);
     stopListening();
-    
+
     try {
       const response = await interviewer.sendResponse(currentQuestion);
       setCurrentQuestion(response);
@@ -713,7 +771,9 @@ const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessi
   const handleParticipantJoined = (participant: { displayName?: string }) => {
     toast({
       title: t("participant_joined"),
-      description: `${participant.displayName || 'A participant'} ${t("has_joined_the_session")}`,
+      description: `${participant.displayName || "A participant"} ${t(
+        "has_joined_the_session"
+      )}`,
     });
   };
 
@@ -731,16 +791,27 @@ const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessi
 
         <div className="mb-4 p-4 bg-gray-100 rounded-lg">
           <h2 className="text-lg font-semibold mb-2">Camera Test</h2>
-          <p className="mb-2">If your camera isn't working in the interview, click the button below to test direct camera access:</p>
-          <button 
+          <p className="mb-2">
+            If your camera isn't working in the interview, click the button
+            below to test direct camera access:
+          </p>
+          <button
             onClick={async () => {
               try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                alert("Camera access granted successfully! Your camera is working.");
+                const stream = await navigator.mediaDevices.getUserMedia({
+                  video: true,
+                });
+                alert(
+                  "Camera access granted successfully! Your camera is working."
+                );
                 // Clean up
-                stream.getTracks().forEach(track => track.stop());
+                stream.getTracks().forEach((track) => track.stop());
               } catch (err) {
-                alert(`Camera access failed: ${err.message || err}. Please check your camera permissions.`);
+                alert(
+                  `Camera access failed: ${
+                    err.message || err
+                  }. Please check your camera permissions.`
+                );
               }
             }}
             className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md"
@@ -753,7 +824,7 @@ const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessi
           <div className="mb-4 p-4 bg-red-50 border border-red-300 rounded-md text-red-800">
             <h3 className="text-lg font-semibold mb-2">Jitsi Error</h3>
             <p>{jitsiError}</p>
-            <Button 
+            <Button
               onClick={() => {
                 setJitsiError(null);
                 setIsLoading(true);
@@ -770,7 +841,7 @@ const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessi
             </Button>
           </div>
         )}
-        
+
         <div className="flex items-center justify-between mb-6">
           <Button
             variant="ghost"
@@ -799,27 +870,33 @@ const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessi
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/80">
                   <Loader2 className="h-8 w-8 animate-spin mb-2" />
                   <p className="text-sm text-center max-w-xs">
-                    {scriptLoaded 
-                      ? "Connecting to Jitsi conference room..." 
+                    {scriptLoaded
+                      ? "Connecting to Jitsi conference room..."
                       : "Loading Jitsi Meet API..."}
                   </p>
                 </div>
               ) : jitsiError ? (
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/80 p-4">
                   <div className="text-center max-w-md">
-                    <h3 className="text-lg font-semibold text-red-600 mb-2">Connection Error</h3>
+                    <h3 className="text-lg font-semibold text-red-600 mb-2">
+                      Connection Error
+                    </h3>
                     <p className="mb-4">{jitsiError}</p>
                     <div className="text-xs text-left bg-gray-100 p-2 mb-4 rounded-md max-h-32 overflow-y-auto">
                       <p className="font-semibold">Debug Info:</p>
-                      <pre>{debugInfo || "No debug information available."}</pre>
+                      <pre>
+                        {debugInfo || "No debug information available."}
+                      </pre>
                     </div>
                     <div className="flex gap-2 justify-center">
-                      <Button 
+                      <Button
                         onClick={() => {
                           setJitsiError(null);
                           setIsLoading(true);
-                          setRetryCount(prev => prev + 1);
-                          logDebug(`Manual retry initiated (attempt ${retryCount + 1})`);
+                          setRetryCount((prev) => prev + 1);
+                          logDebug(
+                            `Manual retry initiated (attempt ${retryCount + 1})`
+                          );
                           if (apiRef.current) {
                             apiRef.current.dispose();
                             apiRef.current = null;
@@ -829,7 +906,7 @@ const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessi
                       >
                         Retry Connection
                       </Button>
-                      <Button 
+                      <Button
                         variant="outline"
                         onClick={() => navigate("/interview")}
                       >
@@ -937,8 +1014,8 @@ const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessi
                 )}
 
                 {!interviewStarted ? (
-                  <Button 
-                    onClick={startInterview} 
+                  <Button
+                    onClick={startInterview}
                     className="w-full"
                     disabled={isProcessing || !interviewer?.isReady()}
                   >
@@ -947,18 +1024,20 @@ const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessi
                 ) : (
                   <div className="space-y-4">
                     <div className="p-4 bg-muted rounded-lg">
-                      <h3 className="font-semibold mb-2">Current Question/Feedback:</h3>
+                      <h3 className="font-semibold mb-2">
+                        Current Question/Feedback:
+                      </h3>
                       <p>{currentQuestion}</p>
                     </div>
                     <div className="flex gap-4">
-                      <Button 
+                      <Button
                         onClick={isListening ? stopListening : startListening}
                         variant={isListening ? "destructive" : "default"}
                         className="flex-1"
                       >
                         {isListening ? "Stop Speaking" : "Start Speaking"}
                       </Button>
-                      <Button 
+                      <Button
                         onClick={submitAnswer}
                         variant="outline"
                         className="flex-1"
@@ -978,4 +1057,3 @@ const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessi
 };
 
 export default InterviewSession;
-

@@ -25,14 +25,14 @@ const Settings = () => {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{t("settings")}</h1>
-          <p className="text-gray-500 mt-1">{t("settings desc")}</p>
+          <h1 className="text-3xl font-bold text-gray-900">{t("Settings")}</h1>
+          <p className="text-gray-500 mt-1">{t("Settings desc")}</p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>{t("language preferences")}</CardTitle>
-            <CardDescription>{t("language preferences desc")}</CardDescription>
+            <CardTitle>{t("Language preferences")}</CardTitle>
+            <CardDescription>{t("Language preferences desc")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-1">
