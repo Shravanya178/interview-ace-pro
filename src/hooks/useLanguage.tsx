@@ -123,6 +123,11 @@ const translations = {
     edit_profile: "प्रोफ़ाइल संपादित करें",
     save: "सहेजें",
     cancel: "रद्द करें",
+    // Interview types with proper capitalization
+    technical_interview: "तकनीकी इंटरव्यू",
+    behavioral_interview: "व्यवहारिक इंटरव्यू",
+    system_design: "सिस्टम डिज़ाइन",
+    full_mock_interview: "पूर्ण मॉक इंटरव्यू",
     // Interview Session translations
     "Back to Interview": "इंटरव्यू पर वापस जाएं",
     "Mock Interview": "मॉक इंटरव्यू",
@@ -144,7 +149,48 @@ const translations = {
     interview_session_started: "इंटरव्यू सत्र शुरू हो गया है",
     participant_joined: "प्रतिभागी शामिल हुए",
     has_joined_the_session: "सत्र में शामिल हो गए हैं",
-    // Add more translations as needed
+    // Report page translations
+    progress_over_time: "समय के साथ प्रगति",
+    interview_skills_progress: "आपकी इंटरव्यू कौशल प्रगति",
+    candidate_report: "उम्मीदवार रिपोर्ट",
+    Technical_interview: "तकनीकी इंटरव्यू",
+    Behavioral_interview: "व्यवहारिक इंटरव्यू",
+    System_design: "सिस्टम डिज़ाइन",
+    Full_mock_interview: "पूर्ण मॉक इंटरव्यू",
+    Progress: "प्रगति",
+    Candidate_report: "उम्मीदवार रिपोर्ट",
+    Recommendations: "सिफारिशें",
+    Progress_over_time: "समय के साथ प्रगति",
+    Interview_skills_progress: "आपकी इंटरव्यू कौशल प्रगति",
+    Priority: "प्राथमिकता",
+    performance_reports: "प्रदर्शन रिपोर्ट",
+    Performance_reports: "प्रदर्शन रिपोर्ट",
+    track_progress: "अपनी प्रगति पर नज़र रखें",
+    Track_progress: "अपनी प्रगति पर नज़र रखें",
+    learning_resources: "सीखने के संसाधन",
+    Learning_resources: "सीखने के संसाधन",
+    recommended_resources: "अनुशंसित संसाधन",
+    Recommended_resources: "अनुशंसित संसाधन",
+    // Settings page
+    settings: "सेटिंग्स",
+    settings_desc: "अपनी पसंद और सेटिंग्स प्रबंधित करें",
+    language_preferences: "भाषा पसंद",
+    language_preferences_desc: "अपनी पसंद की भाषा चुनें",
+    select_language: "भाषा चुनें",
+    notification_preferences: "सूचना पसंद",
+    notification_preferences_desc: "अपनी सूचना सेटिंग्स प्रबंधित करें",
+    email_notifications: "ईमेल सूचनाएं",
+    email_notifications_desc: "ईमेल के माध्यम से अपडेट प्राप्त करें",
+    browser_notifications: "ब्राउज़र सूचनाएं",
+    browser_notifications_desc: "वेब ब्राउज़र में सूचनाएं प्राप्त करें",
+    privacy_settings: "गोपनीयता सेटिंग्स",
+    privacy_settings_desc: "अपनी गोपनीयता और डेटा सेटिंग्स प्रबंधित करें",
+    data_collection: "डेटा संग्रह",
+    data_collection_desc: "हम आपका उपयोग डेटा एकत्र कर सकते हैं",
+    analytics_tracking: "एनालिटिक्स ट्रैकिंग",
+    analytics_tracking_desc: "आपके उपयोग का विश्लेषण करने की अनुमति दें",
+    // Additional common terms
+    language: "भाषा",
   },
   mr: {
     dashboard: "डॅशबोर्ड",
@@ -173,6 +219,11 @@ const translations = {
     edit_profile: "प्रोफाइल संपादित करा",
     save: "जतन करा",
     cancel: "रद्द करा",
+    // Interview types with proper capitalization
+    technical_interview: "तांत्रिक मुलाखत",
+    behavioral_interview: "वर्तणूक मुलाखत",
+    system_design: "सिस्टम डिझाइन",
+    full_mock_interview: "पूर्ण मॉक मुलाखत",
     // Interview Session translations
     "Back to Interview": "मुलाखतीकडे परत जा",
     "Mock Interview": "मॉक मुलाखत",
@@ -194,7 +245,48 @@ const translations = {
     interview_session_started: "मुलाखत सत्र सुरू झाले",
     participant_joined: "सहभागी सामील झाले",
     has_joined_the_session: "सत्रात सामील झाले आहेत",
-    // Add more translations as needed
+    // Report page translations
+    progress_over_time: "कालांतराने प्रगती",
+    interview_skills_progress: "तुमच्या मुलाखत कौशल्यांची प्रगती",
+    candidate_report: "उमेदवार अहवाल",
+    Technical_interview: "तांत्रिक मुलाखत",
+    Behavioral_interview: "वर्तणूक मुलाखत",
+    System_design: "सिस्टम डिझाइन",
+    Full_mock_interview: "पूर्ण मॉक मुलाखत",
+    Progress: "प्रगती",
+    Candidate_report: "उमेदवार अहवाल",
+    Recommendations: "शिफारसी", 
+    Progress_over_time: "कालांतराने प्रगती",
+    Interview_skills_progress: "तुमच्या मुलाखत कौशल्यांची प्रगती",
+    Priority: "प्राधान्य",
+    performance_reports: "कामगिरी अहवाल",
+    Performance_reports: "कामगिरी अहवाल",
+    track_progress: "आपली प्रगती ट्रॅक करा",
+    Track_progress: "आपली प्रगती ट्रॅक करा",
+    learning_resources: "शिक्षण संसाधने",
+    Learning_resources: "शिक्षण संसाधने",
+    recommended_resources: "शिफारस केलेली संसाधने",
+    Recommended_resources: "शिफारस केलेली संसाधने",
+    // Settings page
+    settings: "सेटिंग्ज",
+    settings_desc: "आपली प्राधान्ये आणि सेटिंग्ज व्यवस्थापित करा",
+    language_preferences: "भाषा प्राधान्ये",
+    language_preferences_desc: "आपली पसंतीची भाषा निवडा",
+    select_language: "भाषा निवडा",
+    notification_preferences: "सूचना प्राधान्ये",
+    notification_preferences_desc: "आपल्या सूचना सेटिंग्ज व्यवस्थापित करा",
+    email_notifications: "ईमेल सूचना",
+    email_notifications_desc: "ईमेलद्वारे अपडेट्स प्राप्त करा",
+    browser_notifications: "ब्राउझर सूचना",
+    browser_notifications_desc: "वेब ब्राउझरमध्ये सूचना प्राप्त करा",
+    privacy_settings: "गोपनीयता सेटिंग्ज",
+    privacy_settings_desc: "आपली गोपनीयता आणि डेटा सेटिंग्ज व्यवस्थापित करा",
+    data_collection: "डेटा संकलन",
+    data_collection_desc: "आम्ही तुमचा वापर डेटा गोळा करू शकतो",
+    analytics_tracking: "अँनालिटिक्स ट्रॅकिंग",
+    analytics_tracking_desc: "तुमच्या वापराचे विश्लेषण करण्यास परवानगी द्या",
+    // Additional common terms
+    language: "भाषा",
   },
 };
 
@@ -221,7 +313,25 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({
   const t = (key: string): string => {
     const currentTranslations =
       translations[language as keyof typeof translations] || translations.en;
-    return currentTranslations[key as keyof typeof currentTranslations] || key;
+    
+    // First try to get the translation in the current language
+    const translation = currentTranslations[key as keyof typeof currentTranslations];
+    
+    if (translation) {
+      return translation;
+    }
+    
+    // If no translation found in current language and it's not English,
+    // try to get the English translation as fallback
+    if (language !== 'en') {
+      const englishTranslation = translations.en[key as keyof typeof translations.en];
+      if (englishTranslation) {
+        return englishTranslation;
+      }
+    }
+    
+    // If no translation found in any language, return the key itself
+    return key;
   };
 
   return (
