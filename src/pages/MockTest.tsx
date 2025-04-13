@@ -165,17 +165,24 @@ const MockTest = () => {
                       </CardTitle>
                       <CardDescription className="mt-1">{test.description}</CardDescription>
                     </div>
-                    <Badge
-                      variant={
-                        test.difficulty === 'Easy' 
-                          ? 'outline' 
-                          : test.difficulty === 'Medium' 
-                            ? 'secondary' 
-                            : 'default'
-                      }
-                    >
-                      {test.difficulty}
-                    </Badge>
+                    <div className="flex flex-col gap-2 items-end">
+                      {test.id === 'coding-test' && (
+                        <Badge className="bg-yellow-500 text-white hover:bg-yellow-600">
+                          Unique
+                        </Badge>
+                      )}
+                      <Badge
+                        variant={
+                          test.difficulty === 'Easy' 
+                            ? 'outline' 
+                            : test.difficulty === 'Medium' 
+                              ? 'secondary' 
+                              : 'default'
+                        }
+                      >
+                        {test.difficulty}
+                      </Badge>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>

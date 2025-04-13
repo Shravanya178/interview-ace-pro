@@ -68,33 +68,77 @@ const InterviewPrep = () => {
   const interviewTypes = [
     {
       id: 'technical',
-      title: t('technical_interview'),
+      title: t('Technical_interview'),
       description: t('technical_interview_desc'),
       icon: Code,
       color: 'bg-blue-100 text-blue-700',
     },
     {
       id: 'behavioral',
-      title: t('behavioral_interview'),
+      title: t('Behavioral_interview'),
       description: t('behavioral_interview_desc'),
       icon: MessageSquare,
       color: 'bg-green-100 text-green-700',
     },
     {
       id: 'system-design',
-      title: t('system_design'),
+      title: t('System_design'),
       description: t('system_design_desc'),
       icon: BookOpen,
       color: 'bg-purple-100 text-purple-700',
     },
     {
       id: 'mock',
-      title: t('full_mock_interview'),
+      title: t('Full_mock_interview'),
       description: t('full_mock_interview_desc'),
       icon: Video,
       color: 'bg-orange-100 text-orange-700',
     },
   ];
+
+  // Add Facial Emotion Analysis card directly after the interview types cards
+  const renderFacialAnalysis = () => (
+    <Card className="overflow-hidden relative">
+      <div className="absolute -top-1 -right-1 z-10">
+        <Badge className="bg-yellow-500 text-white hover:bg-yellow-600">
+          Unique Feature
+        </Badge>
+      </div>
+      <CardHeader className="pb-3">
+        <div className="flex items-center space-x-2 mb-1">
+          <div className="p-2 rounded-full bg-yellow-100">
+            <Smile className="h-5 w-5 text-yellow-700" />
+          </div>
+          <CardTitle>Facial Emotion Analysis</CardTitle>
+        </div>
+        <CardDescription>Analyze your facial expressions to improve your interview presence</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ul className="space-y-1 text-sm">
+          <li className="flex items-start gap-2">
+            <span className="inline-block w-1 h-1 rounded-full bg-gray-500 mt-2"></span>
+            <span>
+              Real-time facial expression analysis using AI
+            </span>
+          </li>
+          <li className="flex items-start gap-2">
+            <span className="inline-block w-1 h-1 rounded-full bg-gray-500 mt-2"></span>
+            <span>
+              Get feedback on how your expressions appear to interviewers
+            </span>
+          </li>
+        </ul>
+      </CardContent>
+      <CardFooter className="pt-0">
+        <Button 
+          className="w-full" 
+          onClick={() => navigate("/facial-emotion-analysis")}
+        >
+          {t('Start')} Facial Analysis
+        </Button>
+      </CardFooter>
+    </Card>
+  );
 
   const startAIInterview = (interviewType: string) => {
     if (!selectedCompany || !selectedRole) {
@@ -226,52 +270,14 @@ const InterviewPrep = () => {
                     className="w-full" 
                     onClick={() => startAIInterview(type.id)}
                   >
-                    {t('start')} {type.title}
+                    {t('Start')} {type.title}
                   </Button>
                 </CardFooter>
               </Card>
             );
           })}
-        </div>
-        
-        <div className="mt-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Additional Interview Tools</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="overflow-hidden">
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-2">
-                  <div className={`p-2 rounded-md bg-rose-100 text-rose-700`}>
-                    <Smile className="h-5 w-5" />
-                  </div>
-                  <CardTitle>Facial Emotion Analysis</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-gray-500 mb-4">
-                  Analyze your facial expressions during interviews to understand how you appear to recruiters. Get real-time feedback and tips to improve your non-verbal communication.
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  <Badge variant="outline" className="px-2 py-1">
-                    Body Language
-                  </Badge>
-                  <Badge variant="outline" className="px-2 py-1">
-                    Facial Expression
-                  </Badge>
-                  <Badge variant="outline" className="px-2 py-1">
-                    Emotion Detection
-                  </Badge>
-                </div>
-              </CardContent>
-              <CardFooter className="border-t bg-gray-50 px-6 py-4">
-                <Button 
-                  className="w-full"
-                  onClick={() => navigate('/facial-emotion-analysis')}
-                >
-                  Analyze Facial Expressions
-                </Button>
-              </CardFooter>
-            </Card>
-          </div>
+          {/* Add Facial Emotion Analysis card */}
+          {renderFacialAnalysis()}
         </div>
       </div>
     </DashboardLayout>
