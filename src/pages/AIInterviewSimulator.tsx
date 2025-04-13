@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo, ErrorInfo, Component, ReactNode } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -16,6 +16,8 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import axios from 'axios';
+import EmotionDetector from '@/components/interview/EmotionDetector';
+import EmotionReport from '@/components/interview/EmotionReport';
 
 // Define the SpeechRecognition interfaces
 interface SpeechRecognitionErrorEvent extends Event {
@@ -67,8 +69,8 @@ interface SpeechRecognition extends EventTarget {
 // Declare global window properties
 declare global {
   interface Window {
-    SpeechRecognition: { new(): SpeechRecognition };
-    webkitSpeechRecognition: { new(): SpeechRecognition };
+    SpeechRecognition: typeof SpeechRecognition;
+    webkitSpeechRecognition: typeof SpeechRecognition;
     TEMP_API_KEY?: string;
   }
 }
@@ -149,27 +151,150 @@ const AI_FEEDBACK = {
   ]
 };
 
+// Define the type for company-specific questions
+interface CompanyQuestionsType {
+  [company: string]: {
+    [role: string]: string[];
+  };
+}
+
 // Company data with specific questions
-const COMPANY_SPECIFIC_QUESTIONS = {
-  google: [
-    "How would you improve Google Search?",
-    "Tell me about a time you had to make a decision with insufficient information."
-  ],
-  microsoft: [
-    "How would you implement a feature for Microsoft Teams?",
-    "Describe your approach to ensuring accessibility in software."
-  ],
-  amazon: [
-    "How do you think about customer obsession in your work?",
-    "Tell me about a time you had to make a decision that wasn't popular."
-  ],
-  apple: [
-    "How would you balance innovation with user experience?",
-    "Describe a time when you had to simplify a complex design."
-  ]
+const COMPANY_SPECIFIC_QUESTIONS: CompanyQuestionsType = {
+  google: {
+    frontend: [
+      "How would you implement a high-performance UI component for Google Search auto-suggestions?",
+      "Explain your approach to optimizing load times for Google's web applications.",
+      "How would you architect a complex state management system for a large-scale Google application?",
+      "Describe how you would ensure accessibility in Google's web interfaces.",
+      "How would you improve the responsive design of Google Maps?"
+    ],
+    backend: [
+      "How would you design a scalable backend system to handle Google-scale search queries?",
+      "Explain how you would implement efficient caching for a Google backend service.",
+      "How would you architect a distributed database system like Google's Spanner?",
+      "Describe your approach to handling rate limiting for Google APIs.",
+      "How would you structure microservices for Google's backend infrastructure?"
+    ],
+    fullstack: [
+      "How would you implement real-time collaboration features like in Google Docs?",
+      "Explain your approach to full-stack optimization for Google's web applications.",
+      "How would you integrate Google Cloud services in a full-stack application?",
+      "Describe how you would implement OAuth integration with Google's identity services.",
+      "How would you approach testing a complex Google application across the full stack?"
+    ]
+  },
+  microsoft: {
+    frontend: [
+      "How would you create a component system that aligns with Microsoft's Fluent Design?",
+      "Explain your approach to building accessible UI components for Microsoft Teams.",
+      "How would you implement cross-platform UI that works well across Microsoft's ecosystem?",
+      "Describe your experience with responsive design for enterprise applications like Microsoft's.",
+      "How would you optimize the performance of a React application for Microsoft's web services?"
+    ],
+    backend: [
+      "How would you architect a backend service that integrates with Microsoft Azure?",
+      "Explain your approach to building secure APIs for Microsoft's enterprise customers.",
+      "How would you implement a scalable .NET backend for a Microsoft application?",
+      "Describe your experience with cloud-native development on Azure.",
+      "How would you design a data pipeline for a Microsoft business intelligence tool?"
+    ],
+    fullstack: [
+      "How would you architect a full-stack application using Microsoft's technology stack?",
+      "Explain your approach to implementing SSO using Microsoft's identity platform.",
+      "How would you design a system that integrates with Microsoft 365 services?",
+      "Describe your experience with DevOps practices in a Microsoft environment.",
+      "How would you approach building an enterprise application that leverages Microsoft Graph API?"
+    ]
+  },
+  amazon: {
+    frontend: [
+      "How would you design a responsive UI for Amazon's product pages?",
+      "Explain your approach to optimizing the user experience for Amazon's checkout flow.",
+      "How would you implement A/B testing for Amazon's frontend features?",
+      "Describe your experience with creating performant web interfaces for e-commerce.",
+      "How would you structure a component library for Amazon's diverse product categories?"
+    ],
+    backend: [
+      "How would you architect a microservice system using AWS services?",
+      "Explain your approach to building scalable backend systems like those at Amazon.",
+      "How would you implement a recommendation engine for Amazon's products?",
+      "Describe your experience with distributed systems at scale.",
+      "How would you design a system to handle Amazon's order processing volume?"
+    ],
+    fullstack: [
+      "How would you implement a complete feature across Amazon's technology stack?",
+      "Explain your approach to full-stack monitoring and observability at Amazon scale.",
+      "How would you design a system that integrates with multiple AWS services?",
+      "Describe your experience with serverless architecture for e-commerce applications.",
+      "How would you approach building a feature that spans mobile, web, and backend systems?"
+    ]
+  },
+  apple: {
+    frontend: [
+      "How would you implement animations and transitions that match Apple's design language?",
+      "Explain your approach to creating pixel-perfect interfaces like Apple's products.",
+      "How would you design responsive web applications that feel native on Apple devices?",
+      "Describe your experience with optimizing UI performance for high-end devices.",
+      "How would you implement accessibility features that meet Apple's standards?"
+    ],
+    backend: [
+      "How would you architect backend services that power Apple's ecosystem?",
+      "Explain your approach to implementing secure data synchronization across devices.",
+      "How would you design APIs that maintain Apple's privacy standards?",
+      "Describe your experience with high-performance backend systems.",
+      "How would you implement a backend service that scales to support Apple's user base?"
+    ],
+    fullstack: [
+      "How would you create a seamless experience across Apple's platforms?",
+      "Explain your approach to implementing cloud features while maintaining privacy.",
+      "How would you design an application that works across the Apple ecosystem?",
+      "Describe your experience with integrating hardware and software features.",
+      "How would you implement a feature that requires both frontend polish and backend performance?"
+    ]
+  }
 };
 
+// Create an error boundary component to catch runtime errors
+class ErrorBoundary extends Component<{children: ReactNode}, {hasError: boolean, errorMessage: string}> {
+  constructor(props: {children: ReactNode}) {
+    super(props);
+    this.state = { hasError: false, errorMessage: '' };
+  }
+
+  static getDerivedStateFromError(_: Error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error("Error caught by boundary:", error, errorInfo);
+    this.setState({ errorMessage: error.message });
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <DashboardLayout>
+          <div className="max-w-4xl mx-auto p-8">
+            <Card className="border-red-500">
+              <CardHeader>
+                <CardTitle className="text-red-600">Error</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="mb-4">Something went wrong: {this.state.errorMessage}</p>
+                <Button onClick={() => window.location.reload()}>Reload Application</Button>
+              </CardContent>
+            </Card>
+          </div>
+        </DashboardLayout>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 const AIInterviewSimulator = () => {
+  console.log("Initializing AIInterviewSimulator component");
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -178,6 +303,7 @@ const AIInterviewSimulator = () => {
   const company = searchParams.get('company') || 'google';
   const role = searchParams.get('role') || 'frontend';
   const interviewType = searchParams.get('type') || 'technical';
+  console.log(`Interview params: company=${company}, role=${role}, type=${interviewType}`);
   
   // State for interview
   const [isInterviewStarted, setIsInterviewStarted] = useState(false);
@@ -203,7 +329,7 @@ const AIInterviewSimulator = () => {
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   
   // State for debugging
-  const [showDebug, setShowDebug] = useState(false);
+  const [showDebug, setShowDebug] = useState(true); // Set debug to visible by default to help troubleshooting
   const [debugMessages, setDebugMessages] = useState<string[]>([]);
   
   // Scoring and feedback states
@@ -216,15 +342,65 @@ const AIInterviewSimulator = () => {
   const [apiConnecting, setApiConnecting] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   
-  // Debug function - simplified to avoid infinite renders
+  // Error state for component
+  const [componentError, setComponentError] = useState<string | null>(null);
+  
+  // Add state for emotion tracking
+  const [emotionData, setEmotionData] = useState<{ [key: string]: number }>({});
+  const [showEmotionReport, setShowEmotionReport] = useState(false);
+  
+  // Add handleEmotionCapture function
+  const handleEmotionCapture = useCallback((emotions: { [key: string]: number }) => {
+    // Update emotion data state
+    setEmotionData(prevEmotions => {
+      const newEmotions = { ...prevEmotions };
+      
+      // If no previous data, just use the new data
+      if (Object.keys(newEmotions).length === 0) {
+        return emotions;
+      }
+      
+      // Otherwise, calculate a weighted average (90% old, 10% new)
+      Object.keys(emotions).forEach(emotion => {
+        const prevValue = prevEmotions[emotion] || 0;
+        newEmotions[emotion] = prevValue * 0.9 + emotions[emotion] * 0.1;
+      });
+      
+      return newEmotions;
+    });
+  }, []);
+  
+  // Add debug function - enhanced to also log to console
   const debug = useCallback((message: string) => {
-    console.log(message);
+    console.log(`[DEBUG] ${message}`);
     // Only update state occasionally to prevent infinite loops
     requestAnimationFrame(() => {
       setDebugMessages(prev => [...prev.slice(-19), message]);
     });
   }, []);
 
+  // Add state to hold dynamically generated questions
+  const [dynamicQuestions, setDynamicQuestions] = useState<{question: string, delay: number}[]>([]);
+
+  // Add error handling for critical operations
+  useEffect(() => {
+    console.log("AIInterviewSimulator component mounted");
+    
+    // Add global error handler
+    const handleError = (event: ErrorEvent) => {
+      console.error("Global error caught:", event.error);
+      setComponentError(`Error: ${event.message}`);
+      debug(`Global error: ${event.message}`);
+    };
+    
+    window.addEventListener('error', handleError);
+    
+    return () => {
+      window.removeEventListener('error', handleError);
+      console.log("AIInterviewSimulator component unmounted");
+    };
+  }, [debug]);
+  
   // Get active API key
   const getActiveApiKey = useCallback(() => {
     return window.TEMP_API_KEY || GOOGLE_API_KEY;
@@ -260,85 +436,129 @@ const AIInterviewSimulator = () => {
       const apiEndpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent';
       debug(`Calling API endpoint: ${apiEndpoint}`);
       
-      const response = await axios.post(
-        apiEndpoint,
-        {
-          contents: [
-            {
-              parts: [
-                { text: "Hello" }
-              ]
+      // Add timeout to prevent long-hanging requests
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+      
+      try {
+        const response = await axios.post(
+          apiEndpoint,
+          {
+            contents: [
+              {
+                parts: [
+                  { text: "Hello" }
+                ]
+              }
+            ],
+            generationConfig: {
+              temperature: 0.1,
+              maxOutputTokens: 10
             }
-          ],
-          generationConfig: {
-            temperature: 0.1,
-            maxOutputTokens: 10
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'x-goog-api-key': apiKey
+            },
+            signal: controller.signal
           }
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'x-goog-api-key': apiKey
-          }
+        );
+        
+        clearTimeout(timeoutId);
+        
+        debug(`API response status: ${response.status}`);
+        debug(`API response data: ${JSON.stringify(response.data)}`);
+        
+        if (response.data && 
+            response.data.candidates && 
+            response.data.candidates[0] && 
+            response.data.candidates[0].content && 
+            response.data.candidates[0].content.parts &&
+            response.data.candidates[0].content.parts[0]) {
+          
+          const responseText = response.data.candidates[0].content.parts[0].text;
+          debug(`API text response: "${responseText}"`);
+          
+          setIsApiConnected(true);
+          toast({
+            title: "Gemini API Connected",
+            description: "Ready to start your AI interview",
+          });
+        } else {
+          debug("API response did not contain expected data structure");
+          setApiError("Invalid API response format. Please check your API key.");
+          toast({
+            title: "API Connection Error",
+            description: "Invalid response from Gemini API",
+            variant: "destructive",
+          });
         }
-      );
+      } catch (error) {
+        clearTimeout(timeoutId);
+        throw error; // Re-throw to be caught by the outer try/catch
+      }
+    } catch (error: unknown) {
+      console.error("Failed to connect to Gemini API:", error);
       
-      debug(`API response status: ${response.status}`);
-      debug(`API response data: ${JSON.stringify(response.data)}`);
-      
-      if (response.data && 
-          response.data.candidates && 
-          response.data.candidates[0] && 
-          response.data.candidates[0].content && 
-          response.data.candidates[0].content.parts &&
-          response.data.candidates[0].content.parts[0]) {
-        
-        const responseText = response.data.candidates[0].content.parts[0].text;
-        debug(`API text response: "${responseText}"`);
-        
-        setIsApiConnected(true);
+      // Check if it's a timeout error
+      if (error instanceof Error && error.name === 'AbortError') {
+        debug("API request timed out");
+        setApiError("Connection to Gemini API timed out. The API may be down or inaccessible from your network.");
         toast({
-          title: "Gemini API Connected",
-          description: "Ready to start your AI interview",
-        });
-      } else {
-        debug("API response did not contain expected data structure");
-        setApiError("Invalid API response format. Please check your API key.");
-        toast({
-          title: "API Connection Error",
-          description: "Invalid response from Gemini API",
+          title: "API Connection Timeout",
+          description: "Connection to Gemini API timed out. Please try again later.",
           variant: "destructive",
         });
+        setApiConnecting(false);
+        return;
       }
-    } catch (error: any) {
-      console.error("Failed to connect to Gemini API:", error);
       
       let errorMessage = "Could not connect to the Gemini API.";
       
       // Extract more specific error information
-      if (error.response) {
-        // The request was made and the server responded with a non-2xx status
-        debug(`API error response: ${JSON.stringify(error.response.data)}`);
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as {
+          response?: {
+            status: number;
+            data?: {
+              error?: {
+                message?: string;
+              };
+            };
+          };
+          request?: unknown;
+          message?: string;
+        };
         
-        if (error.response.status === 400) {
-          errorMessage = "Bad request to Gemini API. The API key may be invalid.";
-        } else if (error.response.status === 401 || error.response.status === 403) {
-          errorMessage = "Authentication failed. The API key is invalid or has been revoked.";
-        } else if (error.response.status === 429) {
-          errorMessage = "Too many requests. API quota may be exceeded.";
-        } else if (error.response.status === 404) {
-          errorMessage = "API endpoint not found. The Gemini model name or endpoint URL may be incorrect.";
-        } else {
-          errorMessage = `API Error: ${error.response.status} - ${error.response.data?.error?.message || "Unknown error"}`;
+        // The request was made and the server responded with a non-2xx status
+        if (axiosError.response) {
+          debug(`API error response: ${JSON.stringify(axiosError.response.data)}`);
+          
+          if (axiosError.response.status === 400) {
+            errorMessage = "Bad request to Gemini API. The API key may be invalid.";
+          } else if (axiosError.response.status === 401 || axiosError.response.status === 403) {
+            errorMessage = "Authentication failed. The API key is invalid or has been revoked.";
+          } else if (axiosError.response.status === 429) {
+            errorMessage = "Too many requests. API quota may be exceeded.";
+          } else if (axiosError.response.status === 404) {
+            errorMessage = "API endpoint not found. The Gemini model name or endpoint URL may be incorrect.";
+          } else {
+            const apiErrorMessage = axiosError.response.data?.error?.message || "Unknown error";
+            errorMessage = `API Error: ${axiosError.response.status} - ${apiErrorMessage}`;
+          }
+        } else if (axiosError.request) {
+          // The request was made but no response was received
+          debug("No response received from API server");
+          errorMessage = "No response from Gemini API. Please check your internet connection.";
+        } else if (axiosError.message) {
+          // Something happened in setting up the request
+          debug(`API request setup error: ${axiosError.message}`);
+          errorMessage = `Error setting up API request: ${axiosError.message}`;
         }
-      } else if (error.request) {
-        // The request was made but no response was received
-        debug("No response received from API server");
-        errorMessage = "No response from Gemini API. Please check your internet connection.";
-      } else {
-        // Something happened in setting up the request
-        debug(`API request setup error: ${error.message}`);
-        errorMessage = `Error setting up API request: ${error.message}`;
+      } else if (error instanceof Error) {
+        debug(`API general error: ${error.message}`);
+        errorMessage = `Error connecting to API: ${error.message}`;
       }
       
       setApiError(errorMessage);
@@ -351,6 +571,18 @@ const AIInterviewSimulator = () => {
       setApiConnecting(false);
     }
   }, [debug, toast, getActiveApiKey]);
+
+  // Add auto-retry mechanism for API connection
+  useEffect(() => {
+    if (apiError && !apiConnecting) {
+      const retryTimeout = setTimeout(() => {
+        debug("Retrying API connection...");
+        checkApiConnection();
+      }, 5000); // Retry after 5 seconds
+
+      return () => clearTimeout(retryTimeout);
+    }
+  }, [apiError, apiConnecting, checkApiConnection, debug]);
 
   // Add a button to directly enter your own API key - now correctly defined after checkApiConnection
   const handleApiKeyUpdate = useCallback(() => {
@@ -555,10 +787,28 @@ const AIInterviewSimulator = () => {
   
   // Get questions based on interview type and role
   const getQuestionSet = useCallback(() => {
-    debug(`Getting questions for ${interviewType} interview, ${role} role`);
+    debug(`Getting questions for ${interviewType} interview, ${role} role at ${company}`);
     
+    // Use dynamically generated questions if available
+    if (dynamicQuestions && dynamicQuestions.length > 0) {
+      debug("Using Gemini-generated questions");
+      return dynamicQuestions;
+    }
+    
+    // Otherwise, fall back to predefined questions
     try {
-      // First try to get role-specific questions
+      // First try to get company and role-specific questions
+      if (company && role && 
+          COMPANY_SPECIFIC_QUESTIONS[company] && 
+          COMPANY_SPECIFIC_QUESTIONS[company][role]) {
+        
+        const companyRoleQuestions = COMPANY_SPECIFIC_QUESTIONS[company][role];
+        
+        // Transform string questions into question objects
+        return companyRoleQuestions.map(q => ({ question: q, delay: 3000 }));
+      }
+      
+      // Fallback to technical questions for this role if no company-specific ones
       if (interviewType === 'technical' && role in QUESTION_SETS.technical) {
         return QUESTION_SETS.technical[role];
       }
@@ -580,7 +830,7 @@ const AIInterviewSimulator = () => {
         { question: "Why are you interested in this position?", delay: 3000 }
       ];
     }
-  }, [interviewType, role, debug]);
+  }, [interviewType, role, company, debug, dynamicQuestions]);
 
   // Current question fixed
   const currentQuestion = useMemo(() => {
@@ -592,132 +842,489 @@ const AIInterviewSimulator = () => {
     return questionObj ? (questionObj.question ? questionObj.question : questionObj) : null;
   }, [currentQuestionIndex, getQuestionSet]);
 
-  // Handle webcam setup
-  useEffect(() => {
-    if (isInterviewStarted && videoRef.current) {
-      const setupCamera = async () => {
-        try {
-          debug("Requesting camera and microphone access...");
-          
-          // Simpler camera request with fewer constraints
-          navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-            .then(stream => {
-              debug("Camera access granted");
-              
-              if (videoRef.current) {
-                videoRef.current.srcObject = stream;
-                videoRef.current.onloadedmetadata = () => {
-                  if (videoRef.current) {
-                    videoRef.current.play()
-                      .then(() => debug("Video playback started"))
-                      .catch(e => debug(`Error playing video: ${e}`));
-                  }
-                };
-              }
-            })
-            .catch(error => {
-              debug(`Camera access error: ${error}`);
-              toast({
-                title: "Camera Access Failed",
-                description: "Unable to access your camera. You can still continue with audio only.",
-                variant: "destructive"
-              });
-            });
-          
-          // Initialize timer for the interview
-          setIsTimerRunning(true);
-        } catch (error) {
-          debug(`Error in camera setup: ${error}`);
-        }
-      };
+  // Add company-specific questions
+  const getCompanySpecificQuestions = useCallback(() => {
+    // With the new structure, we need to extract questions in a different way
+    if (COMPANY_SPECIFIC_QUESTIONS[company]) {
+      // Get questions across all roles for this company
+      const allRoleQuestions: string[] = [];
       
-      setupCamera();
-    }
-
-    return () => {
-      // Cleanup webcam
-      if (videoRef.current && videoRef.current.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
-        stream.getTracks().forEach(track => {
-          track.stop();
-          debug(`Stopped track: ${track.kind}`);
-        });
-      }
-    };
-  }, [isInterviewStarted, toast, debug]);
-
-  // Initialize speech recognition when interview starts
-  useEffect(() => {
-    if (isInterviewStarted) {
-      initSpeechRecognition();
+      // Collect questions from all roles for this company
+      Object.values(COMPANY_SPECIFIC_QUESTIONS[company]).forEach(roleQuestions => {
+        if (Array.isArray(roleQuestions)) {
+          allRoleQuestions.push(...roleQuestions);
+        }
+      });
+      
+      // Shuffle and take 2 random company questions
+      const shuffled = [...allRoleQuestions].sort(() => 0.5 - Math.random());
+      const selected = shuffled.slice(0, 2);
+      
+      return selected.map(q => ({ question: q, delay: 3000 }));
     }
     
-    return () => {
-      if (recognitionRef.current) {
-        recognitionRef.current.stop();
-      }
-    };
-  }, [isInterviewStarted, initSpeechRecognition]);
+    // Fallback to empty array if no company questions found
+    return [];
+  }, [company]);
 
-  // Interview timer
-  useEffect(() => {
-    if (isTimerRunning && !interviewEnded) {
-      timerRef.current = setInterval(() => {
-        setTimer(prev => prev + 1);
-        setInterviewDuration(prev => prev + 1);
-      }, 1000);
+  // Add a function to limit total questions to 5
+  const getAllQuestionsLimited = useCallback(() => {
+    // Check if we have company and role-specific questions
+    if (company && role && 
+        COMPANY_SPECIFIC_QUESTIONS[company] && 
+        COMPANY_SPECIFIC_QUESTIONS[company][role]) {
+      
+      // Use up to 5 company-role specific questions
+      const companyRoleQuestions = getQuestionSet().slice(0, 5);
+      debug(`Using ${companyRoleQuestions.length} company-role specific questions for ${company} ${role}`);
+      return companyRoleQuestions;
     }
+    
+    // If no company-role specific questions, use our original approach
+    const standardQuestions = getQuestionSet().slice(0, 3); // Get only 3 standard questions
+    const companyQuestions = getCompanySpecificQuestions(); // Get 2 company-specific questions
+    return [...standardQuestions, ...companyQuestions]; // Total: 5 questions
+  }, [getQuestionSet, getCompanySpecificQuestions, company, role]);
 
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
-  }, [isTimerRunning, interviewEnded]);
-
-  // Add startUserVideo function definition
+  // Use limited questions
+  const allQuestions = useMemo(() => getAllQuestionsLimited(), [getAllQuestionsLimited]);
+  
+  // Add startUserVideo function definition - modified to work with EmotionDetector
   const startUserVideo = useCallback(async () => {
     debug("Starting user video");
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        debug("Video stream attached to video element");
-      }
+      // We don't need to set up the video stream directly anymore
+      // as the EmotionDetector component will handle this internally
+      
+      // Just check if camera is accessible
+      await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      debug("Camera access granted");
+      
+      // Don't need to set videoRef.current.srcObject as EmotionDetector will handle it
     } catch (err) {
       debug(`Error accessing camera: ${err}`);
       toast({
         title: "Camera access denied",
         description: "Please allow camera access to participate in the interview",
-        variant: "destructive"
+        variant: "destructive",
       });
+      // Set video to off if camera access fails
+      setIsVideoOff(true);
     }
   }, [debug, toast]);
+  
+  // Replace the entire useEffect that references startUserVideo
+  useEffect(() => {
+    if (!isInterviewStarted) return;
+    
+    // We're now using the startUserVideo function we defined
+    if (videoRef.current) {
+      startUserVideo();
+    }
+    
+    return () => {
+      // Clean up video stream on unmount
+      if (videoRef.current?.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [isInterviewStarted, startUserVideo]);
+  
+  // Updated useEffect that no longer needs to directly manage video streams
+  useEffect(() => {
+    if (!isInterviewStarted) return;
+    
+    // Just check camera permissions when interview starts
+    startUserVideo();
+    
+    // No cleanup needed here as EmotionDetector will handle its own cleanup
+    return () => {
+      // Nothing to clean up here
+    };
+  }, [isInterviewStarted, startUserVideo]);
+  
+  // Add a new useEffect to check camera permissions on component mount
+  useEffect(() => {
+    // Check camera permissions when component mounts
+    debug("Checking camera permissions on mount");
+    startUserVideo();
+  }, [startUserVideo]);
+  
+  // Handle timer
+  useEffect(() => {
+    if (isTimerRunning) {
+      timerRef.current = setInterval(() => {
+        setTimer(prev => prev + 1);
+      }, 1000);
+    } else if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [isTimerRunning]);
+
+  // First declare processResponseWithAI
+  const processResponseWithAI = useCallback(async (userResponse) => {
+    if (!userResponse.trim()) {
+      toast({
+        title: "Empty Response",
+        description: "Please provide an answer before submitting.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    debug("Processing response with Google Gemini API");
+    setAiResponding(true);
+    
+    // Check for short or dismissive answers
+    const lowEffortResponse = userResponse.toLowerCase().trim();
+    if (
+      lowEffortResponse === "i don't know" || 
+      lowEffortResponse === "i have no idea" || 
+      lowEffortResponse === "no idea" ||
+      lowEffortResponse === "idk" ||
+      lowEffortResponse.length < 15
+    ) {
+      // Provide immediate critical feedback without API call
+      const criticalFeedback = [
+        "That's not the type of answer I'd expect in a real interview. Could you try to provide a more thoughtful response?",
+        "In an actual interview, saying 'I don't know' without attempting to answer would be a red flag. Let's try to work through this question.",
+        "I understand this might be challenging, but in a real interview, you should attempt to reason through the problem even if you're uncertain.",
+        "That response wouldn't impress an interviewer. Would you like to try again with a more detailed answer?"
+      ];
+      
+      const feedback = criticalFeedback[Math.floor(Math.random() * criticalFeedback.length)];
+      
+      // Set a low score for this type of answer
+      const score = 2;
+      setScores(prev => ({ ...prev, [currentQuestionIndex]: score }));
+      setFeedbackHistory(prev => ({ ...prev, [currentQuestionIndex]: feedback }));
+      
+      // Update overall score
+      const allScores = { ...scores, [currentQuestionIndex]: score };
+      const scoreValues = Object.values(allScores);
+      const newOverallScore = scoreValues.reduce((sum, val) => sum + val, 0) / scoreValues.length;
+      setOverallScore(newOverallScore);
+      
+      setAiResponse(feedback);
+      speakText(feedback);
+      setAiResponding(false);
+      
+      // Clear the user response to prevent mismatch with next question
+      setUserResponse('');
+      setTranscript('');
+      
+      return;
+    }
+    
+    try {
+      // Define company-specific traits and expectations to focus on
+      const companyTraits = {
+        google: {
+          values: ["Innovation", "Technical excellence", "Scalability", "Problem-solving", "Data-driven"],
+          focus: {
+            frontend: "web performance optimization, large-scale applications, and modern frameworks",
+            backend: "distributed systems, algorithm efficiency, and scalable infrastructure",
+            fullstack: "end-to-end solutions, technical depth across stack, and Google Cloud Platform"
+          }
+        },
+        microsoft: {
+          values: ["Growth mindset", "Customer obsession", "Inclusive design", "Collaborative", "Technical leadership"],
+          focus: {
+            frontend: "accessibility, cross-platform compatibility, and UI/UX innovation",
+            backend: ".NET ecosystem, Azure cloud services, and enterprise-scale solutions",
+            fullstack: "Microsoft technology stack integration, cloud-native applications, and DevOps"
+          }
+        },
+        amazon: {
+          values: ["Customer obsession", "Ownership", "High bar for talent", "Bias for action", "Frugality"],
+          focus: {
+            frontend: "user experience, responsive design, and performance metrics",
+            backend: "microservices, distributed systems, and AWS infrastructure",
+            fullstack: "end-to-end ownership, full-lifecycle development, and cloud-first architecture"
+          }
+        },
+        apple: {
+          values: ["Design excellence", "User focus", "Simplicity", "Quality", "Innovation"],
+          focus: {
+            frontend: "pixel-perfect interfaces, animation quality, and design-led development",
+            backend: "performance optimization, security, and system integration",
+            fullstack: "seamless ecosystem integration, platform-specific optimization, and user privacy"
+          }
+        }
+      };
+      
+      // Get relevant company traits or use generic traits if company not recognized
+      const traits = companyTraits[company as keyof typeof companyTraits] || {
+        values: ["Technical excellence", "Problem-solving", "Teamwork"],
+        focus: {
+          frontend: "user interfaces and experiences",
+          backend: "systems and infrastructure",
+          fullstack: "end-to-end development"
+        }
+      };
+      
+      // Create a prompt for the AI that's tailored to the company and role
+      const prompt = `You are an interviewer at ${company} conducting a technical interview for a ${role} developer position. KEEP RESPONSES BRIEF.
+      
+      INSTRUCTIONS:
+      1. Evaluate this answer to the question: "${currentQuestion}"
+      2. The candidate responded: "${userResponse}"
+      3. You are at question #${currentQuestionIndex + 1} of 5 total questions.
+      4. Stay in character as a ${company} interviewer focusing on ${traits.focus[role as keyof typeof traits.focus]}
+      5. Your company values are: ${traits.values.join(', ')}
+      
+      YOUR RESPONSE MUST BE CONCISE AND INCLUDE:
+      - Brief feedback (1-2 sentences maximum)
+      - A short follow-up or transition (1 sentence maximum)
+      - A new technical question about ${traits.focus[role as keyof typeof traits.focus]} 
+      
+      LIMIT YOUR ENTIRE RESPONSE TO 3-4 SENTENCES TOTAL. DO NOT USE PLEASANTRIES OR EXCESSIVE EXPLANATION.
+      
+      Format your response as JSON with these fields:
+      {
+        "score": 1-10 numerical rating,
+        "feedback": "1-2 sentence feedback on their answer",
+        "next_question": "A specific technical question about ${traits.focus[role as keyof typeof traits.focus]}"
+      }`;
+      
+      debug("Sending request to Gemini API");
+      // Using Google's AI API with updated endpoint
+      const response = await axios.post(
+        'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent',
+        {
+          contents: [
+            {
+              parts: [
+                { text: prompt }
+              ]
+            }
+          ],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 350
+          }
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': getActiveApiKey()
+          }
+        }
+      );
+      
+      debug("Received response from Gemini API");
+      
+      let aiReply;
+      let score = 0;
+      let nextQuestion = "";
+      
+      try {
+        // Parse the AI's response
+        const rawResponse = response.data.candidates[0].content.parts[0].text;
+        debug(`Raw AI response: ${rawResponse}`);
+        
+        // Extract JSON from the response (handling potential text before/after JSON)
+        const jsonMatch = rawResponse.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const jsonResponse = JSON.parse(jsonMatch[0]);
+          score = jsonResponse.score || 5;
+          aiReply = jsonResponse.feedback || "Let's move on to the next question.";
+          nextQuestion = jsonResponse.next_question || null;
+        } else {
+          // Fallback if JSON parsing fails
+          aiReply = "I need to assess your approach further.";
+          score = 5;
+        }
+      } catch (parseError) {
+        debug(`Error parsing AI response: ${parseError}`);
+        aiReply = "Let's move on to the next question.";
+        score = 5;
+      }
+      
+      // Store the score for this question
+      setScores(prev => ({ ...prev, [currentQuestionIndex]: score }));
+      setFeedbackHistory(prev => ({ ...prev, [currentQuestionIndex]: aiReply }));
+      
+      // Update overall score
+      const allScores = { ...scores, [currentQuestionIndex]: score };
+      const scoreValues = Object.values(allScores);
+      const newOverallScore = scoreValues.reduce((sum, val) => sum + val, 0) / scoreValues.length;
+      setOverallScore(newOverallScore);
+      
+      // Store the next question if provided by the AI
+      if (nextQuestion) {
+        const newQuestions = [...getQuestionSet()];
+        if (currentQuestionIndex + 1 < newQuestions.length) {
+          // Replace the next question with the AI-generated one
+          newQuestions[currentQuestionIndex + 1] = { question: nextQuestion, delay: 3000 };
+          // We don't need to update the state here as we're using the question directly
+          debug(`AI provided next question: ${nextQuestion}`);
+        }
+      }
+      
+      // Use a concise response format to avoid token exhaustion
+      const fullResponse = `${aiReply} ${nextQuestion ? nextQuestion : ''}`;
+      debug(`AI feedback: ${fullResponse}`);
+      setAiResponse(fullResponse);
+      speakText(fullResponse);
+      
+      // Clear the user response to prevent mismatch with next question
+      setUserResponse('');
+      setTranscript('');
+      
+    } catch (error) {
+      debug(`Error with AI API: ${error}`);
+      // Fallback to challenging response
+      const fallbackResponse = "Let's move on to the next question.";
+      setAiResponse(fallbackResponse);
+      speakText(fallbackResponse);
+      
+      // Default score for failed API calls
+      setScores(prev => ({ ...prev, [currentQuestionIndex]: 5 }));
+      
+      // Clear the user response to prevent mismatch with next question
+      setUserResponse('');
+      setTranscript('');
+    } finally {
+      setAiResponding(false);
+    }
+  }, [interviewType, role, company, currentQuestion, currentQuestionIndex, userResponse, scores, speakText, debug, getActiveApiKey, getQuestionSet, toast]);
+
+  // Then declare submitResponse
+  const submitResponse = useCallback(() => {
+    debug("Submitting user response");
+    
+    // Stop listening if still active
+    if (isListening) {
+      toggleListening();
+    }
+    
+    // Process the response using AI
+    processResponseWithAI(userResponse);
+    
+    // Response will be cleared inside processResponseWithAI after processing
+  }, [isListening, toggleListening, userResponse, processResponseWithAI]);
+  
+  // Try to connect to API on component mount
+  useEffect(() => {
+    // Check API connection when component mounts
+    checkApiConnection();
+  }, [checkApiConnection]);
 
   // Modify the startInterview function to check for API first and fix the reference
   const startInterview = useCallback(() => {
     // Don't start if the API isn't connected
     if (!isApiConnected) {
+      debug("API not connected, attempting to connect...");
       toast({
         title: "API Not Connected",
-        description: "Please wait for the Gemini API to connect before starting",
-        variant: "destructive"
+        description: "Attempting to connect to Gemini API before starting...",
+        variant: "default"
       });
-      // Try to reconnect
-      checkApiConnection();
+      
+      // Set a loading state
+      setApiConnecting(true);
+      
+      // Try to connect with a retry mechanism
+      const connect = async () => {
+        let retries = 0;
+        const maxRetries = 3;
+        
+        while (retries < maxRetries) {
+          try {
+            await checkApiConnection();
+            
+            // If we reach here, connection was successful
+            debug("API connection successful after retry");
+            
+            // Now we can start the interview
+            startInterviewAfterConnection();
+            return;
+          } catch (error) {
+            retries++;
+            debug(`API connection retry ${retries}/${maxRetries} failed`);
+            
+            if (retries >= maxRetries) {
+              toast({
+                title: "API Connection Failed",
+                description: "Unable to connect to Gemini API after multiple attempts. Please check your connection and API key.",
+                variant: "destructive"
+              });
+              setApiConnecting(false);
+              return;
+            }
+            
+            // Wait before retrying
+            await new Promise(resolve => setTimeout(resolve, 2000));
+          }
+        }
+      };
+      
+      connect();
       return;
     }
 
-    // Rest of your existing startInterview logic
+    // If API is already connected, start interview directly
+    startInterviewAfterConnection();
+  }, [isApiConnected, debug, checkApiConnection, toast]);
+  
+  // Extract interview start logic to a separate function
+  const startInterviewAfterConnection = useCallback(() => {
     debug("Starting interview");
     setIsInterviewStarted(true);
     setIsTimerRunning(true);
     
-    // Initialize speech recognition
-    initSpeechRecognition();
+    // Initialize speech recognition with retry
+    const initSpeechWithRetry = async () => {
+      let retries = 0;
+      const maxRetries = 2;
+      
+      while (retries <= maxRetries) {
+        const success = initSpeechRecognition();
+        if (success) {
+          debug("Speech recognition initialized successfully");
+          break;
+        }
+        
+        debug(`Speech recognition init failed, retry ${retries + 1}/${maxRetries + 1}`);
+        retries++;
+        
+        if (retries > maxRetries) {
+          toast({
+            title: "Speech Recognition Failed",
+            description: "Could not initialize speech recognition. You can still type your responses.",
+            variant: "default"
+          });
+          break;
+        }
+        
+        // Wait before retrying
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+    };
     
-    // Start video
-    startUserVideo();
+    initSpeechWithRetry();
+    
+    // Start video with error handling
+    try {
+      startUserVideo().catch(err => {
+        debug(`Error starting video: ${err}`);
+        toast({
+          title: "Camera Access Error",
+          description: "Could not access camera. The interview will continue without video.",
+          variant: "default"
+        });
+      });
+    } catch (err) {
+      debug(`Exception starting video: ${err}`);
+    }
     
     // Start the timer
     timerRef.current = setInterval(() => {
@@ -725,12 +1332,170 @@ const AIInterviewSimulator = () => {
       setInterviewDuration((prev) => prev + 1);
     }, 1000);
     
-    // Start with the current question
-    if (currentQuestion) {
-      setAiResponse(`Welcome to your interview with ${company}. ${currentQuestion}`);
-      speakText(`Welcome to your interview with ${company}. ${currentQuestion}`);
+    // Generate fresh questions using Gemini
+    generateQuestionsWithGemini().then(questions => {
+      if (questions && questions.length > 0) {
+        const firstQuestion = questions[0];
+        debug(`First Gemini-generated question: ${firstQuestion}`);
+        
+        const companyName = company.charAt(0).toUpperCase() + company.slice(1);
+        const welcomeMessage = `Welcome to your ${role} developer interview with ${companyName}. I'll be asking you questions specific to our company and role. ${firstQuestion}`;
+        setAiResponse(welcomeMessage);
+        speakText(welcomeMessage);
+      } else {
+        debug("Failed to generate questions with Gemini, falling back to predefined set");
+        // Fall back to first predefined question if API fails
+        if (currentQuestion) {
+          const companyName = company.charAt(0).toUpperCase() + company.slice(1);
+          const welcomeMessage = `Welcome to your ${role} developer interview with ${companyName}. I'll be asking you questions specific to our company and role. ${currentQuestion}`;
+          setAiResponse(welcomeMessage);
+          speakText(welcomeMessage);
+        } else {
+          debug("No current question available");
+          toast({
+            title: "Error Loading Questions",
+            description: "Could not load interview questions. Please try refreshing the page.",
+            variant: "destructive"
+          });
+        }
+      }
+    });
+  }, [debug, initSpeechRecognition, startUserVideo, currentQuestion, company, role, speakText, toast, setTimer, setInterviewDuration]);
+
+  // Add a function to generate questions with Gemini
+  const generateQuestionsWithGemini = useCallback(async (): Promise<string[]> => {
+    debug("Generating fresh interview questions with Gemini API");
+    
+    try {
+      // Define company-specific traits and expectations to focus on
+      const companyTraits = {
+        google: {
+          values: ["Innovation", "Technical excellence", "Scalability", "Problem-solving", "Data-driven"],
+          focus: {
+            frontend: "web performance optimization, large-scale applications, and modern frameworks",
+            backend: "distributed systems, algorithm efficiency, and scalable infrastructure",
+            fullstack: "end-to-end solutions, technical depth across stack, and Google Cloud Platform"
+          }
+        },
+        microsoft: {
+          values: ["Growth mindset", "Customer obsession", "Inclusive design", "Collaborative", "Technical leadership"],
+          focus: {
+            frontend: "accessibility, cross-platform compatibility, and UI/UX innovation",
+            backend: ".NET ecosystem, Azure cloud services, and enterprise-scale solutions",
+            fullstack: "Microsoft technology stack integration, cloud-native applications, and DevOps"
+          }
+        },
+        amazon: {
+          values: ["Customer obsession", "Ownership", "High bar for talent", "Bias for action", "Frugality"],
+          focus: {
+            frontend: "user experience, responsive design, and performance metrics",
+            backend: "microservices, distributed systems, and AWS infrastructure",
+            fullstack: "end-to-end ownership, full-lifecycle development, and cloud-first architecture"
+          }
+        },
+        apple: {
+          values: ["Design excellence", "User focus", "Simplicity", "Quality", "Innovation"],
+          focus: {
+            frontend: "pixel-perfect interfaces, animation quality, and design-led development",
+            backend: "performance optimization, security, and system integration",
+            fullstack: "seamless ecosystem integration, platform-specific optimization, and user privacy"
+          }
+        }
+      };
+      
+      // Get relevant company traits or use generic traits if company not recognized
+      const traits = companyTraits[company as keyof typeof companyTraits] || {
+        values: ["Technical excellence", "Problem-solving", "Teamwork"],
+        focus: {
+          frontend: "user interfaces and experiences",
+          backend: "systems and infrastructure",
+          fullstack: "end-to-end development"
+        }
+      };
+      
+      // Create a prompt for the AI to generate interview questions
+      const prompt = `You are an interviewer at ${company} conducting a ${interviewType} interview for a ${role} developer position.
+
+      TASK:
+      Generate 5 unique and challenging interview questions that a ${company} interviewer would ask a ${role} developer candidate.
+      
+      CONTEXT:
+      - Questions should be for a ${interviewType} interview type
+      - Focus on ${traits.focus[role as keyof typeof traits.focus]}
+      - Questions should reflect ${company}'s values: ${traits.values.join(', ')}
+      - Questions should be varied in difficulty (mix of easy, medium, and hard)
+      - Questions should test both knowledge and problem-solving skills
+      
+      FORMAT YOUR RESPONSE AS A JSON ARRAY:
+      [
+        "Question 1 here?",
+        "Question 2 here?",
+        "Question 3 here?",
+        "Question 4 here?", 
+        "Question 5 here?"
+      ]
+      
+      ONLY RETURN THE JSON ARRAY WITH QUESTIONS. NO EXPLANATIONS OR OTHER TEXT.`;
+      
+      debug("Sending question generation request to Gemini API");
+      
+      // Call the Gemini API to generate questions
+      const response = await axios.post(
+        'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent',
+        {
+          contents: [
+            {
+              parts: [
+                { text: prompt }
+              ]
+            }
+          ],
+          generationConfig: {
+            temperature: 0.9, // Higher temperature for more variety
+            maxOutputTokens: 800
+          }
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': getActiveApiKey()
+          }
+        }
+      );
+      
+      // Parse the AI's response
+      const rawResponse = response.data.candidates[0].content.parts[0].text;
+      debug(`Raw API question generation response: ${rawResponse.substring(0, 100)}...`);
+      
+      try {
+        // Extract and parse the JSON array of questions
+        const jsonMatch = rawResponse.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+          const questions = JSON.parse(jsonMatch[0]);
+          debug(`Successfully generated ${questions.length} questions with Gemini`);
+          
+          // Store these questions in state for later use
+          // We'll create an array of question objects to match our expected format
+          const questionObjects = questions.map((q: string) => ({ question: q, delay: 3000 }));
+          
+          // Override the original getQuestionSet function behavior
+          const dynamicQuestionSet = () => questionObjects;
+          setDynamicQuestions(questionObjects);
+          
+          return questions;
+        } else {
+          debug("Failed to parse JSON from Gemini response");
+          return [];
+        }
+      } catch (parseError) {
+        debug(`Error parsing Gemini response: ${parseError}`);
+        return [];
+      }
+    } catch (error) {
+      debug(`Error generating questions with Gemini: ${error}`);
+      return [];
     }
-  }, [isApiConnected, debug, startUserVideo, currentQuestion, company, speakText, toast, checkApiConnection, initSpeechRecognition, setTimer, setInterviewDuration]);
+  }, [company, role, interviewType, debug, getActiveApiKey]);
 
   // Move to the next question
   const nextQuestion = useCallback(() => {
@@ -808,45 +1573,45 @@ const AIInterviewSimulator = () => {
     setIsSpeakingEnabled(prev => !prev);
   }, []);
 
-  // Toggle video
+  // Toggle video - simplified for EmotionDetector integration
   const toggleVideo = useCallback(() => {
+    // Just toggle the state - EmotionDetector will handle visibility based on isVideoOff
     setIsVideoOff(prev => !prev);
-    
-    if (videoRef.current && videoRef.current.srcObject) {
-      const stream = videoRef.current.srcObject as MediaStream;
-      const videoTracks = stream.getVideoTracks();
-      
-      videoTracks.forEach(track => {
-        // Toggle the enabled state (this approach is more reliable)
-        track.enabled = !track.enabled;
-        console.log(`Video track ${track.enabled ? 'enabled' : 'disabled'}`);
-      });
-    }
-  }, []);
+    console.log(`Video turned ${!isVideoOff ? 'off' : 'on'}`);
+  }, [isVideoOff]);
 
-  // End interview
+  // End interview - updated for EmotionDetector integration
   const endInterview = useCallback(() => {
     setInterviewEnded(true);
     setIsTimerRunning(false);
+    
+    // Show emotion report
+    setShowEmotionReport(true);
     
     // Stop listening
     if (isListening) {
       toggleListening();
     }
     
-    // Stop webcam
-    if (videoRef.current && videoRef.current.srcObject) {
-      const stream = videoRef.current.srcObject as MediaStream;
-      stream.getTracks().forEach(track => {
-        track.stop();
-        console.log(`Stopped track: ${track.kind}`);
-      });
-    }
+    // No need to manually stop webcam as EmotionDetector handles this when component unmounts
     
     // Generate feedback
     setAiResponse("Thank you for completing this interview. Here's some feedback based on your responses...");
     speakText("Thank you for completing this interview. Here's some feedback based on your responses.");
-  }, [isListening, toggleListening, speakText]);
+    
+    // Add a suggestion for facial emotion analysis
+    setTimeout(() => {
+      toast({
+        title: "Interview Complete",
+        description: "Try our Facial Emotion Analysis tool to improve your non-verbal communication.",
+        action: (
+          <Button variant="outline" onClick={() => navigate("/facial-emotion-analysis")}>
+            Try Now
+          </Button>
+        )
+      });
+    }, 2000);
+  }, [isListening, toggleListening, speakText, toast, navigate]);
 
   // Format time from seconds to MM:SS
   const formatTime = (seconds: number) => {
@@ -855,265 +1620,73 @@ const AIInterviewSimulator = () => {
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
   
-  // Add company-specific questions
-  const companyQuestions = COMPANY_SPECIFIC_QUESTIONS[company as keyof typeof COMPANY_SPECIFIC_QUESTIONS] || [];
-  const allQuestions = [...getQuestionSet(), ...companyQuestions.map(q => ({ question: q, delay: 3000 }))];
-  
-  // Replace the entire useEffect that references startUserVideo
-  useEffect(() => {
-    if (!isInterviewStarted) return;
-    
-    // We're now using the startUserVideo function we defined
-    if (videoRef.current) {
-      startUserVideo();
-    }
-    
-    return () => {
-      // Clean up video stream on unmount
-      if (videoRef.current?.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
-        stream.getTracks().forEach(track => track.stop());
-      }
-    };
-  }, [isInterviewStarted, startUserVideo]);
-  
-  // Handle timer
-  useEffect(() => {
-    if (isTimerRunning) {
-      timerRef.current = setInterval(() => {
-        setTimer(prev => prev + 1);
-      }, 1000);
-    } else if (timerRef.current) {
-      clearInterval(timerRef.current);
-    }
-    
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
-  }, [isTimerRunning]);
-  
   // Return to interview prep page
   const goBackToPrep = () => {
     navigate('/interview');
   };
   
-  // Modify the order by moving these methods around
-  // First declare processResponseWithAI
-  const processResponseWithAI = useCallback(async (userResponse) => {
-    if (!userResponse.trim()) {
-      toast({
-        title: "Empty Response",
-        description: "Please provide an answer before submitting.",
-        variant: "destructive"
-      });
-      return;
-    }
+  // Check browser compatibility
+  useEffect(() => {
+    debug("Checking browser compatibility...");
     
-    debug("Processing response with Google Gemini API");
-    setAiResponding(true);
-    
-    // Check for short or dismissive answers
-    const lowEffortResponse = userResponse.toLowerCase().trim();
-    if (
-      lowEffortResponse === "i don't know" || 
-      lowEffortResponse === "i have no idea" || 
-      lowEffortResponse === "no idea" ||
-      lowEffortResponse === "idk" ||
-      lowEffortResponse.length < 15
-    ) {
-      // Provide immediate critical feedback without API call
-      const criticalFeedback = [
-        "That's not the type of answer I'd expect in a real interview. Could you try to provide a more thoughtful response?",
-        "In an actual interview, saying 'I don't know' without attempting to answer would be a red flag. Let's try to work through this question.",
-        "I understand this might be challenging, but in a real interview, you should attempt to reason through the problem even if you're uncertain.",
-        "That response wouldn't impress an interviewer. Would you like to try again with a more detailed answer?"
+    // Check browser features required by the app
+    const checkBrowserCompatibility = () => {
+      // Check for basic Web APIs
+      const requiredFeatures = [
+        { name: 'fetch', feature: 'fetch' in window },
+        { name: 'Promises', feature: typeof Promise !== 'undefined' },
+        { name: 'videoElement', feature: typeof HTMLVideoElement !== 'undefined' },
+        { name: 'MediaDevices', feature: !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) },
+        { name: 'WebRTC', feature: typeof RTCPeerConnection !== 'undefined' },
+        { name: 'SpeechRecognition', feature: !!(window.SpeechRecognition || window.webkitSpeechRecognition) },
+        { name: 'SpeechSynthesis', feature: 'speechSynthesis' in window }
       ];
       
-      const feedback = criticalFeedback[Math.floor(Math.random() * criticalFeedback.length)];
+      const missingFeatures = requiredFeatures.filter(feature => !feature.feature).map(feature => feature.name);
       
-      // Set a low score for this type of answer
-      const score = 2;
-      setScores(prev => ({ ...prev, [currentQuestionIndex]: score }));
-      setFeedbackHistory(prev => ({ ...prev, [currentQuestionIndex]: feedback }));
-      
-      // Update overall score
-      const allScores = { ...scores, [currentQuestionIndex]: score };
-      const scoreValues = Object.values(allScores);
-      const newOverallScore = scoreValues.reduce((sum, val) => sum + val, 0) / scoreValues.length;
-      setOverallScore(newOverallScore);
-      
-      setAiResponse(feedback);
-      speakText(feedback);
-      setAiResponding(false);
-      
-      // Clear the user response to prevent mismatch with next question
-      setUserResponse('');
-      setTranscript('');
-      
-      return;
-    }
-    
-    try {
-      // Create a prompt for the AI that's specific to the company and role
-      const prompt = `You are an AI interviewer conducting a ${interviewType} interview for a ${role} position at ${company}. 
-      
-      IMPORTANT CONTEXT: 
-      - You are interviewing for a ${role} developer role at ${company}
-      - The candidate is currently at question #${currentQuestionIndex + 1}
-      - The current question is: "${currentQuestion}"
-      - The candidate just responded with: "${userResponse}"
-      
-      I need you to:
-      1. Analyze this response on a scale of 1-10
-      2. Provide specific feedback relevant to ${company}'s expectations for ${role} developers
-      3. For the next question, ask something SPECIFICALLY relevant to ${company} and ${role}
-      
-      For example:
-      - If interviewing for Amazon backend, ask about scalability, microservices, or AWS
-      - If interviewing for Google frontend, ask about performance optimization or modern JS frameworks
-      - If interviewing for Microsoft fullstack, ask about .NET, Azure, or cross-platform development
-      
-      Be critical and challenging, like a real interviewer. Don't just be polite - push the candidate to think deeper.
-      If the answer is completely wrong or shows significant misunderstanding, point that out directly.
-      
-      Format your response as JSON with these fields:
-      - score: numerical score from 1-10
-      - feedback: your assessment and feedback (2-3 sentences)
-      - quality: one of "excellent", "good", "average", or "poor"
-      - challenge: a follow-up question that challenges the candidate to elaborate or think deeper
-      - next_question: a NEW question specifically relevant to ${company} and the ${role} position`;
-      
-      debug("Sending request to Gemini API");
-      // Using Google's AI API with updated endpoint
-      const response = await axios.post(
-        'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent',
-        {
-          contents: [
-            {
-              parts: [
-                { text: prompt }
-              ]
-            }
-          ],
-          generationConfig: {
-            temperature: 0.8,
-            maxOutputTokens: 1000
-          }
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'x-goog-api-key': getActiveApiKey()
-          }
-        }
-      );
-      
-      debug("Received response from Gemini API");
-      
-      let aiReply;
-      let score = 0;
-      let feedbackQuality = "average";
-      let challengeQuestion = "";
-      let nextQuestion = "";
-      
-      try {
-        // Parse the AI's response
-        const rawResponse = response.data.candidates[0].content.parts[0].text;
-        debug(`Raw AI response: ${rawResponse}`);
-        
-        // Extract JSON from the response (handling potential text before/after JSON)
-        const jsonMatch = rawResponse.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          const jsonResponse = JSON.parse(jsonMatch[0]);
-          score = jsonResponse.score || 5;
-          feedbackQuality = jsonResponse.quality || "average";
-          aiReply = jsonResponse.feedback || "Thank you for your response.";
-          challengeQuestion = jsonResponse.challenge || "Could you elaborate more on your answer?";
-          nextQuestion = jsonResponse.next_question || null;
-        } else {
-          // Fallback if JSON parsing fails
-          aiReply = "I'm not fully convinced by that answer. Could you elaborate more?";
-          challengeQuestion = "What specific examples can you provide to support your point?";
-          score = 5;
-        }
-      } catch (parseError) {
-        debug(`Error parsing AI response: ${parseError}`);
-        aiReply = "I understand your approach, but I'd like to challenge your thinking on this.";
-        challengeQuestion = "Have you considered alternative perspectives?";
-        score = 5;
+      if (missingFeatures.length > 0) {
+        const missingFeaturesStr = missingFeatures.join(', ');
+        const errorMessage = `Your browser doesn't support required features: ${missingFeaturesStr}. Please use a modern browser like Chrome or Edge.`;
+        debug(`Browser compatibility issue: ${errorMessage}`);
+        setComponentError(errorMessage);
+        return false;
       }
       
-      // Store the score for this question
-      setScores(prev => ({ ...prev, [currentQuestionIndex]: score }));
-      setFeedbackHistory(prev => ({ ...prev, [currentQuestionIndex]: aiReply }));
-      
-      // Update overall score
-      const allScores = { ...scores, [currentQuestionIndex]: score };
-      const scoreValues = Object.values(allScores);
-      const newOverallScore = scoreValues.reduce((sum, val) => sum + val, 0) / scoreValues.length;
-      setOverallScore(newOverallScore);
-      
-      // Store the next question if provided by the AI
-      if (nextQuestion) {
-        const newQuestions = [...getQuestionSet()];
-        if (currentQuestionIndex + 1 < newQuestions.length) {
-          // Replace the next question with the AI-generated one
-          newQuestions[currentQuestionIndex + 1] = { question: nextQuestion, delay: 3000 };
-          // We don't need to update the state here as we're using the question directly
-          debug(`AI provided next question: ${nextQuestion}`);
-        }
-      }
-      
-      // Make the response more interactive by directly challenging the candidate
-      const fullResponse = `${aiReply} ${challengeQuestion}`;
-      debug(`AI feedback: ${fullResponse}`);
-      setAiResponse(fullResponse);
-      speakText(fullResponse);
-      
-      // Clear the user response to prevent mismatch with next question
-      setUserResponse('');
-      setTranscript('');
-      
-    } catch (error) {
-      debug(`Error with AI API: ${error}`);
-      // Fallback to challenging response
-      const fallbackResponse = "I'm not sure that answer fully addresses the question. Could you think about it from another angle and try again?";
-      setAiResponse(fallbackResponse);
-      speakText(fallbackResponse);
-      
-      // Default score for failed API calls
-      setScores(prev => ({ ...prev, [currentQuestionIndex]: 5 }));
-      
-      // Clear the user response to prevent mismatch with next question
-      setUserResponse('');
-      setTranscript('');
-    } finally {
-      setAiResponding(false);
+      debug("Browser compatibility check passed");
+      return true;
+    };
+    
+    const isCompatible = checkBrowserCompatibility();
+    
+    // If browser is compatible, proceed with initialization
+    if (isCompatible) {
+      // Try to connect to API as soon as component loads
+      checkApiConnection().catch(error => {
+        debug(`Initial API connection error: ${error}`);
+        // Don't set component error for API issues, as they're handled separately
+      });
     }
-  }, [interviewType, role, company, currentQuestion, currentQuestionIndex, userResponse, scores, speakText, debug, getActiveApiKey, getQuestionSet]);
-
-  // Then declare submitResponse
-  const submitResponse = useCallback(() => {
-    debug("Submitting user response");
-    
-    // Stop listening if still active
-    if (isListening) {
-      toggleListening();
-    }
-    
-    // Process the response using AI
-    processResponseWithAI(userResponse);
-    
-    // Response will be cleared inside processResponseWithAI after processing
-  }, [isListening, toggleListening, userResponse, processResponseWithAI]);
+  }, [debug, checkApiConnection]);
   
-  // Try to connect to API on component mount
-  useEffect(() => {
-    // Check API connection when component mounts
-    checkApiConnection();
-  }, [checkApiConnection]);
+  // Render error UI if compatibility issues are detected
+  if (componentError) {
+    return (
+      <DashboardLayout>
+        <div className="max-w-4xl mx-auto p-8">
+          <Card className="border-red-500">
+            <CardHeader>
+              <CardTitle className="text-red-600">Browser Compatibility Error</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="mb-4">{componentError}</p>
+              <p className="mb-4">Please try using a modern browser like Chrome or Edge.</p>
+              <Button onClick={() => window.location.reload()}>Retry</Button>
+            </CardContent>
+          </Card>
+        </div>
+      </DashboardLayout>
+    );
+  }
   
   // Render interview completion screen
   if (interviewEnded) {
@@ -1196,24 +1769,56 @@ const AIInterviewSimulator = () => {
                   {Object.keys(scores).map((questionIndex) => {
                     const idx = parseInt(questionIndex);
                     const questionObj = allQuestions[idx];
-                    const question = typeof questionObj === 'object' ? questionObj.question : questionObj;
                     return (
-                      <div key={idx} className="bg-gray-50 p-4 rounded-lg">
-                        <div className="flex justify-between items-center mb-2">
+                      <div key={idx} className="bg-gray-50 p-4 rounded-md">
+                        <div className="flex justify-between mb-2">
                           <h4 className="font-medium">Question {idx + 1}</h4>
-                          <Badge variant={scores[idx] >= 8 ? "default" : scores[idx] >= 5 ? "outline" : "destructive"}>
-                            Score: {scores[idx]}/10
-                          </Badge>
+                          <span className="text-sm bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
+                            Score: {scores[idx].toFixed(1)}/10
+                          </span>
                         </div>
-                        <p className="text-sm mb-2">{question}</p>
-                        {feedbackHistory[idx] && (
-                          <p className="text-xs text-gray-500 italic">"{feedbackHistory[idx]}"</p>
-                        )}
+                        <p className="text-sm mb-2">{questionObj?.question || `Question ${idx + 1}`}</p>
+                        <Progress value={scores[idx] * 10} className="h-1.5" />
                       </div>
                     );
                   })}
                 </div>
               </div>
+              
+              {/* Add Emotion Analysis Report */}
+              {showEmotionReport && Object.keys(emotionData).length > 0 && (
+                <div className="mt-6 border-t pt-6">
+                  <h3 className="text-lg font-medium mb-3">Facial Expression Analysis</h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    During your interview, we analyzed your facial expressions to help you understand how you might appear to interviewers.
+                    This can provide valuable insights into your non-verbal communication.
+                  </p>
+                  <EmotionReport 
+                    emotionData={emotionData}
+                    title="Your Expression Profile"
+                  />
+                </div>
+              )}
+              
+              {/* Add a note if no emotion data was collected */}
+              {showEmotionReport && Object.keys(emotionData).length === 0 && (
+                <div className="mt-6 border-t pt-6">
+                  <h3 className="text-lg font-medium mb-3">Facial Expression Analysis</h3>
+                  <div className="bg-gray-100 p-4 rounded">
+                    <p className="text-sm">
+                      No facial expression data was collected during this interview. This may be because your camera was off or 
+                      facial detection was not working properly. Try our dedicated Facial Emotion Analysis tool for better results.
+                    </p>
+                    <Button 
+                      className="mt-3" 
+                      variant="outline" 
+                      onClick={() => navigate("/facial-emotion-analysis")}
+                    >
+                      Try Facial Emotion Analysis
+                    </Button>
+                  </div>
+                </div>
+              )}
               
               <div className="flex justify-between pt-4">
                 <Button variant="outline" onClick={goBackToPrep}>
@@ -1457,6 +2062,34 @@ const AIInterviewSimulator = () => {
       <div className="grid gap-4 md:grid-cols-3 h-[calc(100vh-150px)]">
         {/* Left column - Video and controls */}
         <div className="space-y-4">
+          <div className="bg-yellow-50 border border-yellow-200 p-3 rounded-md mb-4">
+            <p className="text-sm font-medium mb-2">Camera not working?</p>
+            <button
+              onClick={async () => {
+                try {
+                  const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { width: 640, height: 480 } 
+                  });
+                  
+                  if (videoRef.current) {
+                    videoRef.current.srcObject = stream;
+                    videoRef.current.onloadedmetadata = () => {
+                      videoRef.current?.play();
+                      alert("Camera is working! You should see your video feed now.");
+                    };
+                  } else {
+                    alert("Video reference is not available. This is likely a bug.");
+                    stream.getTracks().forEach(track => track.stop());
+                  }
+                } catch (err) {
+                  alert(`Camera access error: ${err.message || err}. Please check your camera permissions.`);
+                }
+              }}
+              className="bg-blue-500 hover:bg-blue-600 text-white text-sm py-1 px-3 rounded"
+            >
+              Try Direct Camera Access
+            </button>
+          </div>
           <Card className="h-[70vh]">
             <CardHeader className="pb-2">
               <CardTitle className="flex justify-between items-center">
@@ -1474,12 +2107,24 @@ const AIInterviewSimulator = () => {
                     <span>Camera is off</span>
                   </div>
                 ) : (
-                  <video
-                    ref={videoRef}
-                    autoPlay
-                    muted
-                    className="w-full h-full object-cover"
-                  />
+                  <div className="relative w-full h-full">
+                    {/* Show the video element directly */}
+                    <video
+                      ref={videoRef}
+                      autoPlay
+                      muted
+                      className="w-full h-full object-cover"
+                    />
+                    {/* Invisible EmotionDetector for analysis only */}
+                    <div className="absolute top-0 left-0 opacity-0 pointer-events-none">
+                      <EmotionDetector
+                        width={1}
+                        height={1}
+                        onEmotionCapture={handleEmotionCapture}
+                        isActive={!isVideoOff}
+                      />
+                    </div>
+                  </div>
                 )}
                 
                 {/* Timer overlay */}
@@ -1678,4 +2323,11 @@ const AIInterviewSimulator = () => {
   );
 };
 
-export default AIInterviewSimulator; 
+// Export the wrapped component
+const AIInterviewSimulatorWithErrorBoundary = () => (
+  <ErrorBoundary>
+    <AIInterviewSimulator />
+  </ErrorBoundary>
+);
+
+export default AIInterviewSimulatorWithErrorBoundary; 

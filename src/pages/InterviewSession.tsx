@@ -727,6 +727,28 @@ const InterviewSession = ({ roomName, language = "en", onClose }: InterviewSessi
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-7xl mx-auto">
+        <h1 className="text-2xl font-bold mb-4">Interview Session</h1>
+
+        <div className="mb-4 p-4 bg-gray-100 rounded-lg">
+          <h2 className="text-lg font-semibold mb-2">Camera Test</h2>
+          <p className="mb-2">If your camera isn't working in the interview, click the button below to test direct camera access:</p>
+          <button 
+            onClick={async () => {
+              try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                alert("Camera access granted successfully! Your camera is working.");
+                // Clean up
+                stream.getTracks().forEach(track => track.stop());
+              } catch (err) {
+                alert(`Camera access failed: ${err.message || err}. Please check your camera permissions.`);
+              }
+            }}
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md"
+          >
+            Test Camera Access
+          </button>
+        </div>
+
         {jitsiError && (
           <div className="mb-4 p-4 bg-red-50 border border-red-300 rounded-md text-red-800">
             <h3 className="text-lg font-semibold mb-2">Jitsi Error</h3>
