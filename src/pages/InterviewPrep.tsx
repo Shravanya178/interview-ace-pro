@@ -153,7 +153,7 @@ const InterviewPrep = () => {
     try {
       // Show popup with chat and video interview options
       const useVideoInterview = window.confirm(
-        "Choose Interview Type:\n\nClick 'OK' for Video Interview\nClick 'Cancel' for Chat Interview"
+        "Choose Interview Type:\n\nClick 'OK' for Video Interview\nClick 'Chat' for Chat Interview"
       );
       
       if (useVideoInterview) {
