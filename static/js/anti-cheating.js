@@ -1,5 +1,5 @@
 /**
- * Anti-Cheating Measures for Interview Pro
+ * Anti-Cheating Measures for PrepMate
  * This script enforces anti-cheating measures during interviews:
  * - Ensures camera remains on
  * - Ensures microphone remains on

@@ -67,7 +67,7 @@ INTERVIEW_QUESTIONS = {
 class MockInterviewApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("AI-Powered Mock Interview System")
+        self.root.title("PrepMate")
         self.root.geometry("1000x800")
         self.root.configure(bg='#f0f0f0')
         
@@ -99,7 +99,7 @@ class MockInterviewApp:
         header_frame = ttk.Frame(main_frame)
         header_frame.pack(fill=tk.X, pady=(0, 20))
         
-        ttk.Label(header_frame, text="AI-Powered Mock Interview System", 
+        ttk.Label(header_frame, text="PrepMate", 
                  style='Header.TLabel').pack(side=tk.LEFT)
         
         # Interview type selection

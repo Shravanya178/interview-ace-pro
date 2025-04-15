@@ -5,6 +5,7 @@ import { Menu, X, UserCircle, LogOut, Settings, Home } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAuth } from "@/hooks/useAuth";
 import LanguageSelector from "@/components/layout/LanguageSelector";
+import ThemeToggle from "@/components/layout/ThemeToggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,19 +27,11 @@ const Navbar = () => {
   };
 
   const navigation = [
-<<<<<<< HEAD
-    { name: "Dashboard", href: "/dashboard" },
-    { name: "Resume Analysis", href: "/resume" },
-    { name: "Interview Preparation", href: "/interview" },
-    { name: "Mock Tests", href: "/mock-test" },
-    { name: "Reports", href: "/reports" },
-=======
-    { name: t("Dashboard"), href: "/dashboard" },
-    { name: t("Resume analysis"), href: "/resume" },
-    { name: t("Interview prep"), href: "/interview" },
-    { name: t("Mock tests"), href: "/mock-test" },
-    { name: t("Reports"), href: "/reports" },
->>>>>>> 3c612b13fdd72451a2aac4d205e644fdaabb1aa3
+    { name: t("dashboard"), href: "/dashboard" },
+    { name: t("resume_analysis"), href: "/resume" },
+    { name: t("interview_prep"), href: "/interview" },
+    { name: t("mock_tests"), href: "/mock-test" },
+    { name: t("reports"), href: "/reports" },
   ];
 
   const isActive = (path: string) => {
@@ -46,17 +39,14 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white shadow-md border-b border-gray-200 fixed w-full z-10">
+    <nav className="bg-white dark:bg-gray-900 shadow-md border-b border-gray-200 dark:border-gray-800 fixed w-full z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
               <Link to="/" className="flex items-center space-x-1 hover:opacity-90 transition-opacity">
-                <span className="text-primary text-xl font-bold">
-                  Interview
-                </span>
-                <span className="text-secondary text-xl font-bold">
-                  Ace Pro
+                <span className="text-xl font-bold">
+                  <span className="text-primary">Prep</span><span className="text-secondary">Mate</span>
                 </span>
               </Link>
             </div>
@@ -67,8 +57,8 @@ const Navbar = () => {
                   to={item.href}
                   className={`inline-flex items-center px-3 pt-1 border-b-2 text-sm font-medium h-full transition-colors duration-200 ${
                     isActive(item.href)
-                      ? "border-secondary text-gray-900 font-semibold"
-                      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                      ? "border-secondary text-gray-900 dark:text-white font-semibold"
+                      : "border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-300"
                   }`}
                 >
                   {capitalize(item.name)}
@@ -77,6 +67,7 @@ const Navbar = () => {
             </div>
           </div>
           <div className="hidden sm:ml-6 sm:flex sm:items-center space-x-3">
+            <ThemeToggle />
             <LanguageSelector />
 
             {user ? (
@@ -91,11 +82,11 @@ const Navbar = () => {
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-white w-56 shadow-lg rounded-md border border-gray-200">
+                <DropdownMenuContent align="end" className="bg-white dark:bg-gray-900 w-56 shadow-lg rounded-md border border-gray-200 dark:border-gray-800">
                   <div className="flex items-center justify-start gap-2 p-2">
                     <div className="flex flex-col space-y-1 leading-none">
-                      <p className="font-medium">{user.name}</p>
-                      <p className="w-[200px] truncate text-sm text-gray-500">
+                      <p className="font-medium dark:text-white">{user.name}</p>
+                      <p className="w-[200px] truncate text-sm text-gray-500 dark:text-gray-400">
                         {user.email}
                       </p>
                     </div>
@@ -104,19 +95,19 @@ const Navbar = () => {
                   <DropdownMenuItem asChild className="cursor-pointer hover:bg-gray-50">
                     <Link to="/dashboard" className="flex items-center">
                       <Home className="mr-2 h-4 w-4" />
-                      <span>{capitalize(t("dashboard"))}</span>
+                      <span>{t("dashboard")}</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild className="cursor-pointer hover:bg-gray-50">
                     <Link to="/profile" className="flex items-center">
                       <UserCircle className="mr-2 h-4 w-4" />
-                      <span>{capitalize(t("profile"))}</span>
+                      <span>{t("profile")}</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild className="cursor-pointer hover:bg-gray-50">
                     <Link to="/settings" className="flex items-center">
                       <Settings className="mr-2 h-4 w-4" />
-                      <span>{capitalize(t("settings"))}</span>
+                      <span>{t("settings")}</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -125,7 +116,7 @@ const Navbar = () => {
                     className="cursor-pointer text-red-600 hover:text-red-700 hover:bg-red-50"
                   >
                     <LogOut className="mr-2 h-4 w-4" />
-                    <span>{capitalize(t("logout"))}</span>
+                    <span>{t("logout")}</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -154,15 +145,15 @@ const Navbar = () => {
 
       {isOpen && (
         <div className="sm:hidden">
-          <div className="pt-2 pb-3 space-y-1 max-h-[calc(100vh-4rem)] overflow-y-auto">
+          <div className="pt-2 pb-3 space-y-1 max-h-[calc(100vh-4rem)] overflow-y-auto bg-white dark:bg-gray-900">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 to={item.href}
                 className={`block pl-4 pr-4 py-3 border-l-4 text-base font-medium transition-colors duration-200 ${
                   isActive(item.href)
-                    ? "border-secondary text-secondary bg-secondary/10 font-semibold"
-                    : "border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-800"
+                    ? "border-secondary text-secondary dark:text-secondary-foreground bg-secondary/10 font-semibold"
+                    : "border-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-800 dark:hover:text-white"
                 }`}
                 onClick={() => setIsOpen(false)}
               >
@@ -227,11 +218,14 @@ const Navbar = () => {
               </div>
             )}
             <div className="mt-3 px-4">
-              <div className="flex items-center">
-                <span className="text-sm text-gray-500 mr-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-500 dark:text-gray-400">
                   {capitalize(t("language"))}
                 </span>
-                <LanguageSelector />
+                <div className="flex items-center space-x-2">
+                  <ThemeToggle />
+                  <LanguageSelector />
+                </div>
               </div>
             </div>
           </div>

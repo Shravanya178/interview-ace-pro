@@ -1,6 +1,6 @@
-**DEPLOYED PROJECT LINK**: https://interview-ace-pro-nu.vercel.app/
+**DEPLOYED PROJECT LINK**:
 
-**VIDEO LINK**: https://drive.google.com/drive/folders/161hR3IM-mUH8WbQ29jz6OCW704hidOvw
+# PrepMate
 ## What technologies are used for this project?
 
 This project is built with:
@@ -43,4 +43,22 @@ Git + GitHub for version control
 Component-based architecture with custom hooks for reusable logic
 
 Vercel for Deployment.
+
+## Deployment Instructions
+
+### Deploying to Vercel
+
+1. Fork or clone this repository
+2. Connect your GitHub repository to Vercel
+3. Configure the following settings:
+   - Build Command: `npm run build`
+   - Output Directory: `dist`
+   - Install Command: `npm install`
+4. Add any required environment variables in the Vercel dashboard
+5. Deploy the application
+
+The project is configured with the necessary Vercel configuration files, including:
+- `vercel.json` - Defines build settings and API routes
+- `.env.production` - Contains production environment variables
+- `api/index.py` - Serverless API handler
 

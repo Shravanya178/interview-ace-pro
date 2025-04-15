@@ -60,8 +60,13 @@ const ResumeAnalysis = () => {
   const { toast } = useToast();
 
   // Handle resume upload completion
-  const handleUploadComplete = () => {
-      setAnalysisComplete(true);
+  const handleUploadComplete = (extractedSkills?: any) => {
+    // If we have extracted skills from the resume, update the skills state
+    if (extractedSkills && extractedSkills.length > 0) {
+      setSkills(extractedSkills);
+    }
+    
+    setAnalysisComplete(true);
     
     // After some time, encourage the user to start the test
     setTimeout(() => {
@@ -263,7 +268,7 @@ const ResumeAnalysis = () => {
       const pageCount = pdf.getNumberOfPages();
       for (let i = 1; i <= pageCount; i++) {
         pdf.setPage(i);
-        pdf.text('Interview Ace Pro - Skills Assessment Report', 20, 285);
+        pdf.text('PrepMate - Skills Assessment Report', 20, 285);
         pdf.text(`Page ${i} of ${pageCount}`, 180, 285);
       }
       

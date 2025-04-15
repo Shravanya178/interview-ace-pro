@@ -50,9 +50,11 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/use-toast";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { useAuth } from "@/hooks/useAuth";
 
 const Reports = () => {
   const { t } = useLanguage();
+  const { user } = useAuth();
   const [selectedCandidate, setSelectedCandidate] = useState<string | null>(
     null
   );
@@ -93,9 +95,10 @@ const Reports = () => {
     { name: "OOP Concepts", value: 10 },
   ];
 
+  // Use logged-in user information for candidate data
   const candidateData = {
-    name: "John Doe",
-    email: "john.doe@example.com",
+    name: user?.name || "Guest User",
+    email: user?.email || "guest@example.com",
     role: "Senior Frontend Developer",
     date: "2023-07-12",
     time: "14:30 - 15:45",
@@ -103,7 +106,7 @@ const Reports = () => {
     totalScore: 78,
     status: "Pass",
     recommendation: "Hire",
-    photoUrl: "",
+    photoUrl: user?.photoUrl || "",
     feedback:
       "Candidate showed strong problem-solving skills and deep knowledge of JavaScript. Could improve on system design concepts and optimization techniques. Overall, a solid performer who would be an asset to the team.",
   };
@@ -452,8 +455,8 @@ const Reports = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="pt-2">
-                <div className="h-80">
-                  <ResponsiveContainer width="100%" height="100%">
+                <div style={{ height: '320px', width: '100%', minHeight: '250px', minWidth: '250px' }}>
+                  <ResponsiveContainer width="100%" height="100%" minWidth={200} minHeight={200}>
                     <LineChart
                       data={progressData.map((item) => ({
                         ...item,
@@ -617,8 +620,8 @@ const Reports = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="h-72">
-                      <ResponsiveContainer width="100%" height="100%">
+                    <div style={{ height: '280px', width: '100%', minHeight: '250px', minWidth: '250px' }}>
+                      <ResponsiveContainer width="100%" height="100%" minWidth={200} minHeight={200}>
                         <BarChart
                           data={performanceData}
                           margin={{
@@ -663,8 +666,8 @@ const Reports = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="h-72">
-                      <ResponsiveContainer width="100%" height="100%">
+                    <div style={{ height: '280px', width: '100%', minHeight: '250px', minWidth: '250px' }}>
+                      <ResponsiveContainer width="100%" height="100%" minWidth={200} minHeight={200}>
                         <PieChart>
                           <Pie
                             data={skillsData}
@@ -803,8 +806,8 @@ const Reports = () => {
                   <h2 className="text-xl font-semibold mb-4">
                     {capitalizeEachWord("Performance Breakdown")}
                   </h2>
-                  <div className="h-72">
-                    <ResponsiveContainer width="100%" height="100%">
+                  <div style={{ height: '280px', width: '100%', minHeight: '250px', minWidth: '250px' }}>
+                    <ResponsiveContainer width="100%" height="100%" minWidth={200} minHeight={200}>
                       <BarChart
                         data={performanceData}
                         margin={{
@@ -846,8 +849,8 @@ const Reports = () => {
                   <h2 className="text-xl font-semibold mb-4">
                     {capitalizeEachWord("Skills Distribution")}
                   </h2>
-                  <div className="h-72">
-                    <ResponsiveContainer width="100%" height="100%">
+                  <div style={{ height: '280px', width: '100%', minHeight: '250px', minWidth: '250px' }}>
+                    <ResponsiveContainer width="100%" height="100%" minWidth={200} minHeight={200}>
                       <PieChart>
                         <Pie
                           data={skillsData}

@@ -2222,8 +2222,8 @@ const AIInterviewSimulator = () => {
   
   // Render active interview screen
   return (
-    <div className="container mx-auto p-4 h-full">
-      <h1 className="text-2xl font-bold mb-6">AI Interview Simulator</h1>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-6">PrepMate</h1>
       
       {/* Debug overlay */}
       {showDebug && (

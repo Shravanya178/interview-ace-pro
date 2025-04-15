@@ -31,12 +31,13 @@ import { useToast } from "@/components/ui/use-toast";
 import { Separator } from "@/components/ui/separator";
 
 const InterviewPrep = () => {
-  const [selectedCompany, setSelectedCompany] = useState("");
-  const [selectedRole, setSelectedRole] = useState("");
+  const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
+  const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [currentInterview, setCurrentInterview] = useState(null);
   const { t } = useLanguage();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [showDetailedReport, setShowDetailedReport] = useState(false);
 
   // Helper function to capitalize each word in a string
   const capitalizeEachWord = (str: string) => {
@@ -44,6 +45,12 @@ const InterviewPrep = () => {
       .split(" ")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
+  };
+
+  // Adding a function to capitalize only the first letter of a string
+  const capitalizeFirstLetter = (str: string) => {
+    if (!str) return '';
+    return str.charAt(0).toUpperCase() + str.slice(1);
   };
 
   // Extended company and role lists
@@ -96,49 +103,29 @@ const InterviewPrep = () => {
   const interviewTypes = [
     {
       id: "technical",
-<<<<<<< HEAD
-      title: capitalizeEachWord(t("technical interview")),
-      description: t("technical interview desc"),
-=======
-      title: t("Technical interview"),
+      title: capitalizeFirstLetter(t("Technical interview")),
       description: t("Technical interview desc"),
->>>>>>> 3c612b13fdd72451a2aac4d205e644fdaabb1aa3
       icon: Code,
       color: "bg-blue-100 text-blue-700",
     },
     {
       id: "behavioral",
-<<<<<<< HEAD
-      title: capitalizeEachWord(t("behavioral interview")),
-      description: t("behavioral interview desc"),
-=======
-      title: t("Behavioral interview"),
+      title: capitalizeFirstLetter(t("Behavioral interview")),
       description: t("Behavioral interview desc"),
->>>>>>> 3c612b13fdd72451a2aac4d205e644fdaabb1aa3
       icon: MessageSquare,
       color: "bg-green-100 text-green-700",
     },
     {
       id: "system-design",
-<<<<<<< HEAD
-      title: capitalizeEachWord(t("system design")),
-      description: t("system design desc"),
-=======
-      title: t("System design"),
+      title: capitalizeFirstLetter(t("System design")),
       description: t("System design desc"),
->>>>>>> 3c612b13fdd72451a2aac4d205e644fdaabb1aa3
       icon: BookOpen,
       color: "bg-purple-100 text-purple-700",
     },
     {
       id: "mock",
-<<<<<<< HEAD
-      title: capitalizeEachWord(t("full mock interview")),
-      description: t("full mock interview desc"),
-=======
-      title: t("Full mock interview"),
+      title: capitalizeFirstLetter(t("full mock interview")),
       description: t("Full mock interview desc"),
->>>>>>> 3c612b13fdd72451a2aac4d205e644fdaabb1aa3
       icon: Video,
       color: "bg-orange-100 text-orange-700",
     },
@@ -182,11 +169,7 @@ const InterviewPrep = () => {
           className="w-full"
           onClick={() => navigate("/facial-emotion-analysis")}
         >
-<<<<<<< HEAD
-          {capitalizeEachWord(t("start"))} Facial Analysis
-=======
-          {t("Start")} Facial Analysis
->>>>>>> 3c612b13fdd72451a2aac4d205e644fdaabb1aa3
+          Start Facial Analysis
         </Button>
       </CardFooter>
     </Card>
@@ -195,13 +178,8 @@ const InterviewPrep = () => {
   const startAIInterview = (interviewType: string) => {
     if (!selectedCompany || !selectedRole) {
       toast({
-<<<<<<< HEAD
-        title: capitalizeEachWord(t("selection required")),
-        description: capitalizeEachWord(t("select company and role")),
-=======
-        title: t("Selection required"),
-        description: t("Select company and role"),
->>>>>>> 3c612b13fdd72451a2aac4d205e644fdaabb1aa3
+        title: "Selection Required",
+        description: "Select Company and Role",
         variant: "destructive",
       });
       return;
@@ -254,9 +232,9 @@ const InterviewPrep = () => {
         case "technical":
           return [
             {
-              area: "algorithmic thinking",
+              area: "Algorithmic Thinking",
               score: 65,
-              status: "needs improvement",
+              status: "Needs Improvement",
               details:
                 "Your technical explanations lacked depth in algorithm complexity analysis and optimization techniques.",
               resources: [
@@ -271,9 +249,9 @@ const InterviewPrep = () => {
               ],
             },
             {
-              area: "code quality",
+              area: "Code Quality",
               score: 72,
-              status: "good",
+              status: "Good",
               details:
                 "Your code is generally well-structured but could benefit from better error handling and edge case consideration.",
               resources: [
@@ -288,9 +266,9 @@ const InterviewPrep = () => {
               ],
             },
             {
-              area: "system design knowledge",
+              area: "System Design Knowledge",
               score: 58,
-              status: "needs improvement",
+              status: "Needs Improvement",
               details:
                 "You need to strengthen your understanding of distributed systems, scalability patterns, and database optimization.",
               resources: [
@@ -305,9 +283,9 @@ const InterviewPrep = () => {
               ],
             },
             {
-              area: "technical communication",
+              area: "Technical Communication",
               score: 85,
-              status: "excellent",
+              status: "Excellent",
               details:
                 "You clearly articulate technical concepts, though sometimes jump ahead without explaining foundational elements.",
               resources: [
@@ -325,9 +303,9 @@ const InterviewPrep = () => {
         case "behavioral":
           return [
             {
-              area: "structured responses",
+              area: "Structured Responses",
               score: 68,
-              status: "needs improvement",
+              status: "Needs Improvement",
               details:
                 "Your answers lack clear structure. Try using the STAR method to organize your responses more effectively.",
               resources: [
@@ -342,9 +320,9 @@ const InterviewPrep = () => {
               ],
             },
             {
-              area: "specificity of examples",
+              area: "Specificity of Examples",
               score: 75,
-              status: "good",
+              status: "Good",
               details:
                 "Your examples are relevant but could be more specific with measurable outcomes and impact.",
               resources: [
@@ -359,9 +337,9 @@ const InterviewPrep = () => {
               ],
             },
             {
-              area: "leadership demonstration",
+              area: "Leadership Demonstration",
               score: 62,
-              status: "needs improvement",
+              status: "Needs Improvement",
               details:
                 "Your examples don't sufficiently highlight leadership qualities and initiative.",
               resources: [
@@ -376,9 +354,9 @@ const InterviewPrep = () => {
               ],
             },
             {
-              area: "adaptability examples",
+              area: "Adaptability Examples",
               score: 88,
-              status: "excellent",
+              status: "Excellent",
               details:
                 "You effectively demonstrate adaptability and resilience when facing challenges.",
               resources: [
@@ -396,9 +374,9 @@ const InterviewPrep = () => {
         case "system-design":
           return [
             {
-              area: "scalability principles",
+              area: "Scalability Principles",
               score: 60,
-              status: "needs improvement",
+              status: "Needs Improvement",
               details:
                 "Your understanding of horizontal and vertical scaling strategies needs improvement.",
               resources: [
@@ -413,9 +391,9 @@ const InterviewPrep = () => {
               ],
             },
             {
-              area: "database design",
+              area: "Database Design",
               score: 72,
-              status: "good",
+              status: "Good",
               details:
                 "You have good knowledge of database concepts but need improvement in choosing the right database for specific use cases.",
               resources: [
@@ -430,9 +408,9 @@ const InterviewPrep = () => {
               ],
             },
             {
-              area: "api design",
+              area: "API Design",
               score: 65,
-              status: "needs improvement",
+              status: "Needs Improvement",
               details:
                 "Your API designs need more consideration for security, versioning, and documentation.",
               resources: [
@@ -444,9 +422,9 @@ const InterviewPrep = () => {
               ],
             },
             {
-              area: "system requirements analysis",
+              area: "System Requirements Analysis",
               score: 85,
-              status: "excellent",
+              status: "Excellent",
               details:
                 "You excel at gathering and analyzing system requirements from business needs.",
               resources: [
@@ -464,9 +442,9 @@ const InterviewPrep = () => {
         default:
           return [
             {
-              area: "technical knowledge",
+              area: "Technical Knowledge",
               score: 65,
-              status: "needs improvement",
+              status: "Needs Improvement",
               details:
                 "Your technical explanations lacked depth in key areas relevant to the role.",
               resources: [
@@ -481,9 +459,9 @@ const InterviewPrep = () => {
               ],
             },
             {
-              area: "communication skills",
+              area: "Communication Skills",
               score: 72,
-              status: "good",
+              status: "Good",
               details:
                 "You articulated concepts clearly but could improve on explaining your thought process step-by-step.",
               resources: [
@@ -498,9 +476,9 @@ const InterviewPrep = () => {
               ],
             },
             {
-              area: "problem solving",
+              area: "Problem Solving",
               score: 58,
-              status: "needs improvement",
+              status: "Needs Improvement",
               details:
                 "You jumped to solutions too quickly without exploring alternative approaches or edge cases.",
               resources: [
@@ -515,9 +493,9 @@ const InterviewPrep = () => {
               ],
             },
             {
-              area: "interview preparation",
+              area: "Interview Preparation",
               score: 85,
-              status: "excellent",
+              status: "Excellent",
               details:
                 "Your examples were specific and demonstrated impact, though could be more concise.",
               resources: [
@@ -541,11 +519,11 @@ const InterviewPrep = () => {
     // Get status color
     const getStatusColor = (status) => {
       switch (status) {
-        case "needs improvement":
+        case "Needs Improvement":
           return "text-red-600 bg-red-50";
-        case "good":
+        case "Good":
           return "text-yellow-600 bg-yellow-50";
-        case "excellent":
+        case "Excellent":
           return "text-green-600 bg-green-50";
         default:
           return "text-gray-600 bg-gray-50";
@@ -564,14 +542,14 @@ const InterviewPrep = () => {
           <div className="flex justify-between items-start">
             <div>
               <CardTitle className="text-2xl">
-                {interviewTitle} {t("Performance report")}
+                {interviewTitle} Performance Report
               </CardTitle>
               <CardDescription>
-                {t("Detailed analysis and improvement suggestions")}
+                Detailed Analysis and Improvement Suggestions
               </CardDescription>
             </div>
             <Button variant="outline" onClick={onClose}>
-              {t("Close")}
+              Close
             </Button>
           </div>
         </CardHeader>
@@ -580,7 +558,7 @@ const InterviewPrep = () => {
             <Card className="border-none shadow-none bg-slate-50 p-6 rounded-lg w-full md:w-1/3">
               <div className="text-center">
                 <h3 className="text-xl font-medium mb-1">
-                  {t("Overall performance")}
+                  Overall Performance
                 </h3>
                 <div className="relative w-32 h-32 mx-auto my-4">
                   <svg className="w-full h-full" viewBox="0 0 100 100">
@@ -622,17 +600,17 @@ const InterviewPrep = () => {
                 </div>
                 <p className="text-gray-500">
                   {overallScore >= 80
-                    ? t("Excellent performance")
+                    ? "Excellent Performance"
                     : overallScore >= 70
-                    ? t("Good performance")
-                    : t("Needs improvement")}
+                    ? "Good Performance"
+                    : "Needs Improvement"}
                 </p>
               </div>
             </Card>
 
             <div className="w-full md:w-2/3 space-y-4">
               <h3 className="text-xl font-medium">
-                {t("Key improvement areas")}
+                Key Improvement Areas
               </h3>
               <div className="space-y-3">
                 {feedbackAreas
@@ -652,7 +630,7 @@ const InterviewPrep = () => {
               </div>
 
               <h3 className="text-xl font-medium mt-6">
-                {t("Recommended next steps")}
+                Recommended Next Steps
               </h3>
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
@@ -661,10 +639,10 @@ const InterviewPrep = () => {
                   </div>
                   <div>
                     <h4 className="font-medium">
-                      {t("Review detailed feedback")}
+                      Review Detailed Feedback
                     </h4>
                     <p className="text-sm text-gray-600">
-                      {t("Analyze each area below")}
+                      Analyze Each Area Below
                     </p>
                   </div>
                 </div>
@@ -674,10 +652,10 @@ const InterviewPrep = () => {
                   </div>
                   <div>
                     <h4 className="font-medium">
-                      {t("Practice targeted exercises")}
+                      Practice Targeted Exercises
                     </h4>
                     <p className="text-sm text-gray-600">
-                      {t("Focus on lowest scoring areas")}
+                      Focus on Lowest Scoring Areas
                     </p>
                   </div>
                 </div>
@@ -687,10 +665,10 @@ const InterviewPrep = () => {
                   </div>
                   <div>
                     <h4 className="font-medium">
-                      {t("Use recommended resources")}
+                      Use Recommended Resources
                     </h4>
                     <p className="text-sm text-gray-600">
-                      {t("Explore learning links below")}
+                      Explore Learning Links Below
                     </p>
                   </div>
                 </div>
@@ -702,7 +680,7 @@ const InterviewPrep = () => {
 
           <div>
             <h3 className="text-xl font-medium mb-4">
-              {t("Detailed performance breakdown")}
+              Detailed Performance Breakdown
             </h3>
             <div className="space-y-6">
               {feedbackAreas.map((area, index) => (
@@ -725,7 +703,7 @@ const InterviewPrep = () => {
                     <div className="mt-4">
                       <h5 className="text-sm font-medium flex items-center gap-1 mb-2">
                         <ArrowDown className="h-3 w-3" />
-                        {t("Improvement resources")}
+                        Improvement Resources
                       </h5>
                       <div className="space-y-2">
                         {area.resources.map((resource, idx) => (
@@ -752,11 +730,11 @@ const InterviewPrep = () => {
 
           <div className="rounded-lg bg-blue-50 p-4">
             <h3 className="text-lg font-medium text-blue-800 mb-2">
-              {t("Continue your improvement")}
+              Continue Your Improvement
             </h3>
-            <p className="text-blue-700 mb-3">{t("Schedule follow up")}</p>
+            <p className="text-blue-700 mb-3">Schedule Follow Up</p>
             <Button variant="outline" className="bg-white">
-              {t("Schedule practice session")}
+              Schedule Practice Session
             </Button>
           </div>
         </CardContent>
@@ -764,43 +742,26 @@ const InterviewPrep = () => {
     );
   };
 
-  // Add a toggle state for showing the report
-  const [showDetailedReport, setShowDetailedReport] = useState(false);
-
   return (
     <DashboardLayout>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-<<<<<<< HEAD
-            {capitalizeEachWord(t("interview prep"))}
-=======
-            {t("Interview prep")}
->>>>>>> 3c612b13fdd72451a2aac4d205e644fdaabb1aa3
+            Interview Preparation
           </h1>
-          <p className="text-gray-500 mt-1">{t("Practice interview desc")}</p>
+          <p className="text-gray-500 mt-1">{capitalizeFirstLetter(t("practice interview desc"))}</p>
         </div>
 
         <Card>
           <CardHeader>
-<<<<<<< HEAD
-            <CardTitle>{capitalizeEachWord(t("customize interview"))}</CardTitle>
-            <CardDescription>{t("customize interview desc")}</CardDescription>
-=======
-            <CardTitle>{t("Customize interview")}</CardTitle>
-            <CardDescription>{t("Customize interview desc")}</CardDescription>
->>>>>>> 3c612b13fdd72451a2aac4d205e644fdaabb1aa3
+            <CardTitle>Customize Interview</CardTitle>
+            <CardDescription>{capitalizeFirstLetter(t("customize interview desc").replace(/_/g, ' '))}</CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="company" className="w-full">
               <TabsList className="grid w-full max-w-md grid-cols-2">
-<<<<<<< HEAD
-                <TabsTrigger value="company">{capitalizeEachWord(t("target company"))}</TabsTrigger>
-                <TabsTrigger value="role">{capitalizeEachWord(t("job role"))}</TabsTrigger>
-=======
-                <TabsTrigger value="company">{t("Target company")}</TabsTrigger>
-                <TabsTrigger value="role">{t("Job role")}</TabsTrigger>
->>>>>>> 3c612b13fdd72451a2aac4d205e644fdaabb1aa3
+                <TabsTrigger value="company">Target Company</TabsTrigger>
+                <TabsTrigger value="role">Job Role</TabsTrigger>
               </TabsList>
 
               <TabsContent value="company" className="mt-4">
@@ -822,11 +783,7 @@ const InterviewPrep = () => {
 
             <div className="mt-6">
               <h3 className="font-medium text-gray-800 mb-3">
-<<<<<<< HEAD
-                {capitalizeEachWord(t("selected options"))}
-=======
-                {t("Selected options")}
->>>>>>> 3c612b13fdd72451a2aac4d205e644fdaabb1aa3
+                Selected Options
               </h3>
               <div className="flex flex-wrap gap-2">
                 {selectedCompany && (
@@ -841,11 +798,7 @@ const InterviewPrep = () => {
                 )}
                 {!selectedCompany && !selectedRole && (
                   <p className="text-sm text-gray-500">
-<<<<<<< HEAD
-                    {capitalizeEachWord(t("no options selected"))}
-=======
-                    {t("No options selected")}
->>>>>>> 3c612b13fdd72451a2aac4d205e644fdaabb1aa3
+                    No Options Selected
                   </p>
                 )}
               </div>
@@ -873,35 +826,20 @@ const InterviewPrep = () => {
                   <ul className="space-y-1 text-sm">
                     <li className="flex items-start gap-2">
                       <span className="inline-block w-1 h-1 rounded-full bg-gray-500 mt-2"></span>
-                      <span>{capitalizeEachWord(t(`${type.id}_feature_1`))}</span>
+                      <span>{capitalizeFirstLetter(t(`${type.id} feature 1`).replace(/_/g, ' '))}</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="inline-block w-1 h-1 rounded-full bg-gray-500 mt-2"></span>
-                      <span>{capitalizeEachWord(t(`${type.id}_feature_2`))}</span>
+                      <span>{capitalizeFirstLetter(t(`${type.id} feature 2`).replace(/_/g, ' '))}</span>
                     </li>
                   </ul>
                 </CardContent>
-                <CardFooter className="flex justify-between items-center pt-0">
+                <CardFooter className="pt-0">
                   <Button
-                    variant="outline"
-                    className="flex items-center gap-2"
-                    onClick={() => {
-                      setCurrentInterview(type);
-                      setShowDetailedReport(true);
-                    }}
-                  >
-                    <FileText className="h-4 w-4" />
-                    {t("View report")}
-                  </Button>
-                  <Button
-                    className={`${type.color} hover:opacity-90`}
+                    className="w-full"
                     onClick={() => startAIInterview(type.id)}
                   >
-<<<<<<< HEAD
-                    {capitalizeEachWord(t("start"))} {type.title}
-=======
-                    {t("Start")} {type.title}
->>>>>>> 3c612b13fdd72451a2aac4d205e644fdaabb1aa3
+                    Start {type.title}
                   </Button>
                 </CardFooter>
               </Card>

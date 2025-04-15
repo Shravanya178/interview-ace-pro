@@ -457,9 +457,9 @@ const InterviewSession = ({
         },
         interfaceConfigOverwrite: {
           SHOW_JITSI_WATERMARK: false,
-          APP_NAME: "Interview Ace Pro",
-          NATIVE_APP_NAME: "Interview Ace Pro",
-          PROVIDER_NAME: "Interview Ace Pro",
+          APP_NAME: "PrepMate",
+          NATIVE_APP_NAME: "PrepMate",
+          PROVIDER_NAME: "PrepMate",
           DEFAULT_BACKGROUND: "#111111",
           TILE_VIEW_MAX_COLUMNS: 2,
           TOOLBAR_BUTTONS: [

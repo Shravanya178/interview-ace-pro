@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -26,105 +26,409 @@ const ResumeTest: React.FC<TestProps> = ({ skills, onTestComplete }) => {
   const [testStarted, setTestStarted] = useState(false);
   const [testComplete, setTestComplete] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [questions, setQuestions] = useState<Question[]>([]);
   
   // Generate questions based on skills
   const generateQuestions = (): Question[] => {
-    // In a real app, these would be generated based on the user's resume and skills
-    // For this example, we're creating mock questions related to the detected skills
+    // Create a pool of questions for different skills
+    const questionPools: Record<string, Question[]> = {
+      // Technical skills questions
+      "JavaScript": [
+        {
+          id: 1,
+          question: "Which of the following is NOT a JavaScript data type?",
+          options: ["String", "Boolean", "Integer", "Symbol"],
+          correctAnswer: 2,
+          skillCategory: "technical",
+          skillName: "JavaScript"
+        },
+        {
+          id: 2,
+          question: "What is the correct way to destructure an array in JavaScript?",
+          options: [
+            "const {first, second} = myArray;",
+            "const first, second = myArray;",
+            "const [first, second] = myArray;",
+            "const (first, second) = myArray;"
+          ],
+          correctAnswer: 2,
+          skillCategory: "technical",
+          skillName: "JavaScript"
+        },
+        {
+          id: 3,
+          question: "Which JavaScript method would you use to add an element to the end of an array?",
+          options: ["push()", "pop()", "shift()", "unshift()"],
+          correctAnswer: 0,
+          skillCategory: "technical",
+          skillName: "JavaScript"
+        }
+      ],
+      "React": [
+        {
+          id: 4,
+          question: "Which React hook would you use to perform side effects in your component?",
+          options: ["useState", "useEffect", "useContext", "useReducer"],
+          correctAnswer: 1,
+          skillCategory: "technical",
+          skillName: "React"
+        },
+        {
+          id: 5,
+          question: "What does JSX stand for in React?",
+          options: ["JavaScript XML", "JavaScript Extension", "JavaScript Syntax", "Java XML"],
+          correctAnswer: 0,
+          skillCategory: "technical",
+          skillName: "React"
+        },
+        {
+          id: 6,
+          question: "Which lifecycle method is called after a component is rendered for the first time?",
+          options: ["componentWillMount", "componentDidMount", "componentWillUpdate", "componentDidUpdate"],
+          correctAnswer: 1,
+          skillCategory: "technical",
+          skillName: "React"
+        }
+      ],
+      "TypeScript": [
+        {
+          id: 7,
+          question: "Which of these is NOT a valid TypeScript type?",
+          options: ["string", "number", "boolean", "float"],
+          correctAnswer: 3,
+          skillCategory: "technical",
+          skillName: "TypeScript"
+        },
+        {
+          id: 8,
+          question: "What is the purpose of the 'interface' keyword in TypeScript?",
+          options: [
+            "To create a class",
+            "To define a contract for an object structure",
+            "To create a module",
+            "To implement inheritance"
+          ],
+          correctAnswer: 1,
+          skillCategory: "technical",
+          skillName: "TypeScript"
+        }
+      ],
+      "HTML/CSS": [
+        {
+          id: 9,
+          question: "Which CSS property is used to change the text color of an element?",
+          options: ["text-color", "color", "font-color", "text-style"],
+          correctAnswer: 1,
+          skillCategory: "technical",
+          skillName: "HTML/CSS"
+        },
+        {
+          id: 10,
+          question: "Which HTML element defines the title of a document?",
+          options: ["<meta>", "<head>", "<title>", "<header>"],
+          correctAnswer: 2,
+          skillCategory: "technical",
+          skillName: "HTML/CSS"
+        }
+      ],
+      "Node.js": [
+        {
+          id: 11,
+          question: "In a Node.js application, which module would you use to create a web server?",
+          options: ["fs", "http", "path", "crypto"],
+          correctAnswer: 1,
+          skillCategory: "technical",
+          skillName: "Node.js"
+        },
+        {
+          id: 12,
+          question: "What is the package manager commonly used with Node.js?",
+          options: ["pip", "npm", "yarn", "both npm and yarn"],
+          correctAnswer: 3,
+          skillCategory: "technical",
+          skillName: "Node.js"
+        }
+      ],
+      "Python": [
+        {
+          id: 13,
+          question: "What data structure in Python uses key-value pairs?",
+          options: ["List", "Tuple", "Dictionary", "Set"],
+          correctAnswer: 2,
+          skillCategory: "technical",
+          skillName: "Python"
+        },
+        {
+          id: 14,
+          question: "How do you create a function in Python?",
+          options: ["function myFunc():", "def myFunc():", "create myFunc():", "func myFunc():"],
+          correctAnswer: 1,
+          skillCategory: "technical",
+          skillName: "Python"
+        }
+      ],
+      "Java": [
+        {
+          id: 15,
+          question: "Which keyword is used to define a constant in Java?",
+          options: ["const", "final", "static", "constant"],
+          correctAnswer: 1,
+          skillCategory: "technical",
+          skillName: "Java"
+        },
+        {
+          id: 16,
+          question: "What is the base class for all classes in Java?",
+          options: ["Class", "Main", "Object", "Super"],
+          correctAnswer: 2,
+          skillCategory: "technical",
+          skillName: "Java"
+        }
+      ],
+      
+      // Soft skills questions
+      "Communication": [
+        {
+          id: 17,
+          question: "What is the most effective way to handle a miscommunication with a colleague?",
+          options: [
+            "Send a detailed email explaining their mistake",
+            "Have a direct conversation to clarify the misunderstanding",
+            "Ask your manager to mediate",
+            "Avoid the issue to prevent confrontation"
+          ],
+          correctAnswer: 1,
+          skillCategory: "soft",
+          skillName: "Communication"
+        },
+        {
+          id: 18,
+          question: "When presenting technical information to non-technical stakeholders, you should:",
+          options: [
+            "Use as much technical jargon as possible to sound professional",
+            "Skip over the technical details entirely",
+            "Use analogies and simplified explanations without sacrificing accuracy",
+            "Let someone else do the presentation"
+          ],
+          correctAnswer: 2,
+          skillCategory: "soft",
+          skillName: "Communication"
+        }
+      ],
+      "Teamwork": [
+        {
+          id: 19,
+          question: "When addressing a team conflict, what approach is generally most effective?",
+          options: [
+            "Ignoring the conflict to maintain harmony",
+            "Having the team leader make the final decision",
+            "Open discussion with all parties to find a compromise",
+            "Taking a vote and going with the majority opinion"
+          ],
+          correctAnswer: 2,
+          skillCategory: "soft",
+          skillName: "Teamwork"
+        },
+        {
+          id: 20,
+          question: "When a team member is struggling with their tasks, what should you do?",
+          options: [
+            "Report them to the manager",
+            "Offer to help or provide guidance",
+            "Ignore it as it's not your responsibility",
+            "Take over their work completely"
+          ],
+          correctAnswer: 1,
+          skillCategory: "soft",
+          skillName: "Teamwork"
+        }
+      ],
+      "Problem Solving": [
+        {
+          id: 21,
+          question: "What approach would you take to troubleshoot a complex technical issue?",
+          options: [
+            "Immediately seek help from a senior colleague",
+            "Try random solutions until one works",
+            "Break down the problem, isolate variables, and test hypotheses methodically",
+            "Restart the system and hope the issue resolves itself"
+          ],
+          correctAnswer: 2,
+          skillCategory: "soft",
+          skillName: "Problem Solving"
+        },
+        {
+          id: 22,
+          question: "When faced with a problem that has multiple possible solutions, you should:",
+          options: [
+            "Choose the first solution that comes to mind",
+            "Evaluate each solution based on effectiveness, efficiency, and resources required",
+            "Always go with the most complex solution to show your expertise",
+            "Let someone else decide"
+          ],
+          correctAnswer: 1,
+          skillCategory: "soft",
+          skillName: "Problem Solving"
+        }
+      ],
+      
+      // Tools
+      "Git": [
+        {
+          id: 23,
+          question: "Which git command would you use to create a new branch and switch to it?",
+          options: [
+            "git branch new-branch",
+            "git checkout -b new-branch",
+            "git create new-branch",
+            "git switch --create new-branch"
+          ],
+          correctAnswer: 1,
+          skillCategory: "tool",
+          skillName: "Git"
+        },
+        {
+          id: 24,
+          question: "How do you stage changes in git?",
+          options: ["git commit", "git add", "git push", "git stage"],
+          correctAnswer: 1,
+          skillCategory: "tool",
+          skillName: "Git"
+        }
+      ],
+      "AWS": [
+        {
+          id: 25,
+          question: "Which AWS service would you use for serverless computing?",
+          options: ["EC2", "S3", "Lambda", "RDS"],
+          correctAnswer: 2,
+          skillCategory: "tool",
+          skillName: "AWS"
+        },
+        {
+          id: 26,
+          question: "Which AWS service is used for object storage?",
+          options: ["EBS", "S3", "EFS", "RDS"],
+          correctAnswer: 1,
+          skillCategory: "tool",
+          skillName: "AWS"
+        }
+      ],
+      "Docker": [
+        {
+          id: 27,
+          question: "What command is used to run a Docker container?",
+          options: ["docker start", "docker run", "docker create", "docker execute"],
+          correctAnswer: 1,
+          skillCategory: "tool",
+          skillName: "Docker"
+        },
+        {
+          id: 28,
+          question: "What file is used to define a Docker container?",
+          options: ["Docker.json", "Container.yml", "Dockerfile", "Docker-compose.yml"],
+          correctAnswer: 2,
+          skillCategory: "tool",
+          skillName: "Docker"
+        }
+      ],
+      
+      // Languages
+      "English": [
+        {
+          id: 29,
+          question: "In a technical document, which approach is best for clarity?",
+          options: [
+            "Using complex sentences with multiple clauses",
+            "Using concise, direct sentences with clear subjects and verbs",
+            "Using passive voice whenever possible",
+            "Avoiding technical terms completely"
+          ],
+          correctAnswer: 1,
+          skillCategory: "language",
+          skillName: "English"
+        }
+      ]
+    };
     
-    return [
-      {
-        id: 1,
-        question: "Which React hook would you use to perform side effects in your component?",
-        options: ["useState", "useEffect", "useContext", "useReducer"],
-        correctAnswer: 1,
-        skillCategory: "technical",
-        skillName: "React"
-      },
-      {
-        id: 2,
-        question: "What is the correct way to destructure an array in JavaScript?",
-        options: [
-          "const {first, second} = myArray;",
-          "const first, second = myArray;",
-          "const [first, second] = myArray;",
-          "const (first, second) = myArray;"
-        ],
-        correctAnswer: 2,
-        skillCategory: "technical",
-        skillName: "JavaScript"
-      },
-      {
-        id: 3,
-        question: "Which of these is NOT a valid TypeScript type?",
-        options: ["string", "number", "boolean", "float"],
-        correctAnswer: 3,
-        skillCategory: "technical",
-        skillName: "TypeScript"
-      },
-      {
-        id: 4,
-        question: "In a Node.js application, which module would you use to create a web server?",
-        options: ["fs", "http", "path", "crypto"],
-        correctAnswer: 1,
-        skillCategory: "technical",
-        skillName: "Node.js"
-      },
-      {
-        id: 5,
-        question: "When addressing a team conflict, what approach is generally most effective?",
-        options: [
-          "Ignoring the conflict to maintain harmony",
-          "Having the team leader make the final decision",
-          "Open discussion with all parties to find a compromise",
-          "Taking a vote and going with the majority opinion"
-        ],
-        correctAnswer: 2,
-        skillCategory: "soft",
-        skillName: "Teamwork"
-      },
-      {
-        id: 6,
-        question: "Which git command would you use to create a new branch and switch to it?",
-        options: [
-          "git branch new-branch",
-          "git checkout -b new-branch",
-          "git create new-branch",
-          "git switch --create new-branch"
-        ],
-        correctAnswer: 1,
-        skillCategory: "tool",
-        skillName: "Git"
-      },
-      {
-        id: 7,
-        question: "Which AWS service would you use for serverless computing?",
-        options: ["EC2", "S3", "Lambda", "RDS"],
-        correctAnswer: 2,
-        skillCategory: "tool",
-        skillName: "AWS"
-      },
-      {
-        id: 8,
-        question: "What approach would you take to troubleshoot a complex technical issue?",
-        options: [
-          "Immediately seek help from a senior colleague",
-          "Try random solutions until one works",
-          "Break down the problem, isolate variables, and test hypotheses methodically",
-          "Restart the system and hope the issue resolves itself"
-        ],
-        correctAnswer: 2,
-        skillCategory: "soft",
-        skillName: "Problem Solving"
+    // Generate questions based on user's skills
+    const generatedQuestions: Question[] = [];
+    let nextId = 100; // Starting with high ID to avoid conflicts
+    
+    // First, prioritize questions from the user's actual skills
+    skills.forEach(skill => {
+      // If we have questions for this skill in our pool
+      if (questionPools[skill.name]) {
+        // Add up to 2 questions for each skill
+        const skillQuestions = questionPools[skill.name];
+        const questionsToAdd = skillQuestions.slice(0, Math.min(2, skillQuestions.length));
+        
+        questionsToAdd.forEach(q => {
+          generatedQuestions.push({
+            ...q,
+            id: nextId++
+          });
+        });
+      } else {
+        // For skills we don't have specific questions for, 
+        // create a generic question about experience level
+        generatedQuestions.push({
+          id: nextId++,
+          question: `How would you rate your proficiency in ${skill.name}?`,
+          options: [
+            "Beginner - I have basic understanding or limited experience",
+            "Intermediate - I can work independently on most tasks",
+            "Advanced - I can handle complex tasks and mentor others",
+            "Expert - I have deep knowledge and extensive experience"
+          ],
+          // For self-assessment questions, all answers are "correct" since it's subjective
+          correctAnswer: -1, // Special value to indicate self-assessment
+          skillCategory: skill.category,
+          skillName: skill.name
+        });
       }
-    ];
+    });
+    
+    // If we have fewer than 8 questions, add some from other common skills
+    const commonSkills = ["JavaScript", "React", "Problem Solving", "Communication", "Teamwork", "Git"];
+    let i = 0;
+    
+    while (generatedQuestions.length < 8 && i < commonSkills.length) {
+      const skill = commonSkills[i];
+      // Check if the skill is not already covered and we have questions for it
+      if (!skills.some(s => s.name === skill) && questionPools[skill]) {
+        // Add one question for this skill
+        const question = questionPools[skill][0];
+        if (question) {
+          generatedQuestions.push({
+            ...question,
+            id: nextId++
+          });
+        }
+      }
+      i++;
+    }
+    
+    // Randomize the order of questions
+    return generatedQuestions.sort(() => Math.random() - 0.5);
   };
 
-  const questions = generateQuestions();
+  // Generate questions only once when component mounts or when skills change
+  useEffect(() => {
+    const generatedQuestions = generateQuestions();
+    setQuestions(generatedQuestions);
+    // Reset selected answers when questions change
+    setSelectedAnswers({});
+  }, [skills]); // Add skills as a dependency
   
+  // Reset everything when test starts
   const handleStartTest = () => {
     setTestStarted(true);
     setProgress(0);
+    // Clear any previously selected answers
+    setSelectedAnswers({});
+    // Reset to the first question
+    setCurrentQuestionIndex(0);
   };
   
   const handleSelectAnswer = (questionId: number, answerIndex: number) => {
@@ -136,6 +440,13 @@ const ResumeTest: React.FC<TestProps> = ({ skills, onTestComplete }) => {
   
   const handleNextQuestion = () => {
     if (currentQuestionIndex < questions.length - 1) {
+      // Force a reset of radio button selection state by manipulating the DOM directly
+      const radios = document.querySelectorAll('input[type="radio"]');
+      radios.forEach((radio) => {
+        (radio as HTMLInputElement).checked = false;
+      });
+      
+      // Move to next question
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setProgress(((currentQuestionIndex + 1) / questions.length) * 100);
     } else {
@@ -160,7 +471,9 @@ const ResumeTest: React.FC<TestProps> = ({ skills, onTestComplete }) => {
       
       skillScores[q.skillName].total += 1;
       
-      if (selectedAnswers[q.id] === q.correctAnswer) {
+      // For self-assessment questions (correctAnswer === -1), count it as correct
+      // For knowledge questions, check if the answer matches the correct answer
+      if (q.correctAnswer === -1 || selectedAnswers[q.id] === q.correctAnswer) {
         skillScores[q.skillName].correct += 1;
       }
     });
@@ -169,18 +482,39 @@ const ResumeTest: React.FC<TestProps> = ({ skills, onTestComplete }) => {
     updatedSkills.forEach((skill, index) => {
       if (skillScores[skill.name]) {
         const score = skillScores[skill.name];
-        const performanceModifier = (score.correct / score.total) * 10;
         
         // Adjust skill level based on test performance
-        // This could be more sophisticated in a real app
         let newLevel = skill.level;
         
-        if (score.correct === 0) {
-          newLevel = Math.max(skill.level - 15, 10); // Significant decrease but minimum 10%
-        } else if (score.correct < score.total) {
-          newLevel = Math.max(skill.level - 5, 20); // Modest decrease but minimum 20%
+        // For self-assessment questions, use the selected answer as a direct skill level indicator
+        const selfAssessmentQuestions = questions.filter(q => 
+          q.skillName === skill.name && q.correctAnswer === -1
+        );
+        
+        if (selfAssessmentQuestions.length > 0) {
+          // Get the first self-assessment question for this skill
+          const selfQ = selfAssessmentQuestions[0];
+          const answer = selectedAnswers[selfQ.id];
+          
+          if (answer !== undefined) {
+            // Convert the answer (0-3) to a skill percentage
+            const selfRatingToPercentage = {
+              0: 25, // Beginner
+              1: 50, // Intermediate
+              2: 75, // Advanced
+              3: 95  // Expert
+            };
+            newLevel = selfRatingToPercentage[answer as 0 | 1 | 2 | 3];
+          }
         } else {
-          newLevel = Math.min(skill.level + 5, 95); // Modest increase but maximum 95%
+          // For knowledge questions, adjust based on performance
+          if (score.correct === 0) {
+            newLevel = Math.max(skill.level - 15, 10); // Significant decrease but minimum 10%
+          } else if (score.correct < score.total) {
+            newLevel = Math.max(skill.level - 5, 20); // Modest decrease but minimum 20%
+          } else {
+            newLevel = Math.min(skill.level + 5, 95); // Modest increase but maximum 95%
+          }
         }
         
         updatedSkills[index] = { ...skill, level: newLevel };
@@ -199,13 +533,16 @@ const ResumeTest: React.FC<TestProps> = ({ skills, onTestComplete }) => {
     questions: Question[],
     answers: Record<number, number>
   ) => {
-    // Calculate correct/incorrect answers
-    const correctCount = questions.filter(q => answers[q.id] === q.correctAnswer).length;
-    const incorrectCount = questions.length - correctCount;
+    // Calculate correct/incorrect answers (excluding self-assessment questions)
+    const knowledgeQuestions = questions.filter(q => q.correctAnswer !== -1);
+    const correctCount = knowledgeQuestions.filter(q => answers[q.id] === q.correctAnswer).length;
+    const incorrectCount = knowledgeQuestions.length - correctCount;
     
     // Identify weak areas
     const skillPerformance: Record<string, { correct: number, total: number, percentage: number }> = {};
-    questions.forEach(q => {
+    
+    // Process knowledge questions only for skill performance
+    knowledgeQuestions.forEach(q => {
       if (!skillPerformance[q.skillName]) {
         skillPerformance[q.skillName] = { correct: 0, total: 0, percentage: 0 };
       }
@@ -220,7 +557,9 @@ const ResumeTest: React.FC<TestProps> = ({ skills, onTestComplete }) => {
     // Calculate percentages
     Object.keys(skillPerformance).forEach(skill => {
       const performance = skillPerformance[skill];
-      performance.percentage = (performance.correct / performance.total) * 100;
+      performance.percentage = performance.total > 0 
+        ? (performance.correct / performance.total) * 100
+        : 0;
     });
     
     // Sort skills by performance
@@ -277,6 +616,24 @@ const ResumeTest: React.FC<TestProps> = ({ skills, onTestComplete }) => {
     };
   };
   
+  // Skip rendering until questions are loaded
+  if (questions.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Preparing Assessment</CardTitle>
+          <CardDescription>
+            Building your personalized skills assessment...
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex justify-center py-8">
+          <div className="w-16 h-16 border-4 border-secondary border-t-transparent rounded-full animate-spin"></div>
+        </CardContent>
+      </Card>
+    );
+  }
+  
+  // Get the current question
   const currentQuestion = questions[currentQuestionIndex];
   
   if (!testStarted) {
@@ -333,7 +690,7 @@ const ResumeTest: React.FC<TestProps> = ({ skills, onTestComplete }) => {
   }
   
   return (
-    <Card>
+    <Card key={`question-card-${currentQuestion.id}`}>
       <CardHeader>
         <div className="flex justify-between items-center">
           <div>
@@ -353,16 +710,30 @@ const ResumeTest: React.FC<TestProps> = ({ skills, onTestComplete }) => {
           <div className="font-medium text-lg">{currentQuestion.question}</div>
           
           <RadioGroup
-            value={selectedAnswers[currentQuestion.id]?.toString()}
-            onValueChange={(value) => 
-              handleSelectAnswer(currentQuestion.id, parseInt(value))
-            }
+            key={`question-group-${currentQuestion.id}`}
+            defaultValue=""
+            value={selectedAnswers[currentQuestion.id] !== undefined ? selectedAnswers[currentQuestion.id].toString() : ""}
+            onValueChange={(value) => {
+              if (value) {
+                handleSelectAnswer(currentQuestion.id, parseInt(value));
+              }
+            }}
           >
             <div className="space-y-3">
               {currentQuestion.options.map((option, index) => (
-                <div key={index} className="flex items-center space-x-2 border p-3 rounded-md">
-                  <RadioGroupItem value={index.toString()} id={`option-${index}`} />
-                  <Label htmlFor={`option-${index}`} className="flex-grow cursor-pointer">
+                <div 
+                  key={`question-${currentQuestion.id}-option-${index}`} 
+                  className="flex items-center space-x-2 border p-3 rounded-md"
+                >
+                  <RadioGroupItem 
+                    value={index.toString()} 
+                    id={`question-${currentQuestion.id}-option-${index}`}
+                    checked={selectedAnswers[currentQuestion.id] === index}
+                  />
+                  <Label 
+                    htmlFor={`question-${currentQuestion.id}-option-${index}`}
+                    className="flex-grow cursor-pointer"
+                  >
                     {option}
                   </Label>
                 </div>

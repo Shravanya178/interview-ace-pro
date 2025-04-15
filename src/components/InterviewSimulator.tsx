@@ -290,9 +290,7 @@ const InterviewSimulator: React.FC = () => {
   return (
     <div className="interview-session">
       <div className="interview-header">
-        <h1>
-          AI Interview for {role} at {company}
-        </h1>
+        <h1>PrepMate</h1>
         <p>Question {questionCounter}/5</p>
       </div>
 

@@ -4,32 +4,41 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, Check, Upload, Video, BookOpen, FileText, Brain, UserCheck } from 'lucide-react';
+import { useLanguage } from '@/hooks/useLanguage';
+import LanguageSelector from '@/components/layout/LanguageSelector';
+import ThemeToggle from '@/components/layout/ThemeToggle';
 
 const LandingPage = () => {
+  const { t } = useLanguage();
+  
   return (
     <div className="flex flex-col min-h-screen">
       {/* Navbar */}
-      <header className="border-b border-gray-200 bg-white">
+      <header className="border-b border-gray-200 bg-white dark:bg-gray-900 dark:border-gray-800">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center">
               <Link to="/" className="flex items-center">
-                <span className="text-xl font-bold text-primary">Interview</span>
-                <span className="text-xl font-bold text-secondary">Ace Pro</span>
+                <span className="text-xl font-bold text-primary">Prep</span>
+                <span className="text-xl font-bold text-secondary">Mate</span>
               </Link>
             </div>
             <div className="hidden md:flex items-center space-x-4">
-              <Link to="/dashboard" className="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium">
-                Dashboard
+              <Link to="/dashboard" className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 px-3 py-2 text-sm font-medium">
+                {t("dashboard")}
               </Link>
-              <Link to="/resume" className="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium">
-                Resume Analysis
+              <Link to="/resume" className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 px-3 py-2 text-sm font-medium">
+                {t("resume_analysis")}
               </Link>
-              <Link to="/interview" className="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm font-medium">
-                Interview Prep
+              <Link to="/interview" className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 px-3 py-2 text-sm font-medium">
+                {t("interview_prep")}
               </Link>
+              <div className="flex items-center space-x-2 ml-4">
+                <ThemeToggle />
+                <LanguageSelector />
+              </div>
               <Link to="/dashboard">
-                <Button>Start Now</Button>
+                <Button>{t("start_now")}</Button>
               </Link>
             </div>
           </div>
@@ -37,37 +46,36 @@ const LandingPage = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gray-50 py-16 md:py-24">
+      <section className="relative overflow-hidden bg-gray-50 dark:bg-gray-900 py-16 md:py-24">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div className="flex flex-col space-y-8">
               <div>
                 <Badge className="mb-4 bg-primary/10 text-primary hover:bg-primary/20 border-none">
-                  AI-Powered Interview Prep
+                  {t("ai_powered_interview_prep")}
                 </Badge>
-                <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900 mb-4">
-                  Ace Your Next Tech Interview
+                <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900 dark:text-gray-100 mb-4">
+                  {t("ace_your_next_tech_interview")}
                 </h1>
-                <p className="text-lg text-gray-600 mb-8">
-                  Prepare for tech interviews with AI-powered resume analysis, 
-                  personalized skill assessments, and realistic mock interviews.
+                <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 mb-6 sm:mb-8">
+                  {t("prepare_for_tech_interviews")}
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Link to="/dashboard">
-                    <Button size="lg" className="w-full sm:w-auto">
-                      Go to Dashboard
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <Link to="/dashboard" className="w-full">
+                    <Button size="lg" className="w-full">
+                      {t("go_to_dashboard")}
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </Link>
-                  <Link to="/resume">
-                    <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                      Try Resume Analysis
+                  <Link to="/resume" className="w-full">
+                    <Button size="lg" variant="outline" className="w-full">
+                      {t("resume_analysis")}
                       <Upload className="ml-2 h-4 w-4" />
                     </Button>
                   </Link>
-                  <Link to="/interview">
-                    <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                      Try Mock Interview
+                  <Link to="/interview" className="w-full">
+                    <Button size="lg" variant="outline" className="w-full">
+                      {t("mock_interview")}
                       <Video className="ml-2 h-4 w-4" />
                     </Button>
                   </Link>
@@ -77,19 +85,19 @@ const LandingPage = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center">
                   <Check className="h-5 w-5 text-green-500 mr-2" />
-                  <span className="text-sm text-gray-600">AI Resume Analysis</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">{t("ai_resume_analysis")}</span>
                 </div>
                 <div className="flex items-center">
                   <Check className="h-5 w-5 text-green-500 mr-2" />
-                  <span className="text-sm text-gray-600">Skill Assessments</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">{t("skill_assessment")}</span>
                 </div>
                 <div className="flex items-center">
                   <Check className="h-5 w-5 text-green-500 mr-2" />
-                  <span className="text-sm text-gray-600">Mock Interviews</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">{t("mock_interviews")}</span>
                 </div>
                 <div className="flex items-center">
                   <Check className="h-5 w-5 text-green-500 mr-2" />
-                  <span className="text-sm text-gray-600">Detailed Feedback</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">{t("detailed_feedback")}</span>
                 </div>
               </div>
             </div>
@@ -138,7 +146,7 @@ const LandingPage = () => {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">How Interview Ace Pro Works</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">How PrepMate Works</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Our AI-powered platform prepares you for interviews by analyzing your skills and providing personalized feedback.
             </p>
@@ -196,7 +204,7 @@ const LandingPage = () => {
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">What Our Users Say</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Thousands of professionals have landed their dream jobs with the help of Interview Ace Pro.
+              Thousands of professionals have landed their dream jobs with the help of PrepMate.
             </p>
           </div>
           
@@ -244,16 +252,15 @@ const LandingPage = () => {
             <p className="text-xl mb-8 opacity-90">
               Join thousands of professionals who are getting hired at top tech companies.
             </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 max-w-md mx-auto gap-4">
               <Link to="/dashboard">
-                <Button size="lg" variant="secondary" className="w-full sm:w-auto">
+                <Button size="lg" variant="secondary" className="w-full">
                   Go to Dashboard
                 </Button>
               </Link>
               <Link to="/resume">
-                <Button size="lg" variant="secondary" className="w-full sm:w-auto bg-white text-primary hover:bg-gray-100">
-                  Try Resume Analysis
-                  <Upload className="ml-2 h-4 w-4" />
+                <Button size="lg" variant="secondary" className="w-full bg-white text-primary hover:bg-gray-100">
+                  Resume Analysis
                 </Button>
               </Link>
             </div>
@@ -266,7 +273,7 @@ const LandingPage = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-xl font-bold mb-4">Interview Ace Pro</h3>
+              <h3 className="text-xl font-bold mb-4">PrepMate</h3>
               <p className="text-gray-400">
                 AI-powered interview preparation to help you land your dream job.
               </p>
@@ -299,7 +306,7 @@ const LandingPage = () => {
             </div>
           </div>
           <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>&copy; {new Date().getFullYear()} Interview Ace Pro. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} PrepMate. All rights reserved.</p>
           </div>
         </div>
       </footer>
