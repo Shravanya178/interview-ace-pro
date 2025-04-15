@@ -1,0 +1,14 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+speechrecognition = "==3.10.0"
+pyttsx3 = "==2.90"
+pillow = "==10.0.0"
+websockets = "==11.0.3"
+flask = "==2.3.3"
+
+[requires]
+python_version = "3.12" 
