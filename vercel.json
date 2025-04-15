@@ -17,5 +17,8 @@
       "maxDuration": 10
     }
   },
-  "public": false
+  "public": false,
+  "builds": [
+    { "src": "api/*.py", "use": "@vercel/python@4.0.0", "config": { "runtime": "python3.10" } }
+  ]
 } 

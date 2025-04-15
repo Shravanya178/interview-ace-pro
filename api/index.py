@@ -2,6 +2,19 @@ from flask import Flask, request, jsonify
 from http.server import BaseHTTPRequestHandler
 import json
 
+app = Flask(__name__)
+
+@app.route('/', methods=['GET'])
+def hello():
+    return jsonify({'message': 'API is online'})
+
+@app.route('/', methods=['POST'])
+def process_request():
+    data = request.json
+    response = {'status': 'success', 'message': 'Received data'}
+    return jsonify(response)
+
+# Handler for Vercel serverless function
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
