@@ -144,14 +144,14 @@ const InterviewPrep = () => {
           <div className="p-2 rounded-full bg-yellow-100">
             <Smile className="h-5 w-5 text-yellow-700" />
           </div>
-          <CardTitle>Facial Emotion Analysis</CardTitle>
+          <CardTitle className="text-base sm:text-lg">Facial Emotion Analysis</CardTitle>
         </div>
-        <CardDescription>
+        <CardDescription className="text-xs sm:text-sm">
           Analyze Your Facial Expressions To Improve Your Interview Presence
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ul className="space-y-1 text-sm">
+        <ul className="space-y-1 text-xs sm:text-sm">
           <li className="flex items-start gap-2">
             <span className="inline-block w-1 h-1 rounded-full bg-gray-500 mt-2"></span>
             <span>Real-Time Facial Expression Analysis Using AI</span>
@@ -166,7 +166,7 @@ const InterviewPrep = () => {
       </CardContent>
       <CardFooter className="pt-0">
         <Button
-          className="w-full"
+          className="w-full text-xs sm:text-sm py-1 sm:py-2"
           onClick={() => navigate("/facial-emotion-analysis")}
         >
           Start Facial Analysis
@@ -186,22 +186,101 @@ const InterviewPrep = () => {
     }
 
     try {
-      // Show popup with chat and video interview options
-      const useVideoInterview = window.confirm(
-        "Choose Interview Type:\n\nClick 'OK' for Video Interview\nClick 'Chat' for Chat Interview"
-      );
-
-      if (useVideoInterview) {
-        // Navigate to the AI Interview Simulator (video interview)
-        navigate(
-          `/ai-interview-simulator?company=${selectedCompany}&role=${selectedRole}&type=${interviewType}`
-        );
-      } else {
-        // Navigate to the simple interview page (chat interview)
-        navigate(
-          `/interview-simple?company=${selectedCompany}&role=${selectedRole}&type=${interviewType}`
-        );
-      }
+      // Create a custom dialog with "OK" and "Chat" buttons
+      // This approach creates a custom modal dialog since window.confirm cannot have custom button labels
+      
+      // Create dialog container
+      const dialogOverlay = document.createElement('div');
+      dialogOverlay.style.position = 'fixed';
+      dialogOverlay.style.top = '0';
+      dialogOverlay.style.left = '0';
+      dialogOverlay.style.width = '100%';
+      dialogOverlay.style.height = '100%';
+      dialogOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+      dialogOverlay.style.display = 'flex';
+      dialogOverlay.style.justifyContent = 'center';
+      dialogOverlay.style.alignItems = 'center';
+      dialogOverlay.style.zIndex = '9999';
+      
+      // Create dialog content
+      const dialogBox = document.createElement('div');
+      dialogBox.style.backgroundColor = 'white';
+      dialogBox.style.borderRadius = '8px';
+      dialogBox.style.padding = '20px';
+      dialogBox.style.width = '350px';
+      dialogBox.style.maxWidth = '90%';
+      dialogBox.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+      
+      // Create dialog title
+      const title = document.createElement('h3');
+      title.innerText = 'Choose Interview Type:';
+      title.style.margin = '0 0 15px 0';
+      title.style.fontSize = '18px';
+      
+      // Create dialog content
+      const content = document.createElement('p');
+      content.innerHTML = "Click <strong>OK</strong> for Video Interview<br>Click <strong>Chat</strong> for Chat Interview";
+      content.style.marginBottom = '20px';
+      
+      // Create button container
+      const buttonContainer = document.createElement('div');
+      buttonContainer.style.display = 'flex';
+      buttonContainer.style.justifyContent = 'flex-end';
+      buttonContainer.style.gap = '10px';
+      
+      // Create OK button (for Video Interview)
+      const okButton = document.createElement('button');
+      okButton.innerText = 'OK';
+      okButton.style.padding = '8px 16px';
+      okButton.style.backgroundColor = '#0078d7';
+      okButton.style.color = 'white';
+      okButton.style.border = 'none';
+      okButton.style.borderRadius = '2px';
+      okButton.style.cursor = 'pointer';
+      okButton.style.minWidth = '100px';
+      
+      // Create Chat button (for Chat Interview) - styled to replace "Cancel" button
+      const chatButton = document.createElement('button');
+      chatButton.innerText = 'Chat';
+      chatButton.style.padding = '8px 16px';
+      chatButton.style.backgroundColor = '#e1e1e1';
+      chatButton.style.color = '#000';
+      chatButton.style.border = 'none';
+      chatButton.style.borderRadius = '2px';
+      chatButton.style.cursor = 'pointer';
+      chatButton.style.minWidth = '100px';
+      
+      // Add elements to DOM - swap order to match browser dialog
+      buttonContainer.appendChild(okButton);
+      buttonContainer.appendChild(chatButton);
+      dialogBox.appendChild(title);
+      dialogBox.appendChild(content);
+      dialogBox.appendChild(buttonContainer);
+      dialogOverlay.appendChild(dialogBox);
+      document.body.appendChild(dialogOverlay);
+      
+      // Return a promise that resolves when a button is clicked
+      return new Promise((resolve) => {
+        // Handle OK button click (Video Interview)
+        okButton.onclick = () => {
+          document.body.removeChild(dialogOverlay);
+          // Navigate to the AI Interview Simulator (video interview)
+          navigate(
+            `/ai-interview-simulator?company=${selectedCompany}&role=${selectedRole}&type=${interviewType}`
+          );
+          resolve(true);
+        };
+        
+        // Handle Chat button click (Chat Interview)
+        chatButton.onclick = () => {
+          document.body.removeChild(dialogOverlay);
+          // Navigate to the simple interview page (chat interview)
+          navigate(
+            `/interview-simple?company=${selectedCompany}&role=${selectedRole}&type=${interviewType}`
+          );
+          resolve(false);
+        };
+      });
     } catch (error) {
       console.error("Error starting interview:", error);
 
@@ -537,30 +616,30 @@ const InterviewPrep = () => {
     );
 
     return (
-      <Card className="w-full max-w-4xl mx-auto">
+      <Card className="w-full max-w-4xl mx-auto max-h-[90vh] overflow-y-auto">
         <CardHeader>
-          <div className="flex justify-between items-start">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
             <div>
-              <CardTitle className="text-2xl">
+              <CardTitle className="text-lg sm:text-2xl">
                 {interviewTitle} Performance Report
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-xs sm:text-sm">
                 Detailed Analysis and Improvement Suggestions
               </CardDescription>
             </div>
-            <Button variant="outline" onClick={onClose}>
+            <Button variant="outline" onClick={onClose} className="text-xs sm:text-sm py-1 sm:py-2">
               Close
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="flex flex-col md:flex-row gap-6 items-center md:items-stretch">
-            <Card className="border-none shadow-none bg-slate-50 p-6 rounded-lg w-full md:w-1/3">
+        <CardContent className="space-y-4 sm:space-y-6 text-xs sm:text-sm">
+          <div className="flex flex-col md:flex-row gap-4 sm:gap-6 items-center md:items-stretch">
+            <Card className="border-none shadow-none bg-slate-50 p-4 sm:p-6 rounded-lg w-full md:w-1/3">
               <div className="text-center">
-                <h3 className="text-xl font-medium mb-1">
+                <h3 className="text-base sm:text-xl font-medium mb-1">
                   Overall Performance
                 </h3>
-                <div className="relative w-32 h-32 mx-auto my-4">
+                <div className="relative w-24 h-24 sm:w-32 sm:h-32 mx-auto my-3 sm:my-4">
                   <svg className="w-full h-full" viewBox="0 0 100 100">
                     <circle
                       className="text-gray-200 stroke-current"
@@ -590,7 +669,7 @@ const InterviewPrep = () => {
                     <text
                       x="50"
                       y="50"
-                      className="text-3xl font-bold"
+                      className="text-2xl sm:text-3xl font-bold"
                       dominantBaseline="middle"
                       textAnchor="middle"
                     >
@@ -598,7 +677,7 @@ const InterviewPrep = () => {
                     </text>
                   </svg>
                 </div>
-                <p className="text-gray-500">
+                <p className="text-gray-500 text-xs sm:text-sm">
                   {overallScore >= 80
                     ? "Excellent Performance"
                     : overallScore >= 70
@@ -608,66 +687,66 @@ const InterviewPrep = () => {
               </div>
             </Card>
 
-            <div className="w-full md:w-2/3 space-y-4">
-              <h3 className="text-xl font-medium">
+            <div className="w-full md:w-2/3 space-y-3 sm:space-y-4">
+              <h3 className="text-base sm:text-xl font-medium">
                 Key Improvement Areas
               </h3>
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {feedbackAreas
                   .sort((a, b) => a.score - b.score) // Sort by lowest score first
                   .slice(0, 3) // Take top 3 improvement areas
                   .map((area, index) => (
-                    <div key={index} className="flex items-start gap-3">
+                    <div key={index} className="flex items-start gap-2 sm:gap-3">
                       <div className="mt-1">
-                        <CircleHelp className="h-5 w-5 text-primary" />
+                        <CircleHelp className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                       </div>
                       <div>
-                        <h4 className="font-medium capitalize">{area.area}</h4>
-                        <p className="text-sm text-gray-600">{area.details}</p>
+                        <h4 className="font-medium capitalize text-xs sm:text-sm">{area.area}</h4>
+                        <p className="text-xs text-gray-600">{area.details}</p>
                       </div>
                     </div>
                   ))}
               </div>
 
-              <h3 className="text-xl font-medium mt-6">
+              <h3 className="text-base sm:text-xl font-medium mt-4 sm:mt-6">
                 Recommended Next Steps
               </h3>
-              <div className="space-y-3">
-                <div className="flex items-start gap-3">
+              <div className="space-y-2 sm:space-y-3">
+                <div className="flex items-start gap-2 sm:gap-3">
                   <div className="mt-1">
-                    <FileText className="h-5 w-5 text-primary" />
+                    <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                   </div>
                   <div>
-                    <h4 className="font-medium">
+                    <h4 className="font-medium text-xs sm:text-sm">
                       Review Detailed Feedback
                     </h4>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-xs text-gray-600">
                       Analyze Each Area Below
                     </p>
                   </div>
                 </div>
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-2 sm:gap-3">
                   <div className="mt-1">
-                    <Lightbulb className="h-5 w-5 text-primary" />
+                    <Lightbulb className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                   </div>
                   <div>
-                    <h4 className="font-medium">
+                    <h4 className="font-medium text-xs sm:text-sm">
                       Practice Targeted Exercises
                     </h4>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-xs text-gray-600">
                       Focus on Lowest Scoring Areas
                     </p>
                   </div>
                 </div>
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-2 sm:gap-3">
                   <div className="mt-1">
-                    <BookOpen className="h-5 w-5 text-primary" />
+                    <BookOpen className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                   </div>
                   <div>
-                    <h4 className="font-medium">
+                    <h4 className="font-medium text-xs sm:text-sm">
                       Use Recommended Resources
                     </h4>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-xs text-gray-600">
                       Explore Learning Links Below
                     </p>
                   </div>
@@ -679,40 +758,40 @@ const InterviewPrep = () => {
           <Separator />
 
           <div>
-            <h3 className="text-xl font-medium mb-4">
+            <h3 className="text-base sm:text-xl font-medium mb-3 sm:mb-4">
               Detailed Performance Breakdown
             </h3>
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {feedbackAreas.map((area, index) => (
                 <Card key={index} className="border-none shadow-sm">
-                  <CardHeader className="pb-2">
+                  <CardHeader className="py-2 sm:pb-2">
                     <div className="flex justify-between items-center">
-                      <h4 className="text-lg font-medium capitalize">
+                      <h4 className="text-sm sm:text-lg font-medium capitalize">
                         {area.area}
                       </h4>
                       <Badge
-                        className={`${getStatusColor(area.status)} border-none`}
+                        className={`${getStatusColor(area.status)} border-none text-xs`}
                       >
                         {area.score}% - {area.status}
                       </Badge>
                     </div>
                   </CardHeader>
-                  <CardContent className="pt-0">
-                    <p className="text-gray-700 mb-3">{area.details}</p>
+                  <CardContent className="pt-0 text-xs sm:text-sm">
+                    <p className="text-gray-700 mb-2 sm:mb-3">{area.details}</p>
 
-                    <div className="mt-4">
-                      <h5 className="text-sm font-medium flex items-center gap-1 mb-2">
+                    <div className="mt-3 sm:mt-4">
+                      <h5 className="text-xs sm:text-sm font-medium flex items-center gap-1 mb-1 sm:mb-2">
                         <ArrowDown className="h-3 w-3" />
                         Improvement Resources
                       </h5>
-                      <div className="space-y-2">
+                      <div className="space-y-1 sm:space-y-2">
                         {area.resources.map((resource, idx) => (
                           <a
                             key={idx}
                             href={resource.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center text-sm text-primary hover:underline"
+                            className="flex items-center text-xs sm:text-sm text-primary hover:underline"
                           >
                             <ExternalLink className="h-3 w-3 mr-1" />
                             {resource.name}
@@ -728,12 +807,12 @@ const InterviewPrep = () => {
 
           <Separator />
 
-          <div className="rounded-lg bg-blue-50 p-4">
-            <h3 className="text-lg font-medium text-blue-800 mb-2">
+          <div className="rounded-lg bg-blue-50 p-3 sm:p-4">
+            <h3 className="text-base sm:text-lg font-medium text-blue-800 mb-1 sm:mb-2">
               Continue Your Improvement
             </h3>
-            <p className="text-blue-700 mb-3">Schedule Follow Up</p>
-            <Button variant="outline" className="bg-white">
+            <p className="text-blue-700 mb-2 sm:mb-3 text-xs sm:text-sm">Schedule Follow Up</p>
+            <Button variant="outline" className="bg-white text-xs sm:text-sm py-1 sm:py-2">
               Schedule Practice Session
             </Button>
           </div>
@@ -744,27 +823,27 @@ const InterviewPrep = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
             Interview Preparation
           </h1>
-          <p className="text-gray-500 mt-1">{capitalizeFirstLetter(t("practice interview desc"))}</p>
+          <p className="text-sm sm:text-base text-gray-500 mt-1">{capitalizeFirstLetter(t("practice interview desc"))}</p>
         </div>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Customize Interview</CardTitle>
-            <CardDescription>{capitalizeFirstLetter(t("customize interview desc").replace(/_/g, ' '))}</CardDescription>
+          <CardHeader className="py-3 sm:py-4">
+            <CardTitle className="text-lg sm:text-xl">Customize Interview</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">{capitalizeFirstLetter(t("customize interview desc").replace(/_/g, ' '))}</CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="company" className="w-full">
               <TabsList className="grid w-full max-w-md grid-cols-2">
-                <TabsTrigger value="company">Target Company</TabsTrigger>
-                <TabsTrigger value="role">Job Role</TabsTrigger>
+                <TabsTrigger value="company" className="text-xs sm:text-sm">Target Company</TabsTrigger>
+                <TabsTrigger value="role" className="text-xs sm:text-sm">Job Role</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="company" className="mt-4">
+              <TabsContent value="company" className="mt-3 sm:mt-4">
                 <CompanySelector
                   companies={companies}
                   selectedCompany={selectedCompany}
@@ -772,7 +851,7 @@ const InterviewPrep = () => {
                 />
               </TabsContent>
 
-              <TabsContent value="role" className="mt-4">
+              <TabsContent value="role" className="mt-3 sm:mt-4">
                 <RoleSelector
                   roles={roles}
                   selectedRole={selectedRole}
@@ -781,23 +860,23 @@ const InterviewPrep = () => {
               </TabsContent>
             </Tabs>
 
-            <div className="mt-6">
-              <h3 className="font-medium text-gray-800 mb-3">
+            <div className="mt-4 sm:mt-6">
+              <h3 className="font-medium text-gray-800 mb-2 sm:mb-3 text-sm sm:text-base">
                 Selected Options
               </h3>
               <div className="flex flex-wrap gap-2">
                 {selectedCompany && (
-                  <Badge variant="secondary" className="px-3 py-1">
+                  <Badge variant="secondary" className="px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm">
                     {companies.find((c) => c.id === selectedCompany)?.name}
                   </Badge>
                 )}
                 {selectedRole && (
-                  <Badge variant="secondary" className="px-3 py-1">
+                  <Badge variant="secondary" className="px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm">
                     {roles.find((r) => r.id === selectedRole)?.name}
                   </Badge>
                 )}
                 {!selectedCompany && !selectedRole && (
-                  <p className="text-sm text-gray-500">
+                  <p className="text-xs sm:text-sm text-gray-500">
                     No Options Selected
                   </p>
                 )}
@@ -806,24 +885,24 @@ const InterviewPrep = () => {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           {interviewTypes.map((type) => {
             const Icon = type.icon;
             return (
               <Card key={type.id} className="overflow-hidden">
-                <CardHeader className="pb-3">
+                <CardHeader className="pb-2 sm:pb-3">
                   <div className="flex items-center space-x-2 mb-1">
                     <div
-                      className={`p-2 rounded-full ${type.color.split(" ")[0]}`}
+                      className={`p-1.5 sm:p-2 rounded-full ${type.color.split(" ")[0]}`}
                     >
-                      <Icon className={`h-5 w-5 ${type.color.split(" ")[1]}`} />
+                      <Icon className={`h-4 w-4 sm:h-5 sm:w-5 ${type.color.split(" ")[1]}`} />
                     </div>
-                    <CardTitle>{type.title}</CardTitle>
+                    <CardTitle className="text-base sm:text-lg">{type.title}</CardTitle>
                   </div>
-                  <CardDescription>{type.description}</CardDescription>
+                  <CardDescription className="text-xs sm:text-sm">{type.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ul className="space-y-1 text-sm">
+                  <ul className="space-y-1 text-xs sm:text-sm">
                     <li className="flex items-start gap-2">
                       <span className="inline-block w-1 h-1 rounded-full bg-gray-500 mt-2"></span>
                       <span>{capitalizeFirstLetter(t(`${type.id} feature 1`).replace(/_/g, ' '))}</span>
@@ -836,7 +915,7 @@ const InterviewPrep = () => {
                 </CardContent>
                 <CardFooter className="pt-0">
                   <Button
-                    className="w-full"
+                    className="w-full text-xs sm:text-sm py-1 sm:py-2"
                     onClick={() => startAIInterview(type.id)}
                   >
                     Start {type.title}
@@ -851,7 +930,7 @@ const InterviewPrep = () => {
       </div>
 
       {showDetailedReport && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
           <InterviewFeedbackReport
             interview={currentInterview}
             onClose={() => setShowDetailedReport(false)}

@@ -438,10 +438,10 @@ const Reports = () => {
         </div>
 
         <Tabs defaultValue="progress" className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-3">
-            <TabsTrigger value="progress">{capitalizeEachWord(t("progress"))}</TabsTrigger>
-            <TabsTrigger value="candidate">{capitalizeEachWord(t("candidate report"))}</TabsTrigger>
-            <TabsTrigger value="recommendations">
+          <TabsList className="inline-flex h-10 items-center w-full max-w-md mb-4">
+            <TabsTrigger value="progress" className="flex-1">{capitalizeEachWord(t("progress"))}</TabsTrigger>
+            <TabsTrigger value="candidate" className="flex-1">{capitalizeEachWord(t("candidate report"))}</TabsTrigger>
+            <TabsTrigger value="recommendations" className="flex-1">
               {capitalizeEachWord(t("recommendations"))}
             </TabsTrigger>
           </TabsList>

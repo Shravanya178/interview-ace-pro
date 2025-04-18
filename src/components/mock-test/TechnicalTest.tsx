@@ -436,28 +436,30 @@ const TechnicalTest = () => {
               </RadioGroup>
             </div>
           </CardContent>
-          <CardFooter className="flex justify-between gap-4">
-            <Button
-              variant="outline"
-              onClick={() => window.location.href = '/mock-test'}
-              className="w-1/4"
-            >
-              Exit Test
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={skipQuestion}
-              className="w-1/4"
-            >
-              Skip Question
-            </Button>
-            <Button
-              onClick={nextQuestion}
-              disabled={!selectedAnswers[currentQuestion.id]}
-              className="w-2/4"
-            >
-              {currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'Complete Test'}
-            </Button>
+          <CardFooter>
+            <div className="w-full flex flex-col sm:flex-row gap-2">
+              <Button
+                variant="outline"
+                onClick={() => window.location.href = '/mock-test'}
+                className="w-full"
+              >
+                Exit Test
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={skipQuestion}
+                className="w-full"
+              >
+                Skip Question
+              </Button>
+              <Button
+                onClick={nextQuestion}
+                disabled={!selectedAnswers[currentQuestion.id]}
+                className="w-full"
+              >
+                {currentQuestionIndex < questions.length - 1 ? 'Next Question' : 'Complete Test'}
+              </Button>
+            </div>
           </CardFooter>
         </Card>
       </div>

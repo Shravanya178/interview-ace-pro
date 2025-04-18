@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "c6dbbf3a-545e-4b0b-8fd2-254416f30703"
+      }
+    },
+    "android": {
+      "package": "com.khushishukla.prepmate"
+    }
+  }
+}

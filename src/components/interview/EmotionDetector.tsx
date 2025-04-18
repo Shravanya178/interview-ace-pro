@@ -929,11 +929,11 @@ const EmotionDetector: React.FC<EmotionDetectorProps> = ({
   return (
     <Card className="mb-4 overflow-hidden">
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg flex justify-between items-center">
+        <CardTitle className="text-sm sm:text-lg flex justify-between items-center">
           <span>Interview Demeanor Analysis</span>
           {currentEmotion && (
             <span
-              className={`text-sm px-2 py-1 rounded-full text-white ${
+              className={`text-xs sm:text-sm px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-white ${
                 EMOTION_COLORS[
                   currentEmotion.label as keyof typeof EMOTION_COLORS
                 ] || "bg-gray-500"
@@ -944,18 +944,18 @@ const EmotionDetector: React.FC<EmotionDetectorProps> = ({
           )}
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-3">
+      <CardContent className="p-2 sm:p-3">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center h-[240px] bg-gray-100 rounded-md">
-            <Loader2 className="h-8 w-8 animate-spin mb-2 text-primary" />
-            <p className="text-sm text-muted-foreground">Loading camera...</p>
+            <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin mb-2 text-primary" />
+            <p className="text-xs sm:text-sm text-muted-foreground">Loading camera...</p>
           </div>
         ) : error ? (
-          <div className="flex flex-col items-center justify-center h-[240px] bg-red-50 text-red-800 rounded-md p-4">
-            <p className="font-semibold mb-2">Camera Error</p>
-            <p className="text-sm mb-4">{error}</p>
+          <div className="flex flex-col items-center justify-center h-[240px] bg-red-50 text-red-800 rounded-md p-3 sm:p-4">
+            <p className="font-semibold mb-2 text-sm sm:text-base">Camera Error</p>
+            <p className="text-xs sm:text-sm mb-3 sm:mb-4 text-center">{error}</p>
             <button
-              className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+              className="bg-blue-500 hover:bg-blue-600 text-white py-1 sm:py-2 px-3 sm:px-4 rounded text-xs sm:text-sm"
               onClick={() => {
                 setError(null);
                 setupCamera();
@@ -984,7 +984,7 @@ const EmotionDetector: React.FC<EmotionDetectorProps> = ({
               {/* Primary emotion badge with interview-specific styling */}
               {currentEmotion && (
                 <div
-                  className="absolute top-2 right-2 px-3 py-1 rounded-xl text-white text-sm font-medium transition-all duration-150 ease-in-out animate-pulse"
+                  className="absolute top-2 right-2 px-2 sm:px-3 py-0.5 sm:py-1 rounded-xl text-white text-xs sm:text-sm font-medium transition-all duration-150 ease-in-out animate-pulse"
                   style={{
                     backgroundColor:
                       currentEmotion.label === "confident"
@@ -1025,7 +1025,7 @@ const EmotionDetector: React.FC<EmotionDetectorProps> = ({
                   return (
                     <div
                       key={emotion}
-                      className="px-2 py-0.5 rounded-full text-white text-xs font-medium"
+                      className="px-1.5 sm:px-2 py-0.5 rounded-full text-white text-[10px] sm:text-xs font-medium"
                       style={{
                         backgroundColor:
                           emotion === "confident"
@@ -1053,18 +1053,18 @@ const EmotionDetector: React.FC<EmotionDetectorProps> = ({
 
               {/* Show loading overlay when camera not active */}
               {!cameraActive && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/70 text-white">
+                <div className="absolute inset-0 flex items-center justify-center bg-black/70 text-white text-xs sm:text-sm">
                   <p>Starting camera...</p>
                 </div>
               )}
             </div>
 
             {/* Interview-specific emotion metrics */}
-            <div className="mt-4">
-              <h4 className="text-sm font-medium mb-2">
+            <div className="mt-3 sm:mt-4">
+              <h4 className="text-xs sm:text-sm font-medium mb-1 sm:mb-2">
                 Interview Demeanor Metrics
               </h4>
-              <div className="space-y-2">
+              <div className="space-y-1 sm:space-y-2">
                 {EMOTIONS.map((emotion) => {
                   const value = averageEmotions[emotion] || 0;
                   const instantValue =
@@ -1076,8 +1076,8 @@ const EmotionDetector: React.FC<EmotionDetectorProps> = ({
 
                   return (
                     <div key={emotion} className="flex items-center">
-                      <div className="w-24 text-xs capitalize">{emotion}</div>
-                      <div className="flex-1 h-5 bg-gray-100 rounded-full overflow-hidden relative">
+                      <div className="w-16 sm:w-24 text-[10px] sm:text-xs capitalize">{emotion}</div>
+                      <div className="flex-1 h-4 sm:h-5 bg-gray-100 rounded-full overflow-hidden relative">
                         {/* Average emotion level */}
                         <div
                           className={`h-full ${
@@ -1102,7 +1102,7 @@ const EmotionDetector: React.FC<EmotionDetectorProps> = ({
                           }}
                         />
                       </div>
-                      <div className="w-10 text-xs text-right">
+                      <div className="w-8 sm:w-10 text-[10px] sm:text-xs text-right">
                         {(instantValue * 100).toFixed(0)}%
                       </div>
                     </div>
@@ -1112,10 +1112,10 @@ const EmotionDetector: React.FC<EmotionDetectorProps> = ({
             </div>
 
             {/* Interview-specific tips */}
-            <div className="mt-4 p-3 bg-blue-50 rounded-md">
-              <p className="text-xs text-blue-800">
+            <div className="mt-3 sm:mt-4 p-2 sm:p-3 bg-blue-50 rounded-md">
+              <p className="text-[10px] sm:text-xs text-blue-800">
                 <strong>Interview Body Language Tips:</strong>
-                Maintain steady eye contact for confidence, control
+                {' '}Maintain steady eye contact for confidence, control
                 micro-movements to reduce nervousness, lean slightly forward to
                 show engagement, nod occasionally to demonstrate active
                 listening, and take thoughtful pauses before answering difficult

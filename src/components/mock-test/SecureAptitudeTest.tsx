@@ -456,28 +456,32 @@ const SecureAptitudeTest = () => {
             </RadioGroup>
           </div>
         </CardContent>
-        <CardFooter className="flex justify-between gap-4">
-          <Button
-            variant="outline"
-            onClick={handleExitTest}
-            className="w-1/4"
-          >
-            Exit Test
-          </Button>
-          <Button
-            variant="secondary"
-            onClick={handleSkipQuestion}
-            className="w-1/4"
-          >
-            Skip Question
-          </Button>
-          <Button
-            onClick={handleNextQuestion}
-            disabled={selectedAnswers[currentQuestion.id] === undefined}
-            className="w-2/4"
-          >
-            {currentQuestionIndex < shuffledQuestions.length - 1 ? 'Next Question' : 'Complete Test'}
-          </Button>
+        <CardFooter>
+          <div className="w-full flex flex-col gap-2">
+            <div className="flex flex-col sm:flex-row gap-2 w-full">
+              <Button
+                variant="outline"
+                onClick={handleExitTest}
+                className="w-full"
+              >
+                Exit Test
+              </Button>
+              <Button
+                onClick={handleNextQuestion}
+                disabled={selectedAnswers[currentQuestion.id] === undefined}
+                className="w-full"
+              >
+                {currentQuestionIndex < shuffledQuestions.length - 1 ? 'Next Question' : 'Complete Test'}
+              </Button>
+            </div>
+            <Button
+              variant="secondary"
+              onClick={handleSkipQuestion}
+              className="w-full"
+            >
+              Skip Question
+            </Button>
+          </div>
         </CardFooter>
       </Card>
     </div>

@@ -2061,9 +2061,9 @@ const AIInterviewSimulator = () => {
                 </div>
               )}
               
-              <div className="flex justify-between pt-4">
+              <div className="flex flex-col sm:flex-row justify-between gap-2 pt-4">
                 <Button variant="outline" onClick={goBackToPrep}>
-                  Return to Interview Prep
+                  Return to Interview Preparation
                 </Button>
                 <Button>
                   Download Interview Report
@@ -2222,12 +2222,12 @@ const AIInterviewSimulator = () => {
   
   // Render active interview screen
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">PrepMate</h1>
+    <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
+      <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">PrepMate</h1>
       
       {/* Debug overlay */}
       {showDebug && (
-        <div className="fixed bottom-4 right-4 bg-black bg-opacity-80 text-white p-4 rounded-lg z-50 max-w-lg max-h-80 overflow-auto text-xs">
+        <div className="fixed bottom-4 right-4 bg-black bg-opacity-80 text-white p-4 rounded-lg z-50 max-w-full sm:max-w-lg max-h-80 overflow-auto text-xs">
           <div className="flex justify-between items-center mb-2">
             <h3 className="font-bold">Debug Information</h3>
             <button 
@@ -2239,7 +2239,7 @@ const AIInterviewSimulator = () => {
           </div>
 
           <div className="space-y-1">
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div>
                 <p className="font-semibold mb-1">Status</p>
                 <p>Interview Started: <span className={isInterviewStarted ? "text-green-400" : "text-red-400"}>{isInterviewStarted ? 'Yes' : 'No'}</span></p>
@@ -2300,7 +2300,7 @@ const AIInterviewSimulator = () => {
         D
       </button>
       
-      <div className="grid gap-4 md:grid-cols-3 h-[calc(100vh-150px)]">
+      <div className="grid gap-4 grid-cols-1 lg:grid-cols-3 h-auto lg:h-[calc(100vh-150px)]">
         {/* Left column - Video and controls */}
         <div className="space-y-4">
           <div className="bg-yellow-50 border border-yellow-200 p-3 rounded-md mb-4">
@@ -2331,21 +2331,21 @@ const AIInterviewSimulator = () => {
               Try Direct Camera Access
             </button>
           </div>
-          <Card className="h-[70vh]">
+          <Card className="h-auto lg:h-[70vh]">
             <CardHeader className="pb-2">
-              <CardTitle className="flex justify-between items-center">
+              <CardTitle className="text-base sm:text-lg flex justify-between items-center">
                 <span>Video Feed</span>
-                <span className="text-sm text-red-500 font-normal animate-pulse">
+                <span className="text-xs sm:text-sm text-red-500 font-normal animate-pulse">
                   Recording
                 </span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="flex flex-col items-center justify-center h-[calc(100%-70px)]">
+            <CardContent className="flex flex-col items-center justify-center h-[240px] sm:h-[320px] lg:h-[calc(100%-70px)]">
               <div className="relative w-full h-full flex items-center justify-center bg-gray-900 rounded-md overflow-hidden">
                 {isVideoOff ? (
                   <div className="flex flex-col items-center justify-center text-gray-400">
-                    <Video className="w-16 h-16 mb-2" />
-                    <span>Camera is off</span>
+                    <Video className="w-12 h-12 sm:w-16 sm:h-16 mb-2" />
+                    <span className="text-sm sm:text-base">Camera is off</span>
                   </div>
                 ) : (
                   <div className="relative w-full h-full">
@@ -2360,7 +2360,7 @@ const AIInterviewSimulator = () => {
                 )}
                 
                 {/* Timer overlay */}
-                <div className="absolute top-2 right-2 bg-gray-800 bg-opacity-75 text-white px-3 py-1 rounded-full">
+                <div className="absolute top-2 right-2 bg-gray-800 bg-opacity-75 text-white px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm">
                   {formatTime(timer)}
                 </div>
               </div>
@@ -2369,8 +2369,8 @@ const AIInterviewSimulator = () => {
           
           {/* Controls */}
           <Card>
-            <CardContent className="pt-4">
-              <div className="flex justify-center space-x-4">
+            <CardContent className="pt-3 sm:pt-4">
+              <div className="flex justify-center space-x-3 sm:space-x-4">
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -2384,7 +2384,7 @@ const AIInterviewSimulator = () => {
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>{isMicMuted ? "Unmute" : "Mute"}</p>
+                      <p className="text-xs sm:text-sm">{isMicMuted ? "Unmute" : "Mute"}</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -2402,7 +2402,7 @@ const AIInterviewSimulator = () => {
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>{isVideoOff ? "Turn on camera" : "Turn off camera"}</p>
+                      <p className="text-xs sm:text-sm">{isVideoOff ? "Turn on camera" : "Turn off camera"}</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -2420,7 +2420,7 @@ const AIInterviewSimulator = () => {
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>{isSpeakingEnabled ? "Disable AI voice" : "Enable AI voice"}</p>
+                      <p className="text-xs sm:text-sm">{isSpeakingEnabled ? "Disable AI voice" : "Enable AI voice"}</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -2437,25 +2437,25 @@ const AIInterviewSimulator = () => {
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>End Interview</p>
+                      <p className="text-xs sm:text-sm">End Interview</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
               </div>
               
               {/* Speech recognition status */}
-              <div className="mt-4 text-center">
+              <div className="mt-3 sm:mt-4 text-center">
                 {isListening ? (
-                  <div className="flex items-center justify-center text-green-600">
+                  <div className="flex items-center justify-center text-green-600 text-xs sm:text-sm">
                     <span className="mr-2">Listening</span>
                     <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-green-600 rounded-full animate-pulse"></div>
-                      <div className="w-2 h-2 bg-green-600 rounded-full animate-pulse delay-75"></div>
-                      <div className="w-2 h-2 bg-green-600 rounded-full animate-pulse delay-150"></div>
+                      <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-600 rounded-full animate-pulse"></div>
+                      <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-600 rounded-full animate-pulse delay-75"></div>
+                      <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-600 rounded-full animate-pulse delay-150"></div>
                     </div>
                   </div>
                 ) : (
-                  <span className="text-gray-500">Microphone {isMicMuted ? "muted" : "not active"}</span>
+                  <span className="text-gray-500 text-xs sm:text-sm">Microphone {isMicMuted ? "muted" : "not active"}</span>
                 )}
               </div>
             </CardContent>
@@ -2463,24 +2463,24 @@ const AIInterviewSimulator = () => {
         </div>
         
         {/* Center column - AI responses */}
-        <div>
-          <Card className="h-full">
-            <CardHeader>
-              <CardTitle>AI Interviewer</CardTitle>
+        <div className="lg:block">
+          <Card className="h-full min-h-[240px]">
+            <CardHeader className="pb-2 sm:pb-3">
+              <CardTitle className="text-base sm:text-lg">AI Interviewer</CardTitle>
             </CardHeader>
-            <CardContent className="h-[calc(100%-80px)] flex flex-col">
-              <div className="bg-gray-100 p-4 rounded-md mb-4 flex-grow overflow-y-auto">
+            <CardContent className="h-[240px] sm:h-[320px] lg:h-[calc(100%-60px)] flex flex-col">
+              <div className="bg-gray-100 p-3 sm:p-4 rounded-md mb-3 sm:mb-4 flex-grow overflow-y-auto">
                 {aiResponding ? (
                   <div className="flex items-center">
-                    <span className="mr-2">AI is thinking</span>
+                    <span className="mr-2 text-xs sm:text-sm">AI is thinking</span>
                     <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
-                      <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse delay-75"></div>
-                      <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse delay-150"></div>
+                      <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-600 rounded-full animate-pulse"></div>
+                      <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-600 rounded-full animate-pulse delay-75"></div>
+                      <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-600 rounded-full animate-pulse delay-150"></div>
                     </div>
                   </div>
                 ) : (
-                  <p>{aiResponse}</p>
+                  <p className="text-xs sm:text-sm">{aiResponse}</p>
                 )}
               </div>
             </CardContent>
@@ -2489,41 +2489,42 @@ const AIInterviewSimulator = () => {
         
         {/* Right column - User responses */}
         <div>
-          <Card className="h-full">
-            <CardHeader>
-              <CardTitle>Your Response</CardTitle>
+          <Card className="h-full min-h-[240px]">
+            <CardHeader className="pb-2 sm:pb-3">
+              <CardTitle className="text-base sm:text-lg">Your Response</CardTitle>
             </CardHeader>
-            <CardContent className="h-[calc(100%-80px)] flex flex-col">
-              <div className="bg-gray-100 p-4 rounded-md flex-grow overflow-y-auto mb-4">
+            <CardContent className="h-[240px] sm:h-[320px] lg:h-[calc(100%-60px)] flex flex-col">
+              <div className="bg-gray-100 p-3 sm:p-4 rounded-md flex-grow overflow-y-auto mb-3 sm:mb-4">
                 {isListening ? (
                   <div>
-                    <p className="text-sm text-green-600 mb-2">Listening... (speak your answer)</p>
-                    <p>{transcript || "Your speech will appear here as you speak..."}</p>
+                    <p className="text-xs sm:text-sm text-green-600 mb-2">Listening... (speak your answer)</p>
+                    <p className="text-xs sm:text-sm">{transcript || "Your speech will appear here as you speak..."}</p>
                   </div>
                 ) : (
                   <Textarea
                     value={userResponse}
                     onChange={(e) => setUserResponse(e.target.value)}
                     placeholder="Type your answer or use the microphone to speak..."
-                    className="min-h-[200px] border-none bg-transparent focus-visible:ring-0"
+                    className="min-h-[100px] sm:min-h-[200px] border-none bg-transparent focus-visible:ring-0 text-xs sm:text-sm"
                   />
                 )}
               </div>
               
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Button 
                   onClick={toggleListening} 
                   variant={isListening ? "destructive" : "default"}
-                  className="flex-1"
+                  className="w-full text-xs sm:text-sm h-8 sm:h-10"
+                  size="sm"
                 >
                   {isListening ? (
                     <>
-                      <Square className="mr-2 h-4 w-4" />
+                      <Square className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                       Stop Recording
                     </>
                   ) : (
                     <>
-                      <Mic className="mr-2 h-4 w-4" />
+                      <Mic className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                       Start Recording
                     </>
                   )}
@@ -2532,19 +2533,21 @@ const AIInterviewSimulator = () => {
                 <Button 
                   onClick={submitResponse}
                   variant="default"
-                  className="flex-1"
+                  className="w-full text-xs sm:text-sm h-8 sm:h-10"
                   disabled={!userResponse.trim() || aiResponding}
+                  size="sm"
                 >
                   Submit Answer
                 </Button>
                 
                 <Button 
                   onClick={nextQuestion} 
-                  className="flex-1"
+                  className="w-full text-xs sm:text-sm h-8 sm:h-10"
                   disabled={interviewEnded || aiResponding}
+                  size="sm"
                 >
-                  Next Question
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  Next
+                  <ArrowRight className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4" />
                 </Button>
               </div>
             </CardContent>
